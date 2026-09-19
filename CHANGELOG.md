@@ -89,7 +89,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   conditional source, tied to the source's pinned digest, and deviations that
   expire within 180 days, or 90 for a vulnerability. `scripts/check-profile.py`
   checks it; `check-component.py --profile` honours active deviations.
-  Proposed [ADR-0005](docs/adr/0005-tailor-by-profile-deviations-expire.md).
+  Recorded [ADR-0005](docs/adr/0005-tailor-by-profile-deviations-expire.md).
 
 ### Fixed
 
