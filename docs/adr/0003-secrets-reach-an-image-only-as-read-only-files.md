@@ -103,5 +103,8 @@ an `fsGroup` for exactly that reason. Building the reference image found it:
 its TLS key, mounted owner-only, was unreadable to the server.
 
 The rule is now: not writable by the runtime identity, not world-readable, and
-readable by no group other than the runtime group. The decision itself, files
-and never the environment, is unchanged.
+readable by no group the runtime process does not belong to. Under Podman that
+group is the process's primary group 0; under Kubernetes it is the pod's
+`fsGroup`, which the platform adds to the process's supplementary groups. Both
+are shown in [IMG-16](../standard/criteria.md#group-read-by-example). The
+decision itself, files and never the environment, is unchanged.

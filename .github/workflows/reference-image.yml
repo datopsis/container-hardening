@@ -54,6 +54,14 @@ jobs:
         working-directory: .
         run: python scripts/check-profile.py examples/reference-web-server/hardening-profile.json
 
+      # The tools that judge the image are pinned and verified like its inputs.
+      - name: Install the pinned scanning tools
+        run: python scripts/install_tools.py "$RUNNER_TEMP/tools"
+
+      # Before the build, as IMG-34 requires.
+      - name: Scan the source for secrets, dependencies, and build-definition issues
+        run: python tests/gates.py source --bin "$RUNNER_TEMP/tools" --evidence evidence
+
       # The only step with network access to inputs. It verifies every one
       # against the lock before the build ever sees it.
       - name: Retrieve and verify inputs
@@ -69,6 +77,13 @@ jobs:
         env:
           REVISION: ${{ github.sha }}
         run: python tests/smoke.py localhost/reference-web-server:ci --revision "$REVISION" --evidence evidence/smoke.json
+
+      - name: Generate the bill of materials and run the vulnerability and malware gates
+        run: python tests/gates.py image localhost/reference-web-server:ci --bundle "$RUNNER_TEMP/bundle" --bin "$RUNNER_TEMP/tools" --evidence evidence
+
+      # A base more than 30 days behind its publisher stops the image (IMG-29).
+      - name: Check the inputs are current
+        run: python scripts/drift.py --enforce --report evidence/drift.json
 
       - name: Keep the evidence
         if: always()

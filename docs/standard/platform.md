@@ -121,8 +121,10 @@ runtime supports one.
 ### PLT-06 Secrets are delivered as read-only files
 
 Secrets and trust material come from a secret store and are mounted into the
-container read-only, readable only by the container's user or its group, and
-never by others. They are never
+container read-only, readable only by the container's user or a group it
+belongs to, and never by others: on Kubernetes, `defaultMode: 0440` with the
+pod's `fsGroup`, since the default mode is world-readable (see
+[group read, by example](criteria.md#group-read-by-example)). They are never
 injected as environment variables. The secret store encrypts them at rest and
 in transit with FIPS 140 approved algorithms in a validated module, and
 provides each secret only to the workloads that require it.

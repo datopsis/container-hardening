@@ -60,6 +60,12 @@ def in_builder(lock: dict, work: Path, script: str) -> None:
         "bash", "-euo", "pipefail", "-c", script)
 
 
+def enable(lock: dict, options: str = "") -> str:
+    """The shell prefix that enables the locked module streams, if any."""
+    streams = " ".join(lock.get("modules", []))
+    return ("dnf -q -y " + options + "module enable " + streams + " >/dev/null && ") if streams else ""
+
+
 def export_runtime(lock: dict, work: Path) -> None:
     container = run("podman", "create", reference(lock["bases"]["runtime"]), capture=True).strip()
     try:
@@ -76,7 +82,8 @@ def fetch(lock: dict, bundle: Path) -> int:
         work = Path(scratch)
         (work / "rpms").mkdir()
         nevras = " ".join(p["nevra"] for p in lock["rpms"])
-        in_builder(lock, work, "dnf -q download --destdir=/work/rpms " + nevras)
+        # A package from a module stream is hidden until its stream is enabled.
+        in_builder(lock, work, enable(lock) + "dnf -q download --destdir=/work/rpms " + nevras)
         problems = []
         for package in lock["rpms"]:
             path = work / "rpms" / package["file"]
@@ -105,6 +112,7 @@ def refresh(lock: dict) -> int:
         export_runtime(lock, work)
         in_builder(lock, work, (
             "mkdir /r && tar -xf /work/runtime.tar -C /r && "
+            + enable(lock, "--installroot=/r --releasever=9 --setopt=reposdir=/etc/yum.repos.d ") +
             "dnf -q -y --installroot=/r --releasever=9 --setopt=reposdir=/etc/yum.repos.d "
             "--setopt=install_weak_deps=False --nodocs --downloadonly --downloaddir=/work/rpms install "
             + " ".join(lock["install"]) + " && "
