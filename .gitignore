@@ -1,0 +1,24 @@
+# Extracted DISA SRG and STIG packages.
+#
+# These are US Government works whose packages state their own redistribution
+# terms, and they are large binary-heavy trees. The repository records their
+# identity by digest in artifacts/sources.json and commits the *generated*
+# Markdown, never the source package.
+#
+# Put extracted packages either at the repository root or under sources/.
+U_*_SRG/
+U_*_STIG/
+sources/
+*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,44 @@
+# Architecture decision records
+
+Each record captures one accepted decision, the problem it answered, the
+options weighed, and what the project gave up in exchange.
+
+## Conventions
+
+Records are numbered sequentially from `0001`. **A number is permanent.** A
+decision that is later reversed is not deleted or renumbered: its record is
+marked `superseded` and names the record that replaced it, so the reasoning
+behind the original choice survives the choice itself.
+
+The file name is `NNNN-short-slug.md`. Every record carries frontmatter with
+`status`, `date`, and `decision-makers`, and the sections in
+[`0000-template.md`](0000-template.md).
+
+`status` is one of:
+
+| Status | Meaning |
+| --- | --- |
+| `proposed` | Written, not yet accepted |
+| `accepted` | In force |
+| `superseded` | Replaced; names the superseding record |
+| `deprecated` | No longer applies, with nothing replacing it |
+
+The `date` is the date the decision was accepted, not the date the record was
+written. The records below were written after the fact, so their dates are the
+dates the decisions actually took effect in the repository.
+
+## What belongs here
+
+A decision belongs in an ADR when reversing it would be expensive, when it
+gave up something a reader would otherwise expect to have, or when the
+reasoning is not recoverable from the code. A decision that is obvious from
+reading the configuration does not need a record.
+
+Where a decision is also enforced — by a test, a CI gate, or a lint rule — the
+record says so, because an unenforced decision decays quietly.
+
+## Index
+
+| # | Decision | Status |
+| --- | --- | --- |
+| [0001](0001-render-catalogues-never-commit-packages.md) | Render requirement catalogues to Markdown and never commit the source packages | accepted |
