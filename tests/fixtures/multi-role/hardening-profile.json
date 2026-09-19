@@ -2,7 +2,7 @@
   "schema_version": 2,
   "image": "multi-role-example",
   "standard": {
-    "revision": "30757690911b52f715f2b9d140bb97837c646693"
+    "revision": "dffdd403d2dfeda7296768e5bcf6393dc2803ab2"
   },
   "function": "A fixture for the conformance self-test: an image with a server and a worker role, run standalone and clustered. It is the reference image's profile with roles and topologies declared, and nothing is built from it.",
   "architectures": [
