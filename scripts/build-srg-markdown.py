@@ -18,7 +18,9 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import html
+import json
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -27,6 +29,7 @@ from pathlib import Path
 
 REPOSITORY = Path(__file__).resolve().parent.parent
 OUTPUT = REPOSITORY / "docs" / "srg"
+REGISTER = REPOSITORY / "artifacts" / "sources.json"
 XCCDF = "{http://checklists.nist.gov/xccdf/1.1}"
 CCI_SYSTEM = "http://cyber.mil/cci"
 
@@ -263,11 +266,45 @@ def catalogue_index(catalogues: list[Catalogue]) -> str:
 
 
 def discover() -> list[Path]:
+    """Find every extracted XCCDF whose digest the register pins.
+
+    A package that is present but not pinned is skipped, not rendered: the
+    weekly verification extracts every pinned package, including those not
+    yet rendered, and rendering is a decision recorded in the register rather
+    than a side effect of what happens to be on disk. A pinned XCCDF whose
+    digest differs is refused outright.
+    """
+    register = json.loads(REGISTER.read_text(encoding="utf-8"))
+    pins = {
+        s["xccdf"]["file"]: s["xccdf"]["sha256"]
+        for s in register["sources"]
+        if s.get("xccdf")
+    }
+
     found: list[Path] = []
     for root in SEARCH_ROOTS:
         if root.is_dir():
             found.extend(sorted(root.glob("U_*/**/*Manual-xccdf.xml")))
-    return found
+
+    selected: list[Path] = []
+    for path in found:
+        expected = pins.get(path.name)
+        if expected is None:
+            print(
+                "  skipped  " + path.name + " (its XCCDF is not pinned in the register)",
+                file=sys.stderr,
+            )
+            continue
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        if digest != expected:
+            raise SystemExit(
+                path.name + " does not match its pinned digest\n"
+                "  pinned   " + expected + "\n"
+                "  actual   " + digest + "\n"
+                "A replaced release is a finding to review, not a digest to update."
+            )
+        selected.append(path)
+    return selected
 
 
 def render(catalogues: list[Catalogue]) -> dict[Path, str]:
@@ -301,9 +338,10 @@ def main() -> int:
     sources = discover()
     if not sources:
         print(
-            "No SRG or STIG package found.\n"
+            "No pinned SRG or STIG package found.\n"
             "Extract a DISA package into the repository root or sources/.\n"
-            "Expected a directory matching U_*/ containing *Manual-xccdf.xml.\n"
+            "Expected a directory matching U_*/ containing *Manual-xccdf.xml\n"
+            "whose XCCDF digest is pinned in artifacts/sources.json.\n"
             "See docs/SOURCES.md for which packages this repository uses.",
             file=sys.stderr,
         )

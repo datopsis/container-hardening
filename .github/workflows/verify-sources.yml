@@ -1,8 +1,8 @@
 name: Verify sources
 
 # Retrieves each pinned source, checks it still matches its recorded digest,
-# and regenerates the catalogues to confirm the committed Markdown is what the
-# packages actually produce.
+# and regenerates the catalogues and the CCI crosswalk to confirm what is
+# committed is what the pinned sources actually produce.
 #
 # This is the check that makes the pinning meaningful. Without it, "pinned by
 # digest" means only that a digest was recorded once.
@@ -45,6 +45,9 @@ jobs:
 
       - name: Check the rendered catalogues match the packages
         run: python scripts/build-srg-markdown.py --check
+
+      - name: Check the crosswalk matches the CCI list and catalogue
+        run: python scripts/build-cci-crosswalk.py --check
 
       - name: Report a drifted or replaced source
         if: failure()

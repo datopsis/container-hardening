@@ -64,6 +64,7 @@ from, and that is the one a reviewer needs to reproduce the output.
 | `process-guide` | Prose guidance; informs the standard, produces no rules |
 | `conditional` | Applies only to images of a particular function |
 | `cross-reference` | Cited by identifier only |
+| `crosswalk` | Joins other sources; produces no rules of its own |
 | `not-applicable` | Assessed and ruled out, with the basis recorded |
 
 A `not-applicable` determination is a claim in its own right. It must record
@@ -77,9 +78,36 @@ python scripts/build-srg-markdown.py --check    # fail if committed output is st
 ```
 
 The generator discovers any `U_*/**/*Manual-xccdf.xml` under the repository
-root or `sources/`. It removes pages whose rule no longer exists, so a release
+root or `sources/` **whose XCCDF digest is pinned in the register**. A package
+that is present but not pinned is skipped, and a pinned one that does not
+match is refused. Rendering a new catalogue therefore starts by recording its
+XCCDF digest, which is the decision; the rendering follows from it. It removes pages whose rule no longer exists, so a release
 upgrade produces a diff of exactly what changed.
 
 It will refuse to run rather than overwrite a rule page if two rules share a
 Group ID. Rules are filed by Group ID because the STIG ID is not unique — GPOS
 V3R3 issues `SRG-OS-000132-GPOS-00067` as both `V-203655` and `V-278973`.
+
+## The CCI crosswalk
+
+Every SRG rule cites one or more CCIs, and the DISA CCI list maps each to NIST
+SP 800-53 Rev 5. [`docs/crosswalk/`](crosswalk/README.md) is the join of the
+two, resolved against the pinned OSCAL catalogue and High baseline; the
+machine-readable form is `artifacts/crosswalk.json`. See
+[ADR-0002](adr/0002-derive-800-53-cross-references-from-cci.md).
+
+```sh
+python scripts/verify-sources.py --fetch sources/   # retrieve every pinned input
+python scripts/build-cci-crosswalk.py               # regenerate the crosswalk
+python scripts/build-cci-crosswalk.py --check       # fail if committed output is stale
+```
+
+The CCI list is `U_CCI_List.zip` at an **unversioned URL**, which DISA replaces
+in place. Its register entry records the package digest and, under `input`,
+the digest of the `U_CCI_List.xml` the generator reads. The weekly verification
+is the only thing that notices a replacement.
+
+The generator refuses to run against an input that does not match its pin, a
+CCI the list does not define, or a control the catalogue lacks or has
+withdrawn. Deprecated CCIs and CCIs with no Rev 5 reference are listed as
+findings on the crosswalk index rather than dropped.

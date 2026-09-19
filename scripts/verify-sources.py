@@ -13,7 +13,7 @@ Unreachable is not the same as unchanged, and is reported separately.
 
 Usage:
     python scripts/verify-sources.py                 # verify digests only
-    python scripts/verify-sources.py --fetch DIR     # also extract for rendering
+    python scripts/verify-sources.py --fetch DIR     # also keep them for rendering
 """
 
 from __future__ import annotations
@@ -79,13 +79,16 @@ def verify(source: dict, extract_to: Path | None) -> Result:
             f"      size     recorded {source['size']}, served {len(payload)}",
         )
 
-    if extract_to is not None and source["url"].endswith(".zip"):
+    if extract_to is not None:
         extract_to.mkdir(parents=True, exist_ok=True)
-        archive = extract_to / Path(source["url"]).name
-        archive.write_bytes(payload)
-        with zipfile.ZipFile(archive) as bundle:
-            bundle.extractall(extract_to)
-        archive.unlink()
+        retrieved = extract_to / Path(source["url"]).name
+        retrieved.write_bytes(payload)
+        # A zip is extracted for the renderers; anything else, such as the
+        # OSCAL catalogue the crosswalk resolves controls against, is kept.
+        if retrieved.suffix == ".zip":
+            with zipfile.ZipFile(retrieved) as bundle:
+                bundle.extractall(extract_to)
+            retrieved.unlink()
 
     return Result(identifier, "match", f"{len(payload)} bytes")
 
@@ -95,8 +98,8 @@ def main() -> int:
     parser.add_argument(
         "--fetch",
         metavar="DIR",
-        help="extract verified zip packages into DIR so the catalogues can be "
-             "regenerated and compared",
+        help="keep verified sources in DIR, extracting zip packages, so the "
+             "catalogues and crosswalk can be regenerated and compared",
     )
     args = parser.parse_args()
 

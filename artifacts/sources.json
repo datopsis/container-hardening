@@ -40,6 +40,29 @@
       "notes": "Selects 370 controls: 188 base and 182 enhancements."
     },
     {
+      "id": "disa-cci-list",
+      "publisher": "Defense Information Systems Agency",
+      "title": "Control Correlation Identifier (CCI) List",
+      "release": "2025-01-23",
+      "released_on": "2025-01-23",
+      "retrieved_on": "2026-09-18",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_CCI_List.zip",
+      "sha256": "077cbb6d2ae5f8fdbaaf416d87a34a8621767cdba490f3283feb0c5c35892700",
+      "size": 417323,
+      "xccdf": null,
+      "input": {
+        "file": "U_CCI_List.xml",
+        "sha256": "a9e3850f7f30665170c377839abea2fd94863019e434cb27b3f6b2d5e277f403",
+        "items": 5137
+      },
+      "rendered": null,
+      "status": "pinned",
+      "role": "crosswalk",
+      "license": "US Government work; redistribution terms stated in the package",
+      "redistributable": false,
+      "notes": "Maps each CCI to NIST SP 800-53 Rev 5, which is what makes SRG-to-800-53 cross-references derivable: every SRG rule cites CCIs. Not rendered; it is an input to scripts/build-cci-crosswalk.py, and input records the digest of the XML that script reads. The URL carries no release, so DISA replaces the list in place; the weekly verification is what makes a replacement visible. 5137 items, 91 deprecated, 3838 Rev 5 references. Every CCI cited by the rendered Container Platform and GPOS SRGs resolves, is current, and carries a Rev 5 reference to a control present and not withdrawn in 800-53 5.2.0."
+    },
+    {
       "id": "disa-container-platform-srg",
       "publisher": "Defense Information Systems Agency",
       "title": "Container Platform Security Requirements Guide",

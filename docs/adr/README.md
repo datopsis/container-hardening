@@ -42,3 +42,4 @@ record says so, because an unenforced decision decays quietly.
 | # | Decision | Status |
 | --- | --- | --- |
 | [0001](0001-render-catalogues-never-commit-packages.md) | Render requirement catalogues to Markdown and never commit the source packages | accepted |
+| [0002](0002-derive-800-53-cross-references-from-cci.md) | Derive SRG-to-800-53 cross-references from the DISA CCI list | accepted |

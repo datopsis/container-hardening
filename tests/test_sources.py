@@ -29,6 +29,7 @@ ROLES = {
     "process-guide",
     "conditional",
     "cross-reference",
+    "crosswalk",
     "not-applicable",
 }
 REQUIRED = (

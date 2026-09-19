@@ -11,6 +11,14 @@ U_*_STIG/
 sources/
 *.zip
 
+# The CCI list and the NIST OSCAL files, should they be extracted or saved at
+# the root rather than under sources/. The CCI list zip has no directory.
+U_CCI_List/
+U_CCI_List.*
+cci2html.xsl
+README.TXT
+NIST_SP-800-53_*.json
+
 # Python
 __pycache__/
 *.py[cod]

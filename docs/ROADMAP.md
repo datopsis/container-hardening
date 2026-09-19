@@ -54,6 +54,7 @@ revision and a replaced package is visible rather than silent.
 | --- | --- | --- | --- |
 | NIST SP 800-53 Rev 5 catalogue | 5.2.0 | Spine | n/a |
 | NIST SP 800-53 Rev 5 High baseline | 5.2.0 | Baseline | n/a |
+| DISA CCI list | 2025-01-23 | Crosswalk | [Joined, 106 controls](crosswalk/README.md) |
 | DISA Container Platform SRG | V2R4 | Platform controls | Yes, 188 rules |
 | DISA GPOS SRG | V3R3 | **Image controls** | Yes, 203 rules |
 | DoD DevSecOps Enterprise Container Hardening Guide | 1.2 | Process guide | n/a, prose |
@@ -120,11 +121,6 @@ an omission from it.
   requirement identifier the adopting product actually states. This is what
   stops a control asserting an obligation nobody committed to, and it is the
   part most worth carrying.
-- [ ] **Generate SRG-to-800-53 cross-references from CCI.** Every SRG rule
-  carries `<ident system="http://cyber.mil/cci">` values, and DISA publishes the
-  CCI list mapping those to 800-53 controls. That makes the cross-reference
-  derivable rather than hand-authored — the single highest-leverage item here.
-  Retrieve and pin `U_CCI_List.zip`, then generate the mapping.
 - [ ] Decide where the control spine lives: in this standard, in each image
   repository, or generated into each from here. This decision shapes every
   adopting repository and should be an ADR.
@@ -164,10 +160,16 @@ an omission from it.
   Markdown file per rule, with `--check` for drift. 391 rules across two
   catalogues render today.
 - `docs/srg/` holds the generated Container Platform SRG V2R4 and GPOS SRG V3R3.
-- `artifacts/sources.json` pins nine sources by digest, recording for each its
+- `artifacts/sources.json` pins ten sources by digest, recording for each its
   role, whether it has been rendered, and whether it may be redistributed. All
-  eight retrievable sources were verified against their recorded digests on
+  nine retrievable sources were verified against their recorded digests on
   2026-09-18.
+- `scripts/build-cci-crosswalk.py` joins every rendered rule's CCIs to 800-53
+  Rev 5 through the pinned DISA CCI list, resolved against the pinned OSCAL
+  catalogue. `docs/crosswalk/` and `artifacts/crosswalk.json` hold the result:
+  the Container Platform SRG reaches 80 controls and the GPOS SRG 97, 106
+  distinct. Every cited CCI resolved, and none was deprecated or unmapped. See
+  [ADR-0002](adr/0002-derive-800-53-cross-references-from-cci.md).
 - `scripts/verify-sources.py` re-verifies those digests and never edits the
   register: a replaced release is a finding to read, not a digest to update.
   It reports unreachable separately from changed, because reaching nothing says

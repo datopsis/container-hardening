@@ -16,7 +16,8 @@ reinvented per application.
 | | |
 | --- | --- |
 | [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 391 rules today. |
-| [Source register](artifacts/sources.json) | Nine sources pinned by SHA-256, with role, rendering state, and redistribution terms. |
+| [SRG to 800-53 crosswalk](docs/crosswalk/README.md) | Every rendered rule joined to NIST SP 800-53 Rev 5 through its CCIs. Derived, not hand-authored. |
+| [Source register](artifacts/sources.json) | Ten sources pinned by SHA-256, with role, rendering state, and redistribution terms. |
 | [Sources guide](docs/SOURCES.md) | How to obtain a package and regenerate the catalogue. |
 | [Roadmap](docs/ROADMAP.md) | What this repository is, and what remains. |
 | [Decisions](docs/adr/README.md) | Decisions that are expensive to reverse. |
@@ -46,6 +47,7 @@ package, and they are large binary-heavy trees. The repository commits the
 # Extract a DISA package into the repository root or sources/, then:
 python scripts/build-srg-markdown.py            # regenerate docs/srg/
 python scripts/build-srg-markdown.py --check    # fail if committed output is stale
+python scripts/build-cci-crosswalk.py           # regenerate the 800-53 crosswalk
 ```
 
 One file per rule is deliberate. When DISA publishes a new release the diff
