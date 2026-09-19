@@ -50,7 +50,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   DISA Container Hardening Process Guide; and a dated conformance snapshot of
   the five image repositories. `tests/test_standard.py` checks every citation
   against the crosswalk.
-- Proposed [ADR-0003](docs/adr/0003-secrets-reach-an-image-only-as-read-only-files.md):
+- Recorded [ADR-0003](docs/adr/0003-secrets-reach-an-image-only-as-read-only-files.md):
   secrets reach an image only as read-only files.
 
 ### Fixed

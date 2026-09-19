@@ -93,9 +93,6 @@ an omission from it.
 
 ## Package 2: the hardening standard
 
-- [ ] Accept or amend [ADR-0003](adr/0003-secrets-reach-an-image-only-as-read-only-files.md),
-  secrets only as read-only files. It is proposed, and it breaks
-  compatibility for `lakekeeper-ubi` and `clickhouse-ubi`.
 - [ ] Agree a GPOS-derived OpenSCAP rule selection, so that
   [IMG-T3](standard/criteria.md#img-t3-compliance-scan) can become required.
   `clickhouse-ubi` and `postgresql-ubi` currently scan against different ones.
