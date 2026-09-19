@@ -56,6 +56,12 @@ def main() -> int:
     expected = {name.upper(): "registry.access.redhat.com/" + b["repository"] + "@" + b["digest"] for name, b in LOCK["bases"].items()}
     record("IMG-01", "every base is referenced by its locked manifest-list digest", pinned == expected, str(pinned))
     record("IMG-05", "no credential-shaped build argument or environment variable", not CREDENTIAL.search(containerfile))
+    # Drift automation reports; it must not be able to change the lock (IMG-04).
+    drift = (HERE.parent.parent / ".github" / "workflows" / "reference-drift.yml").read_text(encoding="utf-8")
+    permissions = re.findall(r"^\s+([a-z-]+):\s*(read|write|none)\s*$", drift, re.M)
+    writes = re.search(r"git push|git commit|gh pr create|create-pull-request", drift)
+    record("IMG-04", "drift automation holds only read permission and changes nothing",
+           permissions == [("contents", "read")] and not writes, str(permissions))
 
     victim = LOCK["rpms"][0]["file"]
     with tempfile.TemporaryDirectory() as scratch:

@@ -25,6 +25,8 @@ management interface, no user accounts, and hosts no application runtime.
 | [`tools.json`](tools.json), [`scripts/install_tools.py`](scripts/install_tools.py) | The scanners, pinned by archive digest and verified before they are unpacked | IMG-02 |
 | [`tests/gates.py`](tests/gates.py) | Source scans before the build; bill of materials, two vulnerability gates, and a malware scan after it | IMG-21, IMG-25, IMG-28, IMG-34 |
 | [`scripts/drift.py`](scripts/drift.py) | How far the inputs are behind their publishers; fails CI once a base is more than 30 days behind | IMG-04, IMG-29 |
+| [`requirements.md`](requirements.md) | What the image commits to, one requirement per criterion, each naming its checks | the verification pointer |
+| [`scripts/component.py`](scripts/component.py), [`oscal/component-definition.json`](oscal/component-definition.json) | Its OSCAL component definition: every baseline control, and its own decisions for the ones the baseline leaves open | the control model |
 | [`tests/smoke.py`](tests/smoke.py) | Reads every runtime property back from the running image, and records the evidence | IMG-06 to IMG-20, IMG-27, IMG-30, IMG-32 |
 
 ## Building and verifying it

@@ -1,22 +1,33 @@
 name: Reference image
 
-# Builds the reference web server the way every Datopsis image is built, and
-# verifies it against the criteria: inputs retrieved and verified in their own
-# step, assembly with networking disabled, a defective input shown to stop the
-# build, and a smoke suite reading every property back from the running image.
-# The evidence each step produces is kept with the run.
+# Builds the reference web server and verifies it against the criteria: inputs
+# retrieved and verified in their own step, the source scanned before the
+# build, assembly with networking disabled, a defective input shown to stop the
+# build, the running image read back against every runtime property, and the
+# built image gated on vulnerabilities, malware, and stale inputs. The evidence
+# is kept with the run, and scored.
+#
+# A tag of the form reference-web-server/vX.Y.Z also releases the image that
+# was verified, not a rebuild of it: signed keylessly, with its bill of
+# materials and SLSA provenance attested, under that version tag only.
 
 on:
   pull_request:
     paths:
       - "examples/reference-web-server/**"
+      - "scripts/**"
+      - "artifacts/**"
       - ".github/workflows/reference-image.yml"
   push:
     branches:
       - main
     paths:
       - "examples/reference-web-server/**"
+      - "scripts/**"
+      - "artifacts/**"
       - ".github/workflows/reference-image.yml"
+    tags:
+      - "reference-web-server/v*"
   workflow_dispatch:
 
 permissions:
@@ -24,17 +35,21 @@ permissions:
 
 concurrency:
   group: reference-image-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 defaults:
   run:
     working-directory: examples/reference-web-server
 
+env:
+  IMAGE: ghcr.io/datopsis/reference-web-server
+  REQUIREMENT_PATTERN: '^###\s+(RWS-\d{3})\s*$'
+
 jobs:
   verify:
     name: build and verify
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -49,10 +64,27 @@ jobs:
       - name: Show the container engine
         run: podman version
 
+      - name: Work out the version
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          if [ "$REF_TYPE" = "tag" ]; then version="${REF_NAME#reference-web-server/v}"; else version="0.0.0-ci"; fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
       # Deviations are the exception register; an expired one fails here (IMG-26).
       - name: Check the hardening profile
         working-directory: .
-        run: python scripts/check-profile.py examples/reference-web-server/hardening-profile.json
+        run: python scripts/check-profile.py examples/reference-web-server/hardening-profile.json --report examples/reference-web-server/evidence/profile.json
+
+      - name: Check the component definition
+        working-directory: .
+        run: |
+          python examples/reference-web-server/scripts/component.py --check
+          python scripts/check-component.py examples/reference-web-server/oscal/component-definition.json \
+            --requirements examples/reference-web-server/requirements.md \
+            --requirement-pattern "$REQUIREMENT_PATTERN" \
+            --profile examples/reference-web-server/hardening-profile.json
 
       # The tools that judge the image are pinned and verified like its inputs.
       - name: Install the pinned scanning tools
@@ -71,7 +103,7 @@ jobs:
         run: python tests/build_checks.py "$RUNNER_TEMP/bundle" --evidence evidence/build.json
 
       - name: Build with networking disabled
-        run: python scripts/build.py "$RUNNER_TEMP/bundle" --tag localhost/reference-web-server:ci
+        run: python scripts/build.py "$RUNNER_TEMP/bundle" --tag localhost/reference-web-server:ci --version "$VERSION"
 
       - name: Verify the image against the criteria
         env:
@@ -85,10 +117,157 @@ jobs:
       - name: Check the inputs are current
         run: python scripts/drift.py --enforce --report evidence/drift.json
 
+      - name: Score the image
+        if: always()
+        working-directory: .
+        run: |
+          set -o pipefail
+          python scripts/score.py examples/reference-web-server/evidence \
+            --profile examples/reference-web-server/hardening-profile.json \
+            --component examples/reference-web-server/oscal/component-definition.json \
+            --requirements examples/reference-web-server/requirements.md \
+            --requirement-pattern "$REQUIREMENT_PATTERN" \
+            --out examples/reference-web-server/evidence/score | tee "$RUNNER_TEMP/score.txt"
+          { echo "## Reference image"; echo; echo '```text'; cat "$RUNNER_TEMP/score.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Keep the evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: reference-image-evidence
           path: examples/reference-web-server/evidence/
+          if-no-files-found: warn
+
+      # The image the release publishes is this one, byte for byte.
+      - name: Save the verified image for release
+        if: github.ref_type == 'tag'
+        run: podman save --format docker-archive --output "$RUNNER_TEMP/image.tar" localhost/reference-web-server:ci
+
+      - name: Keep the verified image
+        if: github.ref_type == 'tag'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: reference-image
+          path: ${{ runner.temp }}/image.tar
+          retention-days: 1
+
+  release:
+    name: release
+    needs: verify
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'reference-web-server/v')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      # Releases are cut only from reviewed commits on the default branch (IMG-33).
+      - name: Require the tagged commit to be on main
+        env:
+          SHA: ${{ github.sha }}
+        run: git merge-base --is-ancestor "$SHA" origin/main
+
+      - name: Work out the version
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: echo "VERSION=${REF_NAME#reference-web-server/v}" >> "$GITHUB_ENV"
+
+      - name: Install the pinned tools
+        run: python scripts/install_tools.py "$RUNNER_TEMP/tools"
+
+      - name: Fetch the verified image and its evidence
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: ${{ runner.temp }}/verified
+
+      - name: Load the verified image
+        run: podman load --input "$RUNNER_TEMP/verified/reference-image/image.tar"
+
+      - name: Log in to the registry
+        env:
+          ACTOR: ${{ github.actor }}
+          TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/docker"
+          echo "DOCKER_CONFIG=$RUNNER_TEMP/docker" >> "$GITHUB_ENV"
+          echo "$TOKEN" | podman login ghcr.io --username "$ACTOR" --password-stdin --authfile "$RUNNER_TEMP/docker/config.json"
+
+      # A version is published once (IMG-24). There is no latest tag.
+      - name: Refuse a version that already exists
+        run: |
+          if skopeo inspect --authfile "$DOCKER_CONFIG/config.json" --raw "docker://$IMAGE:$VERSION" >/dev/null 2>&1; then
+            echo "$IMAGE:$VERSION already exists; a released version is never replaced" >&2
+            exit 1
+          fi
+
+      - name: Publish the verified image
+        run: |
+          podman tag localhost/reference-web-server:ci "$IMAGE:$VERSION"
+          podman push --authfile "$DOCKER_CONFIG/config.json" --digestfile "$RUNNER_TEMP/digest" "$IMAGE:$VERSION"
+          echo "DIGEST=$(cat "$RUNNER_TEMP/digest")" >> "$GITHUB_ENV"
+
+      - name: Sign the digest and attest its bill of materials
+        run: |
+          "$RUNNER_TEMP/tools/cosign" sign --yes "$IMAGE@$DIGEST"
+          "$RUNNER_TEMP/tools/cosign" attest --yes --type spdxjson \
+            --predicate "$RUNNER_TEMP/verified/reference-image-evidence/sbom.spdx.json" "$IMAGE@$DIGEST"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE }}
+          subject-digest: ${{ env.DIGEST }}
+          push-to-registry: true
+
+      # The release is not finished until what it published verifies. Every
+      # result is recorded before the step fails on any of them.
+      - name: Verify the signature, bill of materials, and provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+        run: |
+          set +e
+          identity="https://github.com/${WORKFLOW_REF}"
+          issuer="https://token.actions.githubusercontent.com"
+          "$RUNNER_TEMP/tools/cosign" verify --certificate-identity "$identity" --certificate-oidc-issuer "$issuer" "$IMAGE@$DIGEST" >/dev/null
+          signature=$?
+          "$RUNNER_TEMP/tools/cosign" verify-attestation --type spdxjson --certificate-identity "$identity" --certificate-oidc-issuer "$issuer" "$IMAGE@$DIGEST" >/dev/null
+          sbom=$?
+          gh attestation verify "oci://$IMAGE@$DIGEST" --repo "$REPOSITORY" >/dev/null
+          provenance=$?
+          mkdir -p evidence
+          python3 - "$IMAGE@$DIGEST" "$signature" "$provenance" "$sbom" <<'PY'
+          import json, sys
+          image, signature, provenance, sbom = sys.argv[1], *sys.argv[2:]
+          results = [
+              {"criterion": "IMG-22", "check": "the released digest's keyless signature verifies against the release identity", "passed": signature == "0"},
+              {"criterion": "IMG-22", "check": "the released digest's SLSA provenance verifies", "passed": provenance == "0"},
+              {"criterion": "IMG-21", "check": "the bill of materials is attested to the released digest and retrievable by it", "passed": sbom == "0"},
+              {"criterion": "IMG-24", "check": "the version tag did not exist before the release, and no latest tag is pushed", "passed": True},
+          ]
+          json.dump({"image": image, "results": results}, open("evidence/release.json", "w"), indent=2)
+          print(json.dumps(results, indent=2))
+          PY
+          [ "$signature" = 0 ] && [ "$sbom" = 0 ] && [ "$provenance" = 0 ]
+
+      - name: Keep the release evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: reference-release-evidence
+          path: examples/reference-web-server/evidence/release.json
           if-no-files-found: warn

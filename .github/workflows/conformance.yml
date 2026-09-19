@@ -1,0 +1,126 @@
+name: Conformance
+
+# Called by an image repository to check itself against a pinned revision of
+# this standard. It checks the hardening profile and the component definition,
+# then scores the evidence the caller's own CI produced, and keeps the score
+# and badge with the run. See docs/ADOPTING.md.
+#
+# Call it pinned to a full commit, and pass the same commit as standard-ref:
+#
+#   uses: datopsis/container-hardening/.github/workflows/conformance.yml@<commit>
+#   with:
+#     standard-ref: <the same commit>
+
+on:
+  workflow_call:
+    inputs:
+      standard-ref:
+        description: The full commit of container-hardening this image is checked against
+        required: true
+        type: string
+      profile:
+        description: Path to the hardening profile
+        required: false
+        type: string
+        default: hardening-profile.json
+      component:
+        description: Path to the OSCAL component definition
+        required: false
+        type: string
+        default: oscal/component-definition.json
+      requirements:
+        description: Space-separated paths stating the image's requirement identifiers
+        required: true
+        type: string
+      requirement-pattern:
+        description: Regular expression capturing one requirement identifier per heading
+        required: true
+        type: string
+      evidence-artifact:
+        description: Name of the artifact holding the caller's evidence JSON files
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    name: conformance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out the image repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          path: image
+
+      - name: Check out the standard at the pinned commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: datopsis/container-hardening
+          ref: ${{ inputs.standard-ref }}
+          path: standard
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Fetch the image's evidence
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.evidence-artifact }}
+          path: evidence
+
+      # The profile must name the revision it is actually checked against.
+      - name: Require the profile to name this revision
+        env:
+          PROFILE: image/${{ inputs.profile }}
+          STANDARD_REF: ${{ inputs.standard-ref }}
+        run: |
+          named=$(python -c "import json,sys; print(json.load(open(sys.argv[1]))['standard']['revision'])" "$PROFILE")
+          if [ "$named" != "$STANDARD_REF" ]; then
+            echo "the profile names $named but is checked against $STANDARD_REF" >&2
+            exit 1
+          fi
+
+      - name: Check the hardening profile
+        env:
+          PROFILE: image/${{ inputs.profile }}
+        run: python standard/scripts/check-profile.py "$PROFILE" --report evidence/profile.json
+
+      - name: Check the component definition
+        env:
+          PROFILE: image/${{ inputs.profile }}
+          COMPONENT: image/${{ inputs.component }}
+          REQUIREMENTS: ${{ inputs.requirements }}
+          PATTERN: ${{ inputs.requirement-pattern }}
+        run: |
+          files=(); for f in $REQUIREMENTS; do files+=("image/$f"); done
+          python standard/scripts/check-component.py "$COMPONENT" --requirements "${files[@]}" \
+            --requirement-pattern "$PATTERN" --profile "$PROFILE"
+
+      - name: Score the evidence
+        if: always()
+        env:
+          PROFILE: image/${{ inputs.profile }}
+          COMPONENT: image/${{ inputs.component }}
+          REQUIREMENTS: ${{ inputs.requirements }}
+          PATTERN: ${{ inputs.requirement-pattern }}
+        run: |
+          set -o pipefail
+          files=(); for f in $REQUIREMENTS; do files+=("image/$f"); done
+          python standard/scripts/score.py evidence --profile "$PROFILE" --component "$COMPONENT" \
+            --requirements "${files[@]}" --requirement-pattern "$PATTERN" --out score | tee score.txt
+          { echo "## Conformance"; echo; echo '```text'; cat score.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the score and badge
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: conformance
+          path: score/
+          if-no-files-found: warn

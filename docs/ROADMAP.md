@@ -135,10 +135,12 @@ The [reference web server](../examples/reference-web-server/README.md) is the
 template every image adopts from. It records what it does not yet evidence as
 deviations in its profile; each item below closes some of them.
 
-- [ ] Release the reference image: attest its bill of materials, sign it with a
-  keyless identity with SLSA provenance, and publish immutable tags (IMG-21,
-  IMG-22, IMG-24). Publishing needs a decision on where. Add its OSCAL
-  component definition and criteria evidence file, and compute its score.
+- [ ] Cut the reference image's first release, `reference-web-server/v0.1.0`,
+  once its release job is merged, and close its IMG-21, IMG-22, and IMG-24
+  deviations on the evidence the release records.
+- [ ] Adopt in the first image repository through
+  [ADOPTING.md](ADOPTING.md) and the conformance workflow, and fix whatever
+  the guide turns out not to say.
 - [ ] Build the reference image's SCAP profile: the SCAP Security Guide's RHEL 9
   DISA STIG profile, pinned, tailored for an image, with each rule tied to the
   GPOS SRG rule it serves. It is what lets IMG-T3 become required.
@@ -156,9 +158,8 @@ deviations in its profile; each item below closes some of them.
   pinned revision of this one.
 - [ ] Close the gaps in the [adoption snapshot](adoption/snapshot-2026-09-18.md),
   then delete it: each image repository tracks its own from then on.
-- [ ] Build the [conformance score and badge](adoption/README.md#plan-a-conformance-score-and-badge):
-  `scripts/score.py`, and a criteria evidence file in each image repository
-  mapping every required criterion to the tests that establish it.
+- [ ] Decide where each image repository publishes its badge so a README can
+  show it: GitHub Pages, or a Shields endpoint on a stable URL.
 
 ## Package 6: publication
 
