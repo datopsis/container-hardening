@@ -38,139 +38,173 @@
   "criteria": {
     "IMG-01": {
       "title": "Base image pinned by digest",
-      "level": "required"
+      "level": "required",
+      "scope": "generic"
     },
     "IMG-02": {
       "title": "Every build input pinned and verified",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-03": {
       "title": "Hermetic assembly",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-04": {
       "title": "Input refresh is a reviewed change",
-      "level": "required"
+      "level": "required",
+      "scope": "generic"
     },
     "IMG-05": {
       "title": "No secrets in the build",
-      "level": "required"
+      "level": "required",
+      "scope": "generic"
     },
     "IMG-06": {
       "title": "No package manager",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-07": {
       "title": "Only what the function needs",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-08": {
       "title": "Embedded package inventory",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-09": {
       "title": "No privilege-raising files",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-10": {
       "title": "Software and configuration not writable by the service",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-11": {
       "title": "Non-root, with no privilege transition",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-12": {
       "title": "Runs under an arbitrary UID",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-13": {
       "title": "Works with no capabilities and no new privileges",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-14": {
       "title": "Unprivileged ports",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-15": {
       "title": "Read-only root filesystem",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-16": {
       "title": "Secrets only as read-only files",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-17": {
       "title": "Trust material supplied by the operator",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-18": {
       "title": "Fails closed",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-19": {
       "title": "Logs to standard streams, without secrets",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-20": {
       "title": "Lifecycle is declared",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-21": {
       "title": "Bill of materials",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-22": {
       "title": "Signed, with provenance",
-      "level": "required"
+      "level": "required",
+      "scope": "generic"
     },
     "IMG-23": {
       "title": "Identifying labels",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-24": {
       "title": "Immutable tags",
-      "level": "required"
+      "level": "required",
+      "scope": "generic"
     },
     "IMG-25": {
       "title": "Vulnerability gate and remediation",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-26": {
       "title": "Exceptions expire",
-      "level": "required"
+      "level": "required",
+      "scope": "generic"
     },
     "IMG-27": {
       "title": "No remote administration",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-28": {
       "title": "Malware scan",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-29": {
       "title": "Base kept current",
-      "level": "required"
+      "level": "required",
+      "scope": "generic"
     },
     "IMG-30": {
       "title": "Expected behaviour is declared",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-31": {
       "title": "Admitted under the restricted-v2 SCC and the Restricted Pod Security Standard",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-32": {
       "title": "Runs in a user namespace under the restricted-v3 SCC",
-      "level": "required"
+      "level": "required",
+      "scope": "architecture"
     },
     "IMG-33": {
       "title": "Source is protected and traceable",
-      "level": "required"
+      "level": "required",
+      "scope": "generic"
     },
     "IMG-34": {
       "title": "Source and dependencies are scanned before build",
-      "level": "required"
+      "level": "required",
+      "scope": "generic"
     },
     "IMG-T1": {
       "title": "No shell",

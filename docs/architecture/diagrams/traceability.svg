@@ -25,9 +25,9 @@
 <line x1="190" y1="308" x2="190" y2="326" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="326" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
 <text x="190.0" y="347" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Evidence artifact</text>
-<text x="360" y="353" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">evidence/smoke.json, kept with every CI run</text>
+<text x="360" y="353" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">evidence/smoke.json, per architecture, every CI run</text>
 <line x1="190" y1="370" x2="190" y2="388" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="388" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
 <text x="190.0" y="409" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Continuous compliance result</text>
-<text x="360" y="415" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">scripts/score.py: hardening 31/34 on every change</text>
+<text x="360" y="415" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">conformance.yml: hardening amd64 31/34, release eligible</text>
 </svg>
