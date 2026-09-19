@@ -135,8 +135,11 @@ The [reference web server](../examples/reference-web-server/README.md) is the
 template every image adopts from. It records what it does not yet evidence as
 deviations in its profile; each item below closes some of them.
 
-- [ ] Release the reference image as its first multi-architecture index,
-  0.2.0, and confirm the published verification passes.
+- [ ] Review the reference image's 57 decisions in
+  [decisions.json](../examples/reference-web-server/decisions.json) and record
+  the review; until then it is not release eligible.
+- [ ] Decide the reference image's Web Server and Application Server SRGs rule
+  by rule in worksheets, and cite them from its profile.
 - [ ] Build the reference image's SCAP profile: the SCAP Security Guide's RHEL 9
   DISA STIG profile, pinned, tailored for an image, with each rule tied to the
   GPOS SRG rule it serves. It is what lets IMG-T3 become required.

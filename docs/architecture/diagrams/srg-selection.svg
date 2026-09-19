@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="654" viewBox="0 0 760 654" role="img" aria-labelledby="t d">
+<title id="t">Which SRGs an image takes</title>
+<desc id="d">Every image takes the General Purpose Operating System SRG for itself, the Container Platform SRG for its platform, and the RHEL 9 STIG for its host. Then, for each question, a yes adds a conditional source: serving or proxying HTTP adds the Web Server SRG; hosting an application runtime, a management interface, or user accounts adds the Application Server SRG; being a database adds the Database SRG, not yet pinned; doing something none of these govern is recorded as a gap. More than one can apply. Each conditional source is decided rule by rule in a worksheet, and the determination in the hardening profile follows from it.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="759" height="653" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<rect x="40" y="20" width="680" height="92" rx="6" fill="#ddf4ff" stroke="#0969da"/>
+<text x="380.0" y="41" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Every image</text>
+<text x="54.0" y="62" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">General Purpose OS SRG: the image</text>
+<text x="54.0" y="80" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">Container Platform SRG: the platform</text>
+<text x="384.0" y="62" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">RHEL 9 STIG: the host</text>
+<line x1="210" y1="112" x2="210" y2="150" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="150" width="340" height="56" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="210.0" y="171" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle"></text>
+<text x="210" y="182" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#1f2328" text-anchor="middle">Does it serve or proxy HTTP, an API included?</text>
+<line x1="380" y1="178.0" x2="450" y2="178.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="392" y="172.0" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">yes</text>
+<rect x="450" y="150" width="270" height="56" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="585.0" y="171" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Web Server SRG</text>
+<text x="464.0" y="192" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">worksheet: decide every rule</text>
+<text x="222" y="222" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">no, or also</text>
+<line x1="210" y1="224" x2="210" y2="246" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="246" width="340" height="74" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="210.0" y="267" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle"></text>
+<text x="210" y="278" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#1f2328" text-anchor="middle">Does it host an application runtime, offer a</text>
+<text x="210" y="296" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#1f2328" text-anchor="middle">management interface, or user accounts?</text>
+<line x1="380" y1="283.0" x2="450" y2="283.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="392" y="277.0" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">yes</text>
+<rect x="450" y="246" width="270" height="74" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="585.0" y="267" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Application Server SRG</text>
+<text x="464.0" y="288" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">worksheet: decide every rule</text>
+<text x="222" y="336" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">no, or also</text>
+<line x1="210" y1="338" x2="210" y2="360" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="360" width="340" height="56" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="210.0" y="381" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle"></text>
+<text x="210" y="392" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#1f2328" text-anchor="middle">Is it a database management system?</text>
+<line x1="380" y1="388.0" x2="450" y2="388.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="392" y="382.0" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">yes</text>
+<rect x="450" y="360" width="270" height="56" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="585.0" y="381" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Database SRG</text>
+<text x="464.0" y="402" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">not pinned yet: record the gap</text>
+<text x="222" y="432" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">no, or also</text>
+<line x1="210" y1="434" x2="210" y2="456" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="456" width="340" height="56" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="210.0" y="477" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle"></text>
+<text x="210" y="488" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#1f2328" text-anchor="middle">Does it do something none of these govern?</text>
+<line x1="380" y1="484.0" x2="450" y2="484.0" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="392" y="478.0" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">yes</text>
+<rect x="450" y="456" width="270" height="56" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="585.0" y="477" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">No source identified</text>
+<text x="464.0" y="498" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">record it; ask for one to be pinned</text>
+<text x="222" y="528" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">no, or also</text>
+<rect x="40" y="552" width="680" height="74" rx="6" fill="#ddf4ff" stroke="#0969da"/>
+<text x="380.0" y="573" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">For each conditional source that may apply</text>
+<text x="54.0" y="594" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">generate its worksheet, decide every rule: applies, not-applicable, other-layer, or covered-by</text>
+<text x="54.0" y="612" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">the profile's determination follows from the worksheet: it applies if any rule applies</text>
+</svg>

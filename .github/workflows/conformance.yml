@@ -14,14 +14,26 @@ name: Conformance
 # The run fails on invalid evidence or a failing check. A score short of
 # release eligibility does not fail it; read the release-eligible output, and
 # gate the release on it.
+#
+# With mode: draft, it is a draft assessment for an image still researching
+# the standard: it may be called at a branch, the profile may be incomplete,
+# and the component definition and requirements may not exist yet. It reports
+# what adopting would need and how far the standard has moved since any pinned
+# revision, claims nothing, and never fails.
 
 on:
   workflow_call:
     inputs:
-      standard-ref:
-        description: The full commit of container-hardening this image is judged against; the commit in the uses line
-        required: true
+      mode:
+        description: '"audit", which judges and can fail, or "draft", which reports and claims nothing'
+        required: false
         type: string
+        default: audit
+      standard-ref:
+        description: The full commit of container-hardening this image is judged against; the commit in the uses line. Any value in a draft
+        required: false
+        type: string
+        default: ""
       profile:
         description: Path to the hardening profile
         required: false
@@ -33,9 +45,10 @@ on:
         type: string
         default: oscal/component-definition.json
       requirements:
-        description: Space-separated paths stating the image's requirement identifiers
-        required: true
+        description: Space-separated paths stating the image's requirement identifiers; required in an audit
+        required: false
         type: string
+        default: ""
       requirement-pattern:
         description: Regular expression capturing one requirement identifier per heading; the default finds headings such as "### RWS-001" or "### L1-SUP-001"
         required: false
@@ -43,6 +56,11 @@ on:
         default: '^###\s+([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{3})\s*$'
       crosswalk:
         description: Path to the image's map from each criterion to its requirement identifiers; checked when given
+        required: false
+        type: string
+        default: ""
+      decisions:
+        description: Path to the image's decisions worksheet for the controls the baseline leaves to it; checked when given
         required: false
         type: string
         default: ""
@@ -131,16 +149,25 @@ jobs:
           REQUIREMENTS: ${{ inputs.requirements }}
           PATTERN: ${{ inputs.requirement-pattern }}
           CROSSWALK: ${{ inputs.crosswalk }}
+          DECISIONS: ${{ inputs.decisions }}
+          MODE: ${{ inputs.mode }}
           STANDARD_REF: ${{ inputs.standard-ref }}
           WORKFLOW_SHA: ${{ job.workflow_sha }}
         run: |
           files=(); for f in $REQUIREMENTS; do files+=("image/$f"); done
-          crosswalk=(); if [ -n "$CROSSWALK" ]; then crosswalk=(--crosswalk "image/$CROSSWALK"); fi
+          options=()
+          if [ -n "$CROSSWALK" ]; then options+=(--crosswalk "image/$CROSSWALK"); fi
+          if [ -n "$DECISIONS" ]; then options+=(--decisions "image/$DECISIONS"); fi
+          if [ -n "$REQUIREMENTS" ]; then options+=(--requirements "${files[@]}"); fi
+          case "$MODE" in
+            audit) options+=(--standard-ref "$STANDARD_REF" --workflow-sha "$WORKFLOW_SHA") ;;
+            draft) options+=(--draft) ;;
+            *) echo "mode must be audit or draft, not $MODE" >&2; exit 1 ;;
+          esac
           mkdir -p evidence
           set +e
           python standard/scripts/score.py evidence --profile "$PROFILE" --component "$COMPONENT" \
-            --requirements "${files[@]}" --requirement-pattern "$PATTERN" "${crosswalk[@]}" \
-            --standard-ref "$STANDARD_REF" --workflow-sha "$WORKFLOW_SHA" --out score > score.txt 2>&1
+            --requirement-pattern "$PATTERN" "${options[@]}" --out score > score.txt 2>&1
           code=$?
           set -e
           cat score.txt

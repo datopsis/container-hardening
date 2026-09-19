@@ -30,6 +30,7 @@ accounts, and hosts no application runtime.
 | [`tools.json`](tools.json), [`scripts/install_tools.py`](scripts/install_tools.py) | The scanners, pinned by archive digest for each architecture and verified before they are unpacked | IMG-02 |
 | [`tests/gates.py`](tests/gates.py) | Source scans before the build; bill of materials, two vulnerability gates, and a malware scan after it | IMG-21, IMG-25, IMG-28, IMG-34 |
 | [`scripts/drift.py`](scripts/drift.py) | How far the inputs are behind their publishers; fails CI once a base is more than 30 days behind | IMG-04, IMG-29 |
+| [`decisions.json`](decisions.json) | Its decision, rationale, owner, and review for each control the baseline leaves to the image | the control model |
 | [`requirements.md`](requirements.md) | What the image commits to, one requirement per criterion, each naming its checks | the verification pointer |
 | [`scripts/component.py`](scripts/component.py), [`oscal/component-definition.json`](oscal/component-definition.json) | Its OSCAL component definition: every baseline control, and its own decisions for the ones the baseline leaves open | the control model |
 | [`tests/smoke.py`](tests/smoke.py) | Reads every runtime property back from the running image, and records the evidence | IMG-06 to IMG-20, IMG-27, IMG-30, IMG-32 |
@@ -133,6 +134,15 @@ repository, and refusing a world-readable key file.
 
 ## Releases
 
+### Versions
+
+A version is one tag on one index. The index names an image for each
+architecture, and a client pulls the one for its own; there are no
+per-architecture tags. To pin one architecture's image, pin its digest, which
+the index lists. A version is published once and never replaced, and there is
+no `latest`. The minor version rose to 0.2.0 when a release became an index
+rather than a single amd64 image.
+
 Released images are published as `ghcr.io/datopsis/reference-web-server`,
 under version tags only, and only when the conformance workflow finds the
 verified images release eligible. From 0.2.0, a version is an index of the
@@ -151,10 +161,10 @@ amd64 and arm64 images, released without rebuilding either:
 To verify one:
 
 ```sh
-cosign verify ghcr.io/datopsis/reference-web-server:0.1.1 \
+cosign verify ghcr.io/datopsis/reference-web-server:0.2.0 \
     --certificate-identity-regexp '^https://github.com/datopsis/container-hardening/.github/workflows/reference-image.yml@refs/tags/reference-web-server/v' \
     --certificate-oidc-issuer https://token.actions.githubusercontent.com
-gh attestation verify oci://ghcr.io/datopsis/reference-web-server:0.1.1 --repo datopsis/container-hardening
+gh attestation verify oci://ghcr.io/datopsis/reference-web-server:0.2.0 --repo datopsis/container-hardening
 ```
 
 For an index, verifying the tag verifies the index's own signature. Each

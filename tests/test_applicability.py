@@ -32,7 +32,8 @@ def sections(body: str) -> dict[str, str]:
 
 class AnalysisTests(unittest.TestCase):
     def analyses(self) -> list[Path]:
-        found = sorted(ANALYSES.glob("*.md"))
+        # The README is the guide to choosing sources, not an analysis of one.
+        found = sorted(p for p in ANALYSES.glob("*.md") if p.name != "README.md")
         self.assertTrue(found)
         return found
 
