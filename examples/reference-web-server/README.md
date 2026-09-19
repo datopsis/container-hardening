@@ -100,6 +100,22 @@ would have shipped:
 
 The criteria this image does not yet evidence are recorded as
 [deviations](../../docs/TAILORING.md#deviations) in its profile, each with an
-expiry. The release criteria (bill of materials, signature and provenance,
-immutable tags, vulnerability and malware gates) and the Kubernetes and
-OpenShift admission tests are the next increments on the roadmap.
+expiry: admission under Kubernetes and OpenShift, branch protection on this
+repository, and refusing a world-readable key file.
+
+## Releases
+
+Released images are published as `ghcr.io/datopsis/reference-web-server`,
+under version tags only. Each is signed keylessly by the release workflow,
+with its bill of materials and SLSA provenance attested. To verify one:
+
+```sh
+cosign verify ghcr.io/datopsis/reference-web-server:0.1.1 \
+    --certificate-identity-regexp '^https://github.com/datopsis/container-hardening/.github/workflows/reference-image.yml@refs/tags/reference-web-server/v' \
+    --certificate-oidc-issuer https://token.actions.githubusercontent.com
+gh attestation verify oci://ghcr.io/datopsis/reference-web-server:0.1.1 --repo datopsis/container-hardening
+```
+
+CI re-verifies the latest release this way on every run. Version 0.1.0 is
+signed and has an attested bill of materials but no provenance; use 0.1.1 or
+later.

@@ -145,6 +145,12 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   that version only, signs it keylessly, attests its bill of materials and
   SLSA provenance, and verifies all three before it finishes.
 
+- Released the reference image as 0.1.1: published publicly to GHCR,
+  signed keylessly, with its bill of materials and SLSA provenance attested.
+  CI now re-verifies the latest release on every run, as a consumer would,
+  and the image's IMG-21, IMG-22, and IMG-24 deviations are closed on that
+  evidence.
+
 ### Fixed
 
 - The reference image's release job logged in to the registry at a custom

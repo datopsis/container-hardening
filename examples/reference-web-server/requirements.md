@@ -171,6 +171,7 @@ Each build produces an SPDX bill of materials covering every locked package, att
 - Criterion: IMG-21
 - Verified by `tests/gates.py image`: a bill of materials is generated from the image and covers every locked package
 - Verified by `release job`: the bill of materials is attested to the released digest and retrievable by it
+- Verified by `tests/release_checks.py`: the latest release's bill of materials is attested and retrievable by digest
 
 ### RWS-022
 
@@ -178,6 +179,7 @@ Each released digest is signed keylessly by the release workflow and carries SLS
 
 - Criterion: IMG-22
 - Verified by `release job`: the released digest's keyless signature and SLSA provenance verify against the release identity
+- Verified by `tests/release_checks.py`: the latest release's keyless signature and SLSA provenance verify against the release workflow
 
 ### RWS-023
 
@@ -193,6 +195,7 @@ Each version tag is published once and never moved; there is no latest tag.
 
 - Criterion: IMG-24
 - Verified by `release job`: the version tag did not exist before the release, and no latest tag is pushed
+- Verified by `tests/release_checks.py`: the registry carries version tags only, and no latest
 
 ### RWS-025
 

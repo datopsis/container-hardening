@@ -1865,9 +1865,19 @@
                     "value": "IMG-23"
                   },
                   {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-24"
+                  },
+                  {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-023"
+                  },
+                  {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-024"
                   },
                   {
                     "name": "assessment-method",
@@ -2322,12 +2332,22 @@
                   {
                     "name": "criterion",
                     "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-21"
+                  },
+                  {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
                     "value": "IMG-23"
                   },
                   {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-008"
+                  },
+                  {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-021"
                   },
                   {
                     "name": "requirement",
@@ -2363,9 +2383,19 @@
                     "value": "IMG-08"
                   },
                   {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-21"
+                  },
+                  {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-008"
+                  },
+                  {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-021"
                   },
                   {
                     "name": "assessment-method",
@@ -2396,9 +2426,19 @@
                     "value": "IMG-08"
                   },
                   {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-21"
+                  },
+                  {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-008"
+                  },
+                  {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-021"
                   },
                   {
                     "name": "assessment-method",
@@ -2628,6 +2668,11 @@
                     "value": "IMG-04"
                   },
                   {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-22"
+                  },
+                  {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-001"
@@ -2646,6 +2691,11 @@
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-004"
+                  },
+                  {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-022"
                   },
                   {
                     "name": "assessment-method",
