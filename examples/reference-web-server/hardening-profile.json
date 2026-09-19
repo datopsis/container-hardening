@@ -4,7 +4,7 @@
   "standard": {
     "revision": "a236dc10189e0c3102f76cc68ea9f73a90bac97f"
   },
-  "function": "Serves static content and reverse-proxies HTTP. It has no management interface, no user accounts, and hosts no application runtime.",
+  "function": "Serves static content with nginx. It has no management interface, no user accounts, and hosts no application runtime.",
   "applicability": [
     {
       "source": "disa-application-server-srg",
@@ -27,5 +27,127 @@
       "reviewed_by": "Joey"
     }
   ],
-  "deviations": []
+  "deviations": [
+    {
+      "id": "DEV-001",
+      "kind": "criterion",
+      "target": "IMG-04",
+      "reason": "No drift job yet reports newer inputs; the lock is refreshed only by running acquire.py --refresh by hand.",
+      "compensating": "A refreshed lock is still a reviewed pull request; nothing edits it automatically.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-002",
+      "kind": "criterion",
+      "target": "IMG-29",
+      "reason": "The base's age against the publisher's current release is not yet measured by any job.",
+      "compensating": "The base is refreshed by hand with acquire.py --refresh, and the lock records the date.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-003",
+      "kind": "criterion",
+      "target": "IMG-21",
+      "reason": "No release workflow yet generates or attests a bill of materials.",
+      "compensating": "The embedded package inventory records every installed package and is checked against the lock.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-004",
+      "kind": "criterion",
+      "target": "IMG-22",
+      "reason": "No release workflow yet signs the image or attests its provenance.",
+      "compensating": "The image is built only in CI from a reviewed commit, and its labels name the commit and lock.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-005",
+      "kind": "criterion",
+      "target": "IMG-24",
+      "reason": "Nothing is published yet, so there are no tags to protect.",
+      "compensating": "None.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-006",
+      "kind": "criterion",
+      "target": "IMG-25",
+      "reason": "No vulnerability scan yet gates the build.",
+      "compensating": "The inputs are the current UBI 9 releases, refreshed by hand.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-007",
+      "kind": "criterion",
+      "target": "IMG-28",
+      "reason": "No malware scan yet runs on the inputs or the image.",
+      "compensating": "Every input is verified by digest and Red Hat signature.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-008",
+      "kind": "criterion",
+      "target": "IMG-31",
+      "reason": "The image has not yet been deployed under the Restricted Pod Security Standard or OpenShift's restricted-v2 SCC.",
+      "compensating": "The smoke suite runs it with every capability dropped, no new privileges, the default seccomp profile, and an arbitrary UID, which is what both profiles require.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-009",
+      "kind": "criterion",
+      "target": "IMG-33",
+      "reason": "This repository's default branch is not yet protected, which is Package 6 of the roadmap.",
+      "compensating": "Changes arrive by pull request with CI; none is pushed directly by convention.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-010",
+      "kind": "criterion",
+      "target": "IMG-34",
+      "reason": "No secret, static-analysis, or dependency scan yet runs before the build.",
+      "compensating": "The image contains no code of its own, only configuration and verified RPMs.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-011",
+      "kind": "criterion",
+      "target": "IMG-16",
+      "reason": "nginx does not refuse a world-readable key file, which the criterion requires. It does refuse a missing or empty one.",
+      "compensating": "The key is mounted read-only and never reaches arguments, environment, or logs; the platform mounts it with restrictive permissions (PLT-06).",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    }
+  ]
 }

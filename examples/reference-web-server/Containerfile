@@ -1,0 +1,91 @@
+# The reference web server: a generic, hardened HTTP server image built to the
+# Datopsis container hardening standard. It is the worked example, and the
+# starting point for new images.
+#
+# Assembly runs with networking disabled and pulls refused (IMG-03). Every
+# input arrives through the "bundle" build context, retrieved and verified in
+# advance by scripts/acquire.py, and is verified again here before use (IMG-02).
+# Build it with scripts/build.py, never with a bare "podman build".
+
+ARG BUILDER=registry.access.redhat.com/ubi9/ubi@sha256:9295c5c688f487fa5cf27a734fa55ecd57aeb7dc0904ba537da4f42dfa1d0acb
+ARG RUNTIME=registry.access.redhat.com/ubi9/ubi-micro@sha256:7a0454cbd9bd847e8f6a63b6f0254a6efbeb6e0ed71a5d824a4f6cccbe626650
+
+FROM ${RUNTIME} AS runtime
+
+FROM ${BUILDER} AS assemble
+COPY --from=runtime / /rootfs/
+COPY rootfs/ /overlay/
+RUN --mount=type=bind,from=bundle,target=/bundle,ro \
+    set -euo pipefail; \
+    lock=/bundle/lock.json; \
+    field() { python3 -c "import json,sys; d=json.load(open('$lock')); print($1)"; }; \
+    # The signing key is pinned by digest; a different key is a different trust model.
+    echo "$(field "d['signing']['key_file_sha256']")  $(field "d['signing']['key_file']")" | sha256sum --check --quiet; \
+    rpmkeys --dbpath /tmp/keys --import "$(field "d['signing']['key_file']")"; \
+    allowed="$(field "' '.join(d['signing']['key_ids'])")"; \
+    for entry in $(field "' '.join(r['file']+'|'+r['sha256'] for r in d['rpms'])"); do \
+        file="${entry%%|*}"; digest="${entry##*|}"; \
+        echo "$digest  /bundle/$file" | sha256sum --check --quiet; \
+        rpmkeys --dbpath /tmp/keys --checksig "/bundle/$file" >/dev/null; \
+        signer="$(rpm -qp --nosignature --qf '%{RSAHEADER:pgpsig}' "/bundle/$file")"; \
+        case " $allowed " in *" ${signer##*Key ID }"*) ;; *) echo "unexpected signer for $file: $signer" >&2; exit 1;; esac; \
+    done; \
+    # Scriptlets would need a shell, useradd, and root; the image needs none.
+    rpm --root /rootfs --install --noscripts --nodeps --excludedocs \
+        $(field "' '.join('/bundle/'+r['file'] for r in d['rpms'])"); \
+    # The inventory is written from what was installed, and must cover the lock (IMG-08).
+    install -d -m 0755 /rootfs/usr/share/reference-web-server; \
+    rpm --root /rootfs -qa --qf '%{NEVRA}\t%{SHA256HEADER}\n' | LC_ALL=C sort > /rootfs/usr/share/reference-web-server/rpm-manifest.tsv; \
+    for nevra in $(field "' '.join(r['nevra'] for r in d['rpms'])"); do \
+        grep -q "^${nevra}	" /rootfs/usr/share/reference-web-server/rpm-manifest.tsv || { echo "not installed: $nevra" >&2; exit 1; }; \
+    done; \
+    chmod 0444 /rootfs/usr/share/reference-web-server/rpm-manifest.tsv; \
+    # No package manager, no repository configuration, no repository keys (IMG-06).
+    rm -rf /rootfs/etc/yum.repos.d /rootfs/etc/pki/rpm-gpg /rootfs/etc/dnf /rootfs/etc/yum; \
+    # The base carries residue from its own build: a subscription-manager
+    # repository file and a package-manager log.
+    rm -rf /rootfs/var/lib/rhsm /rootfs/var/lib/dnf /rootfs/var/cache/dnf; \
+    find /rootfs/var/log -type f -delete; \
+    # Only the configuration this image ships (IMG-07, IMG-10).
+    rm -rf /rootfs/etc/nginx/conf.d/* /rootfs/etc/nginx/default.d /rootfs/etc/nginx/*.default \
+           /rootfs/usr/share/nginx/html/* /rootfs/var/lib/nginx /rootfs/var/log/nginx; \
+    # A checkout's file modes depend on the host it was made on; set them here.
+    chmod -R u=rwX,go=rX /overlay; \
+    cp -a /overlay/. /rootfs/; \
+    # nginx opens its compiled-in error log before reading its configuration.
+    install -d -m 0755 /rootfs/var/log/nginx; \
+    ln -s /dev/stderr /rootfs/var/log/nginx/error.log; \
+    # Root owns everything; nothing is group- or world-writable (IMG-09, IMG-10).
+    chown -R 0:0 /rootfs/etc/nginx /rootfs/usr/share/nginx /rootfs/usr/share/reference-web-server; \
+    chmod -R go-w /rootfs/etc/nginx /rootfs/usr/share/nginx; \
+    chmod 0755 /rootfs/var/tmp; \
+    find /rootfs -xdev -type f -perm /6000 -exec chmod ug-s {} +; \
+    if find /rootfs -xdev -perm /6000 -type f | grep -q .; then echo "setuid or setgid file remains" >&2; exit 1; fi; \
+    if find /rootfs -xdev -perm -0002 ! -type l ! -path /rootfs/tmp | grep -q .; then \
+        find /rootfs -xdev -perm -0002 ! -type l ! -path /rootfs/tmp >&2; echo "world-writable path outside /tmp" >&2; exit 1; fi
+
+FROM scratch
+COPY --from=assemble /rootfs/ /
+
+ARG REVISION=unknown
+ARG VERSION=0.0.0
+ARG CREATED=1970-01-01T00:00:00Z
+ARG LOCK_SHA256=unknown
+LABEL org.opencontainers.image.title="reference-web-server" \
+      org.opencontainers.image.description="Generic hardened HTTP server; the Datopsis container hardening reference image" \
+      org.opencontainers.image.source="https://github.com/datopsis/container-hardening" \
+      org.opencontainers.image.revision="${REVISION}" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${CREATED}" \
+      org.opencontainers.image.base.name="registry.access.redhat.com/ubi9/ubi-micro@sha256:7a0454cbd9bd847e8f6a63b6f0254a6efbeb6e0ed71a5d824a4f6cccbe626650" \
+      io.datopsis.lock.sha256="${LOCK_SHA256}"
+
+# A numeric, non-root user in group 0, so an arbitrary UID also works (IMG-11, IMG-12).
+USER 1001:0
+EXPOSE 8080 8443
+# SIGQUIT is nginx's graceful shutdown (IMG-20).
+STOPSIGNAL SIGQUIT
+# Proves the configuration parses, not that the service answers; see the README.
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD ["/usr/sbin/nginx", "-t", "-q"]
+ENTRYPOINT ["/usr/sbin/nginx"]
+CMD ["-g", "daemon off;"]

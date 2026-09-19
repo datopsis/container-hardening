@@ -408,8 +408,9 @@ instead. See [ADR-0003](../adr/0003-secrets-reach-an-image-only-as-read-only-fil
   `_FILE` path and refuses the environment-variable form.
 - **Verification:** With secrets mounted, no secret value appears in any
   `/proc/*/cmdline`, in `/proc/1/environ`, or in the logs; the secret file is not
-  writable by the runtime identity; a missing, empty, or group- or
-  world-readable secret file fails startup.
+  writable by the runtime identity; a missing, empty, or world-readable secret
+  file fails startup. Group read is expected: an image running under an
+  arbitrary UID in group 0 reads a mounted secret through its group.
 - **Expected:** No secret value appears in any process's arguments, in PID 1's
   environment, or in the logs; a malformed secret file stops startup.
 - **Evidence:** The secret-leak scan output; the negative-case results.

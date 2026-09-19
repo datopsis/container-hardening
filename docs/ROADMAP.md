@@ -131,6 +131,25 @@ standard, not an omission from it.
 
 ## Package 5: adoption
 
+The [reference web server](../examples/reference-web-server/README.md) is the
+template every image adopts from. It records what it does not yet evidence as
+deviations in its profile; each item below closes some of them.
+
+- [ ] Add release evidence to the reference image: a bill of materials,
+  keyless signing and SLSA provenance, immutable tags, vulnerability and malware
+  gates, and secret and dependency scans before the build (IMG-21, IMG-22,
+  IMG-24, IMG-25, IMG-28, IMG-34), plus a report-only drift job (IMG-04,
+  IMG-29). Add its OSCAL component definition and criteria evidence file, and
+  compute its score.
+- [ ] Build the reference image's SCAP profile: the SCAP Security Guide's RHEL 9
+  DISA STIG profile, pinned, tailored for an image, with each rule tied to the
+  GPOS SRG rule it serves. It is what lets IMG-T3 become required.
+- [ ] Deploy the reference image under the Restricted Pod Security Standard in
+  CI (IMG-31), and on OpenShift under `restricted-v2` and `restricted-v3` when a
+  cluster is available.
+- [ ] Refuse a group- or world-readable key file at startup without a shell in
+  the runtime path (IMG-16). nginx refuses a missing or empty key, not a
+  permissive one.
 - [ ] Adopt in the image repositories, in the order and with the per-repository
   notes in [adoption](adoption/README.md#planned-order).
 - [ ] Add a hardening profile to each image repository and run
@@ -195,6 +214,10 @@ standard, not an omission from it.
   50 host-inherited, 228 organization-inherited, 11 not applicable, and 57
   left to each image. `scripts/check-component.py` checks an image's OSCAL
   component definition against it.
+- [`examples/reference-web-server/`](../examples/reference-web-server/README.md)
+  is a generic nginx image on UBI 9 Micro, built from nine locked, signed RPMs
+  with networking disabled. CI shows a tampered or missing input stops the
+  build and verifies the running image against 41 checks across 20 criteria.
 - [`docs/TAILORING.md`](TAILORING.md) defines the hardening profile each image
   keeps: an applicability determination for every conditional source, tied to
   its pinned digest, and deviations that each expire. `scripts/check-profile.py`

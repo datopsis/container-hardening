@@ -23,6 +23,7 @@ reinvented per application.
 | [NIST SP 800-190](docs/standard/nist-800-190.md) | Every countermeasure of the Application Container Security Guide, and what implements it. |
 | [Control baseline](docs/controls/README.md) | Every High-baseline control: who satisfies it, derived from the standard. |
 | [Control model](docs/CONTROL-MODEL.md) | How an image states its controls, and the checker that holds it to them. |
+| [Reference image](examples/reference-web-server/README.md) | A generic web server built and verified to the standard: the template for new images. |
 | [Tailoring](docs/TAILORING.md) | How an image records which sources apply to it and where it deviates, with an expiry. |
 | [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 630 rules across four SRGs. |
 | [SRG to 800-53 crosswalk](docs/crosswalk/README.md) | Every rendered rule joined to NIST SP 800-53 Rev 5 through its CCIs. Derived, not hand-authored. |

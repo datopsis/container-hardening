@@ -63,7 +63,9 @@ def deviation(**overrides) -> dict:
 
 class WorkedExampleTests(unittest.TestCase):
     def test_the_worked_example_passes_against_the_live_register(self) -> None:
-        violations, _ = profiles.check(example(), register(), baseline(), TODAY)
+        # Checked as of today, not a fixed date: when one of its deviations
+        # expires, this fails, which is the point of an expiry.
+        violations, _ = profiles.check(example(), register(), baseline(), datetime.date.today())
         self.assertEqual(violations, [])
 
     def test_the_worked_example_records_the_application_server_srg_as_not_applicable(self) -> None:

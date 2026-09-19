@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "note": "Every input the reference image is built from. Written by scripts/acquire.py --refresh and changed only by a reviewed pull request. install lists the packages asked for; dependencies lists the ones their function needs; omitted lists what the package metadata requires but the image deliberately leaves out, and why.",
+  "bases": {
+    "builder": {
+      "repository": "ubi9/ubi",
+      "tag": "latest",
+      "digest": "sha256:9295c5c688f487fa5cf27a734fa55ecd57aeb7dc0904ba537da4f42dfa1d0acb"
+    },
+    "runtime": {
+      "repository": "ubi9/ubi-micro",
+      "tag": "latest",
+      "digest": "sha256:7a0454cbd9bd847e8f6a63b6f0254a6efbeb6e0ed71a5d824a4f6cccbe626650"
+    }
+  },
+  "install": [
+    "nginx-core"
+  ],
+  "dependencies": [
+    "crypto-policies",
+    "libxcrypt",
+    "nginx-filesystem",
+    "openssl-fips-provider",
+    "openssl-fips-provider-so",
+    "openssl-libs",
+    "pcre",
+    "zlib"
+  ],
+  "omitted": {
+    "ca-certificates": "The image adds no trust anchor of its own (IMG-17). Trust material is mounted by the operator.",
+    "shadow-utils": "Required only by nginx-filesystem's install scriptlet, to create an nginx user. Scriptlets do not run; the image runs as UID 1001 in group 0.",
+    "p11-kit, p11-kit-trust, libtasn1, libffi": "Pulled in only by ca-certificates.",
+    "findutils, grep, sed, alternatives, audit-libs, libcap-ng, libsemanage, libsigsegv, bzip2-libs": "Pulled in only by shadow-utils and the scriptlets."
+  },
+  "rpms": [
+    {
+      "name": "crypto-policies",
+      "nevra": "crypto-policies-20260224-1.gitea0f072.el9_8.noarch",
+      "file": "crypto-policies-20260224-1.gitea0f072.el9_8.noarch.rpm",
+      "size": 98707,
+      "sha256": "a9ad86b8df75a7c9c29c6f6dd4b8f78cfa1f42b492eff0d11b82c457d37a7f9f",
+      "key_id": "199e2f91fd431d51"
+    },
+    {
+      "name": "libxcrypt",
+      "nevra": "libxcrypt-4.4.18-3.el9.x86_64",
+      "file": "libxcrypt-4.4.18-3.el9.x86_64.rpm",
+      "size": 122599,
+      "sha256": "a50bb26a28ee7e6379c86b5b91285299b71569fa87ea968d800a56090b7a179d",
+      "key_id": "199e2f91fd431d51"
+    },
+    {
+      "name": "nginx-core",
+      "nevra": "nginx-core-2:1.20.1-28.el9_8.6.x86_64",
+      "file": "nginx-core-1.20.1-28.el9_8.6.x86_64.rpm",
+      "size": 595771,
+      "sha256": "c4f0b6160dd764a8507ae8a7bf4b725a3c0cd288a41fc7f6103fd298dcac30e0",
+      "key_id": "199e2f91fd431d51"
+    },
+    {
+      "name": "nginx-filesystem",
+      "nevra": "nginx-filesystem-2:1.20.1-28.el9_8.6.noarch",
+      "file": "nginx-filesystem-1.20.1-28.el9_8.6.noarch.rpm",
+      "size": 17708,
+      "sha256": "855287d121559addddae5d3581d56e8df37d6ba5bbb93bafcfe7c20ceab4f9e4",
+      "key_id": "199e2f91fd431d51"
+    },
+    {
+      "name": "openssl-fips-provider",
+      "nevra": "openssl-fips-provider-3.0.7-11.el9_8.x86_64",
+      "file": "openssl-fips-provider-3.0.7-11.el9_8.x86_64.rpm",
+      "size": 14256,
+      "sha256": "c00860e9c5a1d90488aa2eb65fe41f62926b38c6b3669d331a8b97e4a60223ac",
+      "key_id": "199e2f91fd431d51"
+    },
+    {
+      "name": "openssl-fips-provider-so",
+      "nevra": "openssl-fips-provider-so-3.0.7-11.el9_8.x86_64",
+      "file": "openssl-fips-provider-so-3.0.7-11.el9_8.x86_64.rpm",
+      "size": 595008,
+      "sha256": "60d36ad3a67d6b00e67bb0a19c0902fbb2ecdd873cf7f280a3039d04a092790c",
+      "key_id": "199e2f91fd431d51"
+    },
+    {
+      "name": "openssl-libs",
+      "nevra": "openssl-libs-1:3.5.8-1.el9_8.x86_64",
+      "file": "openssl-libs-3.5.8-1.el9_8.x86_64.rpm",
+      "size": 2430624,
+      "sha256": "3abe1f190415d91d4dc51db74cf2ad7e06b1e5ca5f63dac978fe58d8fd14e493",
+      "key_id": "199e2f91fd431d51"
+    },
+    {
+      "name": "pcre",
+      "nevra": "pcre-8.44-4.el9.x86_64",
+      "file": "pcre-8.44-4.el9.x86_64.rpm",
+      "size": 205261,
+      "sha256": "e9ddc7d57d4f6e7400b66bcc78b9bafc1f05630e3e0d2a14000bc907f429ddc4",
+      "key_id": "199e2f91fd431d51"
+    },
+    {
+      "name": "zlib",
+      "nevra": "zlib-1.2.11-40.el9.x86_64",
+      "file": "zlib-1.2.11-40.el9.x86_64.rpm",
+      "size": 95708,
+      "sha256": "baf95ffbf40ee014135f16fe33e343faf7ff1ca06509fd97cd988e6afeabf670",
+      "key_id": "199e2f91fd431d51"
+    }
+  ],
+  "signing": {
+    "key_file": "/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release",
+    "key_file_sha256": "0db3dc1b6228f29d60f37c5ad91d9f4cd3547895e8ebedb242469b1c0a0cdf08",
+    "key_ids": [
+      "199e2f91fd431d51"
+    ]
+  },
+  "refreshed_on": "2026-09-19"
+}
