@@ -7,6 +7,14 @@
 | High baseline | Selected |
 | Catalogue | NIST SP 800-53 Rev 5, 5.2.0 |
 
+## Application Server Security Requirements Guide
+
+1 rule reaches this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-204748`](../../srg/application-server-srg/rules/V-204748.md) | `SRG-APP-000153-AS-000104` | CAT II | `CCI-004045` | IA-2 (5) |
+
 ## Container Platform Security Requirements Guide
 
 2 rules reach this control.
