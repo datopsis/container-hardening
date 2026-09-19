@@ -28,8 +28,8 @@ reference image and changed for its own service:
 CI and reports the image **release eligible**: valid evidence, nothing failing,
 and every required criterion on every architecture met or covered by a
 recorded deviation with an expiry. That is what makes the image aligned rather
-than finished. The reference image reports `hardening amd64 31/34` and
-`hardening arm64 31/34`; its three gaps are deviations, and its decisions await
+than finished. The reference image reports `hardening amd64 32/35` and
+`hardening arm64 32/35`; its three gaps are deviations, and its decisions await
 review, which is what stands between it and release eligibility.
 
 A passing run that is not yet release eligible is progress, not alignment:
@@ -171,6 +171,7 @@ The reference image's checks can be copied and adapted:
 | --- | --- | --- |
 | [`scripts/acquire.py`](../examples/reference-web-server/scripts/acquire.py), [`scripts/build.py`](../examples/reference-web-server/scripts/build.py), [`lock.json`](../examples/reference-web-server/lock.json) | IMG-01 to IMG-03 | The packages, module streams, and omissions |
 | [`tests/build_checks.py`](../examples/reference-web-server/tests/build_checks.py) | IMG-01 to IMG-05 | Nothing, beyond paths |
+| [`tests/pipeline_checks.py`](../examples/reference-web-server/tests/pipeline_checks.py) | IMG-35 | The workflow names, and which jobs may write what |
 | [`tests/smoke.py`](../examples/reference-web-server/tests/smoke.py) | IMG-06 to IMG-20, IMG-27, IMG-30, IMG-32 | The service's probes, paths, secrets, and failure cases |
 | [`tools.json`](../examples/reference-web-server/tools.json), [`scripts/install_tools.py`](../examples/reference-web-server/scripts/install_tools.py), [`tests/gates.py`](../examples/reference-web-server/tests/gates.py) | IMG-21, IMG-25, IMG-28, IMG-34 | Nothing |
 | [`scripts/drift.py`](../examples/reference-web-server/scripts/drift.py) and a read-only scheduled workflow | IMG-04, IMG-29 | Nothing |
@@ -341,6 +342,48 @@ architecture-scoped subject. Keep evidence from a clustered deployment
 separate from the image's own, and do not claim a platform expectation as an
 image criterion.
 
+### Fetching inputs
+
+[IMG-03](standard/criteria.md#img-03-hermetic-assembly) confines retrieval to
+fetching what the lock names; how it fetches matters too. The reference
+image's [`acquire.py`](../examples/reference-web-server/scripts/acquire.py)
+does each of these:
+
+- **Fetch by locked location, and resolve nothing.** The lock records where
+  each input is fetched from. Only the refresh runs a package manager, and its
+  output is a reviewed lock change.
+- **HTTPS, from named hosts only.** Refuse any other scheme or host, and any
+  redirect to one; refuse a URL carrying credentials or a query.
+- **Hash as it arrives, and stop at the locked size.** Retry a failed transfer
+  a bounded number of times, each with a timeout.
+- **Admit the bundle whole, or not at all.** Download into a staging
+  directory, and move it into place only when every input has verified. Refuse
+  a bundle directory that already exists, so nothing from an earlier run
+  survives.
+- **Pin keys by full fingerprint, fetched from the publisher.** Not from the
+  builder image, and not from the repository the key signs for.
+- **Check the architecture of what was pulled.** A base pulled by
+  manifest-list digest must be the architecture being built.
+
+### Operating the inputs
+
+Procedures an image's maintainers follow, written down before they are needed:
+
+- **A key rotates or is revoked.** Pin the new key by fingerprint in a reviewed
+  change, refresh the lock so every package names a signer the lock trusts,
+  and rebuild. Remove a revoked key from the lock at once, even if nothing
+  signed by it has been rebuilt yet: the build then stops, which is the point.
+- **A mirror replaces a location.** Change the locations in a reviewed change;
+  the digests do not change, so the same lock verifies what the mirror serves.
+- **Inputs cross an air gap.** Carry the bundle and the lock together, and run
+  the verification again on the far side before building; a bundle is trusted
+  because it matches the lock, never because of where it came from.
+- **A refresh must be undone.** Revert the lock change; the previous inputs are
+  still the reviewed ones.
+- **An emergency rebuild.** Urgency changes the timetable, not the checks. A
+  release that cannot pass them is a deviation with an owner and an expiry, or
+  it is not released.
+
 ### Inputs that are not RPMs
 
 [IMG-02](standard/criteria.md#img-02-every-build-input-pinned-and-verified)
@@ -452,7 +495,7 @@ CI then enforces the rest.
 
 ## What the score means
 
-`hardening arm64 28/34` means 28 of the 34 required criteria are met on the
+`hardening arm64 28/35` means 28 of the 35 required criteria are met on the
 arm64 image with passing evidence and no active deviation. It is conformance to
 this standard, on that architecture, on the day and at the revision the badge
 names. It is not release eligibility, which is a separate answer; it is not a

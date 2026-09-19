@@ -48,3 +48,4 @@ record says so, because an unenforced decision decays quietly.
 | [0005](0005-tailor-by-profile-deviations-expire.md) | Tailor by a per-image profile in which every deviation expires | accepted |
 | [0006](0006-strict-per-architecture-evidence-and-release-eligibility.md) | Read evidence strictly, score it per architecture, and keep release eligibility apart from the score | accepted |
 | [0007](0007-record-manual-reviews-as-expiring-evidence.md) | Record manual reviews as expiring evidence | proposed |
+| [0008](0008-retrieve-by-locked-location-and-hold-the-pipeline-to-the-standard.md) | Retrieve inputs by locked location, pin keys by fingerprint, and hold the pipeline to the standard | proposed |

@@ -206,6 +206,11 @@
       "level": "required",
       "scope": "generic"
     },
+    "IMG-35": {
+      "title": "The pipeline is pinned and least-privileged",
+      "level": "required",
+      "scope": "generic"
+    },
     "IMG-T1": {
       "title": "No shell",
       "level": "target"

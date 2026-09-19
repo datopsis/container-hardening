@@ -18,7 +18,7 @@ reinvented per application.
 | --- | --- |
 | [**The standard**](docs/standard/README.md) | What a hardened Datopsis image is, and why. Start here. |
 | [Reference architecture](docs/architecture/README.md) | Where the standard sits across ten control domains, from source to response, with the sources behind it. |
-| [Image criteria](docs/standard/criteria.md) | The standard as 34 testable properties, each with its implementation, verification, expected result, and evidence. |
+| [Image criteria](docs/standard/criteria.md) | The standard as 35 testable properties, each with its implementation, verification, expected result, and evidence. |
 | [Platform expectations](docs/standard/platform.md) | What the platform and host must impose for the image's properties to count. |
 | [NIST SP 800-190](docs/standard/nist-800-190.md) | Every countermeasure of the Application Container Security Guide, and what implements it. |
 | [Control baseline](docs/controls/README.md) | Every High-baseline control: who satisfies it, derived from the standard. |

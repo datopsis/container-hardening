@@ -205,7 +205,7 @@ The run keeps, for each declared architecture and for `generic`, a standalone
 SVG badge and a Shields endpoint file, such as `badge-arm64.svg`:
 
 ```text
-hardening arm64 | 31/34 · 0123456 · 2026-09-19
+hardening arm64 | 32/35 · 0123456 · 2026-09-20
 ```
 
 Each names its scope, the revision, and the day it was scored, so it never

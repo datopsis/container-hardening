@@ -152,6 +152,17 @@ deviations in its profile; each item below closes some of them.
 - [ ] Decide [ADR-0007](adr/0007-record-manual-reviews-as-expiring-evidence.md),
   manual reviews as expiring evidence, and which criteria allow one; then
   implement it.
+- [ ] Decide [ADR-0008](adr/0008-retrieve-by-locked-location-and-hold-the-pipeline-to-the-standard.md),
+  the tightened IMG-02, IMG-03, IMG-05, and IMG-26 and the new IMG-35.
+- [ ] Split the reference image's lock into a small reviewed input file and a
+  generated lock, with a JSON Schema and tests of it; and add a scheduled job
+  that proposes candidate locks as artifacts without committing them.
+- [ ] Make the reference image's build reproducible, and show it: two builds of
+  one commit with the same image ID (IMG-T2). Timestamps already come from the
+  commit where Podman supports it; two builds still differ.
+- [ ] Consider for adopting images: a pre-commit hook set (hadolint, shellcheck,
+  actionlint, a trailer check), OpenSSF Scorecard, one issue kept current with
+  upstream versions, and scanning the published digest after release.
 - [ ] Consider a second badge for control coverage: baseline controls present
   in the component definition, out of all baseline controls.
 

@@ -131,6 +131,7 @@ Every deviation carries:
 | `owner` | Who will close it |
 | `approved_by` | Who accepted it |
 | `recorded_on`, `expires_on` | When it was accepted, and when it stops being accepted |
+| `architectures` | Optional: the architectures it concerns, such as `["arm64"]`. It then excuses nothing on any other. Only a per-architecture criterion, or a vulnerability, can be scoped this way |
 
 ```json
 {

@@ -22,9 +22,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import tempfile
+import urllib.parse
 from pathlib import Path
 
 import evidence
@@ -61,6 +63,22 @@ class Gates:
                        tools={n: t["version"] for n, t in TOOLS["tools"].items()} | {"clamav": TOOLS["images"]["clamav"]["reference"]})
         print(str(len(self.results) - len(failed)) + " passed, " + str(len(failed)) + " failed")
         return 1 if failed else 0
+
+
+def leftovers(texts: dict[str, str]) -> list[str]:
+    """Where acquisition material or a credential appears: the hosts inputs came
+    from, a signing key, the bundle, or a credential-shaped assignment."""
+    hosts = {urllib.parse.urlsplit(u).hostname for u in
+             [k["url"] for k in LOCK["signing"]["keys"]] + [r["url"] for rs in LOCK["rpms"].values() for r in rs]}
+    patterns = [re.escape(h) for h in sorted(hosts)] + [r"RPM-GPG-KEY", r"BEGIN PGP", r"/bundle/", r"\.bundle-",
+                                                        r"(?i)\b(password|passwd|secret|api[_-]?key)\s*[=:]\s*\S"]
+    found = []
+    for where, text in texts.items():
+        for pattern in patterns:
+            match = re.search(pattern, text)
+            if match:
+                found.append(where + ": " + match.group(0)[:60])
+    return found
 
 
 def source(gates: Gates) -> int:
@@ -100,6 +118,18 @@ def image(gates: Gates, reference: str, bundle: Path) -> int:
         gates.record("IMG-21", "gates.sbom-covers-lock", "a bill of materials is generated from the image and covers every locked package",
                      result.returncode == 0 and not missing, ", ".join(missing) or result.stderr.strip()[-200:],
                      "sbom.spdx.json")
+
+        # Nothing of how the inputs were acquired, and no credential, may reach
+        # what ships: the image's history, its labels, or its bill of materials (IMG-05).
+        found = leftovers({
+            "history": subprocess.run(["podman", "history", "--no-trunc", "--format", "{{.CreatedBy}}", reference],
+                                      text=True, capture_output=True).stdout,
+            "labels": subprocess.run(["podman", "image", "inspect", "--format", "{{json .Labels}}", reference],
+                                     text=True, capture_output=True).stdout,
+            "bill of materials": sbom.read_text(encoding="utf-8") if sbom.exists() else "",
+        })
+        gates.record("IMG-05", "gates.no-acquisition-material", "no credential or acquisition material in history, labels, or the bill of materials",
+                     sbom.exists() and not found, "; ".join(found))
 
         full = gates.evidence / "trivy-image.json"
         report = gates.run(gates.tool("trivy"), "image", "--input", str(archive), "--format", "json",

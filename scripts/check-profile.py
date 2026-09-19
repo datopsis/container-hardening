@@ -217,6 +217,16 @@ def check(
             if not DIGEST.match(scope or ""):
                 violations.append(where + ": a vulnerability deviation is scoped to one image digest (sha256:...)")
 
+        scoped = deviation.get("architectures")
+        if scoped is not None:
+            declared = profile.get("architectures") if isinstance(profile.get("architectures"), list) else []
+            if not isinstance(scoped, list) or not scoped or not all(a in declared for a in scoped):
+                violations.append(where + ": architectures must name some of the profile's architectures ("
+                                  + ", ".join(declared) + ")")
+            elif kind == "criterion" and target in criteria and criteria[target].get("scope") != "architecture":
+                violations.append(where + ": " + target + " is evidenced once for the image, so it cannot be excused "
+                                  "on one architecture")
+
         for key_name in ("reason", "compensating", "owner", "approved_by"):
             text(deviation, key_name, where, violations)
 

@@ -74,6 +74,33 @@ dependencies it declares for known vulnerabilities.
 - **Anchors:** No rendered SRG rule. Serves SA-11 and RA-5.
 - **Source:** NIST SP 800-218 (SSDF)
 
+### IMG-35 The pipeline is pinned and least-privileged
+
+**Required.** The pipeline that builds, tests, and releases the image is an
+input too. Every third-party action and tool it runs is pinned by commit or
+digest; every job holds only the permissions it needs, and none by default;
+no job keeps a credential after the step that uses it; and a release starts
+only from a protected tag or environment.
+
+- **Implementation:** Actions are referenced by full commit SHA, and tools by
+  version and digest; each workflow sets its default permissions to read and
+  grants more per job; checkouts do not persist credentials; a workflow
+  security audit runs in CI; release tags are restricted to maintainers, or the
+  release job runs in an environment that requires approval.
+- **Verification:** Read every workflow: each `uses:` is pinned to a full
+  commit, or refers to the same repository at the running commit; default
+  permissions are read-only; no checkout persists credentials; the release job
+  alone holds write permissions to the registry and the attestation store. Run a
+  workflow security audit and require it to pass.
+- **Expected:** No unpinned action or tool, no job with permissions it does not
+  use, no persisted credential, and a clean audit.
+- **Evidence:** The workflow check's results; the audit's report.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
+- **Anchors:** No rendered SRG rule. Serves SA-10 and SR-11, and the SLSA v1.2
+  Build Track.
+- **Source:** [SLSA v1.2](../../artifacts/sources.json); NIST SP 800-218 (SSDF)
+
 ### IMG-01 Base image pinned by digest
 
 **Required.** Every base image, builder and runtime, is referenced by
@@ -97,10 +124,15 @@ that digest, not a tag.
 ### IMG-02 Every build input pinned and verified
 
 **Required.** Every external input (base, RPM, upstream binary or archive) is
-recorded in a committed lock with its size and SHA-256, and verified against it
-before use. Where the publisher signs the input, the signature is verified
-against a pinned key or identity as well. A checksum fetched from the same
-origin as the artifact is not verification.
+recorded in a committed lock with its size, its SHA-256, and where it is
+retrieved from, and verified against it before use. Where the publisher signs
+the input, the signature is verified against a pinned key or identity as well.
+A signing key is pinned by its full fingerprint, and obtained from the
+publisher separately from what it signs, never taken from the image or
+repository it is meant to vouch for. A binary package records the source
+package it was built from. A checksum fetched from the same origin as the
+artifact is not verification. The verified inputs handed to the build are
+exactly those the lock names: none missing, none extra.
 
 These are three different claims, and a lock keeps them apart. A digest
 recorded in the lock shows the input has not changed since it was reviewed; it
@@ -109,16 +141,17 @@ pinned key or identity, shows who published it. A checksum published beside
 the artifact, such as an `.md5` or `.sha256` file, shows neither, and is
 recorded, if at all, as metadata, never as the input's integrity control.
 
-- **Implementation:** A committed lock records every input's size and SHA-256,
-  and the signing key or identity where one exists; an install step verifies
-  each before use and compares the installed set with the lock. An upstream
-  image is pinned by digest, its signature verified against the publisher's
-  pinned identity at that digest, and only then are files extracted from it,
-  each recorded in the lock by SHA-256.
-- **Verification:** A mismatched digest, a missing input, and an unsigned or
-  wrongly
-  signed package each fail the build; after installation, the installed package
-  set matches the lock.
+- **Implementation:** A committed lock records every input's location, size,
+  and SHA-256, its source package where it has one, and each signing key by
+  location, SHA-256, and full fingerprint; an install step verifies each before
+  use, checks each package's signer and source package against the lock, and
+  compares the installed set with the lock. An upstream image is pinned by
+  digest, its signature verified against the publisher's pinned identity at
+  that digest, and only then are files extracted from it, each recorded in the
+  lock by SHA-256.
+- **Verification:** A mismatched digest, a missing input, an extra input, a key
+  with another fingerprint, and an unsigned or wrongly signed package each fail
+  the build; after installation, the installed package set matches the lock.
 - **Expected:** Each defective input stops the build with the input named; a
   clean build's installed set equals the lock.
 - **Evidence:** The lock; the negative-test results; the installed-versus-locked
@@ -133,12 +166,23 @@ recorded, if at all, as metadata, never as the input's integrity control.
 refused. No package manager, `curl`, `wget`, or language installer runs inside
 the build, and no layer cache restored from outside the build is used.
 
-- **Implementation:** Inputs are retrieved and verified in a separate step and
-  handed to a build that runs with networking disabled and pulls refused.
+Retrieval, the one step with the network, fetches exactly what the lock names,
+from the locations it records. It resolves nothing: no package manager or
+resolver reads live repository metadata to decide what to fetch. Resolving
+versions is the refresh's job, whose output is a lock change reviewed like any
+other ([IMG-04](#img-04-input-refresh-is-a-reviewed-change)). So a build can be
+repeated from a mirror, or from inputs carried across an air gap, and still be
+verified against the same lock.
+
+- **Implementation:** Inputs are retrieved from their locked locations, over
+  HTTPS from named hosts or from a registry by digest, verified, and admitted
+  to a fresh bundle only once all of them verify; the bundle is handed to a
+  build that runs with networking disabled and pulls refused.
 - **Verification:** The build is invoked with `--network=none` (or the builder's
   equivalent) and `--pull=never`, and a negative test shows a build with a
   missing input fails rather than fetching it. A static check rejects network
-  tools in the `Containerfile`.
+  tools in the `Containerfile`, and a package manager or resolver in the
+  retrieval step. Each base pulled is the architecture being built.
 - **Expected:** The build succeeds offline with every declared input, and fails
   without fetching when one is missing.
 - **Evidence:** The build invocation; the negative-build result; the static
@@ -191,10 +235,12 @@ carries fixes nobody has scanned for yet.
 or recorded in a label or in image history.
 
 - **Implementation:** Build arguments carry no credentials; a static check reads
-  the build definition, and a post-build check reads history and labels.
+  the build definition, and a post-build check reads history, labels, the bill
+  of materials, and the provenance.
 - **Verification:** A static check rejects credential-shaped `ARG` and `ENV`
-  names; image
-  history and labels are searched for acquisition material and credentials.
+  names; image history, labels, the bill of materials, and the provenance are
+  searched for credentials and for acquisition material: repository hosts,
+  signing keys, and bundle paths.
 - **Expected:** No credential-shaped name in the build definition, and no
   credential in history or labels.
 - **Evidence:** The static check's report; the history and label scan output.
@@ -742,8 +788,10 @@ the file that was reviewed, not that the file is benign.
 ### IMG-26 Exceptions expire
 
 **Required.** A vulnerability or criterion that will not be met in time is an
-exception: scoped to one image digest, with a reason, an owner, and an expiry
-date. An expired exception fails the build.
+exception: with a reason, an owner, and an expiry date. A vulnerability
+exception is scoped to one image digest. Either kind may be scoped to the
+architectures it concerns, and then excuses nothing on any other. An expired
+exception fails the build.
 
 - **Implementation:** Exceptions are deviations in the hardening profile,
   checked by `check-profile.py`.

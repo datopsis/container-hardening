@@ -2,7 +2,7 @@
   "schema_version": 2,
   "image": "reference-web-server",
   "standard": {
-    "revision": "30757690911b52f715f2b9d140bb97837c646693"
+    "revision": "dffdd403d2dfeda7296768e5bcf6393dc2803ab2"
   },
   "function": "Serves static content with nginx. It has no management interface, no user accounts, and hosts no application runtime.",
   "architectures": [
@@ -32,6 +32,10 @@
     },
     {
       "file": "release-latest.json",
+      "scope": "generic"
+    },
+    {
+      "file": "pipeline.json",
       "scope": "generic"
     }
   ],
