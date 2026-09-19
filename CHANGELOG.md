@@ -69,7 +69,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   through the crosswalk; `artifacts/control-determinations.json` overrides the
   rest, each with a reason, and the generator refuses an override that repeats
   derivation. `scripts/check-component.py` checks an image's OSCAL component
-  definition against the baseline and the verification-pointer rule. Proposed
+  definition against the baseline and the verification-pointer rule. Recorded
   [ADR-0004](docs/adr/0004-derive-the-control-baseline-here-validate-components-there.md).
 - Added HST-05, clock synchronization, which the time-stamp controls needed.
 

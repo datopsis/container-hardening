@@ -103,9 +103,12 @@ an omission from it.
 
 ## Package 3: the control mapping
 
-- [ ] Accept or amend [ADR-0004](adr/0004-derive-the-control-baseline-here-validate-components-there.md),
-  which places the control baseline here and each image's component
-  definition in its own repository.
+- [ ] Review the 124 determinations in
+  [`artifacts/control-determinations.json`](../artifacts/control-determinations.json).
+  They are judgement calls, each with its reason, and have not yet had a
+  second reader. Start with the nine that make a control `image-owned` by
+  determination rather than derivation: AC-6, CM-2, CM-2(2), CM-2(3), CM-8,
+  CM-8(1), CM-8(2), CM-11, and SI-7(15).
 
 ## Package 4: per-application tailoring
 
