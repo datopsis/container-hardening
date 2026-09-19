@@ -13,8 +13,8 @@ Three things vary between images: which function-specific sources apply, how
 the controls that depend on function are answered, and where an image does not
 yet meet the standard.
 
-Before this decision, the first was answered once, in `nginx-ubi`'s ADR-0010,
-and the third had no mechanism at all. [IMG-26](../standard/criteria.md#img-26-exceptions-expire)
+Before this decision, the first was answered ad hoc, if at all, and the third
+had no mechanism. [IMG-26](../standard/criteria.md#img-26-exceptions-expire)
 required an expiring exception register without defining one, and ADR-0004 left
 an image that disagrees with the baseline failing its check "until Package 4
 defines how a deviation is recorded".
@@ -87,4 +87,4 @@ deviation without an owner, approver, reason, or compensating measure, and any
 deviation expiring beyond its limit or already expired.
 `scripts/check-component.py --profile` honours only active deviations.
 `tests/test_tailoring.py` tests each rule by breaking it, and checks the
-`nginx-ubi` worked example against the current register and baseline.
+reference web server's profile against the current register and baseline.

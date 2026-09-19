@@ -6,8 +6,9 @@ stops it becoming a way to quietly opt out.
 
 Each image repository keeps a **hardening profile**, a JSON file checked in CI
 by [`scripts/check-profile.py`](../scripts/check-profile.py) from a pinned
-revision of this repository. A worked example for `nginx-ubi` is in
-[`examples/nginx-ubi.hardening-profile.json`](../examples/nginx-ubi.hardening-profile.json).
+revision of this repository. The worked example is the
+[reference web server](../examples/reference-web-server/hardening-profile.json),
+a generic image kept in this repository as the starting point for new ones.
 The reasoning is [ADR-0005](adr/0005-tailor-by-profile-deviations-expire.md).
 
 ## What every image takes
@@ -59,10 +60,11 @@ scope, but its rules cannot be traced until it is rendered.
 
 ### The worked example
 
-`nginx-ubi` serves and proxies HTTP. It has no management interface, no
-accounts, and no application runtime. Its determination for the Application
-Server SRG, first made in its
-[ADR-0010](https://github.com/datopsis/nginx-ubi/blob/main/docs/adr/0010-application-server-srg-not-applicable.md):
+The reference web server serves static content and reverse-proxies HTTP. It
+has no management interface, no user accounts, and no application runtime. Its
+determination for the Application Server SRG rests on
+[this repository's own analysis](applicability/application-server-srg.md) of
+which rules presuppose those things:
 
 ```json
 {
@@ -70,16 +72,16 @@ Server SRG, first made in its
   "release": "V4R5",
   "sha256": "ea33d7f18f950e86c9e0cc63835cf8802d319804ac143b2020b1fbac13ff2643",
   "applies": false,
-  "basis": "Of the 137 rules in V4R5, 27 presuppose a management interface or hosted applications and 18 refer to accounts. This image has none of those ...",
-  "evidence": "https://github.com/datopsis/nginx-ubi/blob/main/docs/adr/0010-application-server-srg-not-applicable.md",
+  "basis": "27 of the 137 rules in V4R5 govern a management interface, hosted applications, or user accounts and identities, and this image has none of those ...",
+  "evidence": "docs/applicability/application-server-srg.md",
   "reviewed_on": "2026-09-18",
   "reviewed_by": "Joey"
 }
 ```
 
 What makes it a good determination is that it can be checked. It names the
-revision, it counts the rules whose subject does not exist in the image, and
-it names the source that does apply instead. "Not a web application" would be
+revision, it cites the rules whose subject does not exist in the image, each
+one listed and linked, and it names the source that does apply instead. "Not a web application" would be
 a conclusion; this is evidence for one.
 
 ### How a determination is reviewed
@@ -185,7 +187,7 @@ take `--today` to evaluate expiry as of a given date.
 
 ## Enforcement
 
-`tests/test_tailoring.py` checks the worked example against the current
+`tests/test_tailoring.py` checks the reference web server's profile against the current
 register and baseline, and builds profiles that each break one rule, to show
 each rule fails when it should. In each image repository, enforcement is that
 repository running both checks in CI.

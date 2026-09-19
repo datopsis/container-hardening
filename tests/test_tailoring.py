@@ -2,7 +2,7 @@
 
 Each rule is tested by building a profile that breaks it. The worked example is
 checked against the live register and baseline, so a release upgrade that makes
-its determinations stale fails here, the same way it would in nginx-ubi.
+its determinations stale fails here, the same way it would in an image repository.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import unittest
 from pathlib import Path
 
 REPOSITORY = Path(__file__).resolve().parent.parent
-EXAMPLE = REPOSITORY / "examples" / "nginx-ubi.hardening-profile.json"
+EXAMPLE = REPOSITORY / "examples" / "reference-web-server" / "hardening-profile.json"
 TODAY = datetime.date(2026, 9, 18)
 
 

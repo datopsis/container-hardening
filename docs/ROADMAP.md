@@ -190,8 +190,9 @@ standard, not an omission from it.
   keeps: an applicability determination for every conditional source, tied to
   its pinned digest, and deviations that each expire. `scripts/check-profile.py`
   checks it, and `check-component.py --profile` honours active deviations. The
-  `nginx-ubi` Application Server SRG determination is carried across as the
-  worked example.
+  reference web server's profile is the worked example, and its Application
+  Server SRG determination rests on this repository's own
+  [analysis](applicability/application-server-srg.md) of the rendered rules.
 
 Two findings from building it, recorded so they are not rediscovered:
 

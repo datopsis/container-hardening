@@ -181,6 +181,7 @@ class LinkTests(unittest.TestCase):
             list(STANDARD.glob("*.md"))
             + list((REPOSITORY / "docs" / "adr").glob("*.md"))
             + list((REPOSITORY / "docs" / "adoption").glob("*.md"))
+            + list((REPOSITORY / "docs" / "applicability").glob("*.md"))
             + [
                 REPOSITORY / "docs" / "CONTROL-MODEL.md",
                 REPOSITORY / "docs" / "TAILORING.md",
