@@ -37,7 +37,7 @@ jobs:
       # the packages it derives from needs the packages, and is done by
       # verify-sources.yml.
       - name: Validate the register, catalogues, crosswalk, standard, controls, and tailoring
-        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls tests.test_tailoring tests.test_applicability tests.test_score tests.test_revision tests.test_worksheets -v
+        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls tests.test_tailoring tests.test_applicability tests.test_score tests.test_revision tests.test_worksheets tests.test_reviews -v
 
       # A change to the criteria makes the reference image's assessment stale
       # until its profile names the new revision.

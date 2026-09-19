@@ -414,6 +414,23 @@ was reviewed, and the lock says so. The reference image has an example of that
 kind: its scanner images are pinned by digest and not signature-verified, and
 its [tools](../examples/reference-web-server/tools.json) by archive digest.
 
+## 7a. Record any manual review
+
+One criterion, [IMG-04](standard/criteria.md#img-04-input-refresh-is-a-reviewed-change),
+may be evidenced by a person's review, because no test can establish it. If the
+image relies on that, add a `reviews.json` as [Evidence](EVIDENCE.md#manual-reviews)
+describes, name it in the conformance call:
+
+```yaml
+      reviews: reviews.json
+```
+
+and add a `CODEOWNERS` naming who may review. The review holds until the file
+it names changes; then it is recorded again, with the change.
+
+Every other criterion is evidenced by a check. A review of one of them is an
+error, so there is no way to assert a criterion into being met.
+
 ## 8. Show the badges
 
 The conformance run computes the image's current score and writes a badge for

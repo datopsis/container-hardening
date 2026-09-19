@@ -64,6 +64,11 @@ on:
         required: false
         type: string
         default: ""
+      reviews:
+        description: Path to the image's manual reviews, for the few criteria that allow one; checked when given
+        required: false
+        type: string
+        default: ""
       candidates:
         description: Space-separated ARCH=DIGEST pairs naming the images to be released; each architecture's evidence must then be about that digest
         required: false
@@ -155,6 +160,7 @@ jobs:
           PATTERN: ${{ inputs.requirement-pattern }}
           CROSSWALK: ${{ inputs.crosswalk }}
           DECISIONS: ${{ inputs.decisions }}
+          REVIEWS: ${{ inputs.reviews }}
           MODE: ${{ inputs.mode }}
           CANDIDATES: ${{ inputs.candidates }}
           STANDARD_REF: ${{ inputs.standard-ref }}
@@ -164,6 +170,7 @@ jobs:
           options=()
           if [ -n "$CROSSWALK" ]; then options+=(--crosswalk "image/$CROSSWALK"); fi
           if [ -n "$DECISIONS" ]; then options+=(--decisions "image/$DECISIONS"); fi
+          if [ -n "$REVIEWS" ]; then options+=(--reviews "image/$REVIEWS" --repository image); fi
           if [ -n "$REQUIREMENTS" ]; then options+=(--requirements "${files[@]}"); fi
           for candidate in $CANDIDATES; do options+=(--candidate "$candidate"); done
           case "$MODE" in

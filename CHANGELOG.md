@@ -265,8 +265,14 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   history, labels, the bill of materials, and the release's provenance for
   acquisition material, and reads its own workflows. ADOPTING.md adds how to
   fetch inputs and how to operate them.
-- Proposed [ADR-0007](docs/adr/0007-record-manual-reviews-as-expiring-evidence.md):
-  manual reviews as expiring evidence, allowed only where a criterion says so.
+- Accepted [ADR-0007](docs/adr/0007-record-manual-reviews-as-expiring-evidence.md):
+  a person's review may evidence a criterion only where the criterion says so,
+  only by a code owner, and only until what it reviewed changes. IMG-04 is the
+  one criterion that allows it, because no test tells a considered review from
+  a rubber stamp; `scripts/reviews.py` holds a review to those rules, and the
+  conformance workflow takes a `reviews` input. A CODEOWNERS file says who may
+  review. Making IMG-04 testable, through an attested candidate lock, is on the
+  roadmap, and would retire the review.
 
 ### Fixed
 

@@ -54,7 +54,8 @@
     "IMG-04": {
       "title": "Input refresh is a reviewed change",
       "level": "required",
-      "scope": "generic"
+      "scope": "generic",
+      "manual_review": "examine"
     },
     "IMG-05": {
       "title": "No secrets in the build",

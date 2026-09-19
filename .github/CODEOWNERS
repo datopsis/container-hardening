@@ -1,0 +1,4 @@
+# Who may approve a change here, and who may record a manual review (IMG-04).
+# GitHub uses this for review requirements; scripts/reviews.py uses it to say
+# whose review counts.
+*       @joey-huckabee

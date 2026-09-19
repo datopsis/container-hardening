@@ -11,6 +11,11 @@ Each carries:
   required by amending this document, not by drift.
 - **A test.** What a check must do to establish the property. A criterion
   whose only evidence is a sentence in a README is not met.
+- **Whether a person's review may evidence it.** Almost none may: a criterion
+  states *Manual review* only where no test can establish it, and then says by
+  which method. A review is recorded in the image's repository, by a code
+  owner, and holds only until what it reviewed changes; see
+  [Evidence](../EVIDENCE.md#manual-reviews).
 - **A scope.** *Per architecture* where the property belongs to the built
   image, so each architecture's image is evidenced on its own and a passing
   result on one never fills a gap on another; *generic* where it belongs to the
@@ -197,6 +202,12 @@ verified against the same lock.
 may report that a newer input exists; it may not edit the lock or open a change
 that merges without review.
 
+That automation cannot edit the lock is testable, and is tested. That someone
+actually read the change is not: no test distinguishes a considered review from
+a rubber stamp. Until a refresh produces an artifact whose provenance shows how
+the lock was arrived at, and the lock can be checked against it, this is the
+one criterion a person's review may evidence.
+
 - **Implementation:** A scheduled job compares the lock with upstream and opens
   a report; lock changes arrive only as reviewed pull requests.
 - **Verification:** Drift automation has no write permission to the lock and
@@ -205,6 +216,9 @@ that merges without review.
 - **Expected:** The drift job reports newer inputs and changes nothing.
 - **Evidence:** The drift job's permissions and report; the pull request that
   changed the lock.
+- **Manual review:** Allowed, by examine: a code owner records having read the
+  change that produced the current lock. The review names the lock, and lapses
+  when the lock changes.
 - **Scope:** Generic. Evidenced once for the image, whatever its
   architectures.
 - **Anchors:** [V-203720](../srg/general-purpose-operating-system-srg/rules/V-203720.md) → [CM-14](../crosswalk/controls/cm-14.md)

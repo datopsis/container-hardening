@@ -149,9 +149,9 @@ deviations in its profile; each item below closes some of them.
 - [ ] Refuse a world-readable key file at startup without a shell in
   the runtime path (IMG-16). nginx refuses a missing or empty key, not a
   permissive one.
-- [ ] Decide [ADR-0007](adr/0007-record-manual-reviews-as-expiring-evidence.md),
-  manual reviews as expiring evidence, and which criteria allow one; then
-  implement it.
+- [ ] Make IMG-04 testable, and stop allowing a review for it: have the refresh
+  publish its candidate lock with attested provenance, and check the committed
+  lock against an attested candidate.
 - [ ] Decide [ADR-0008](adr/0008-retrieve-by-locked-location-and-hold-the-pipeline-to-the-standard.md),
   the tightened IMG-02, IMG-03, IMG-05, and IMG-26 and the new IMG-35.
 - [ ] Split the reference image's lock into a small reviewed input file and a
