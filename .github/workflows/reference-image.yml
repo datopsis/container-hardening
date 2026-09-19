@@ -201,9 +201,11 @@ jobs:
           ACTOR: ${{ github.actor }}
           TOKEN: ${{ github.token }}
         run: |
-          mkdir -p "$RUNNER_TEMP/docker"
-          echo "DOCKER_CONFIG=$RUNNER_TEMP/docker" >> "$GITHUB_ENV"
-          echo "$TOKEN" | podman login ghcr.io --username "$ACTOR" --password-stdin --authfile "$RUNNER_TEMP/docker/config.json"
+          # The default location, which podman, skopeo, cosign, and the
+          # provenance action all read; the action reads no other.
+          mkdir -p "$HOME/.docker"
+          echo "DOCKER_CONFIG=$HOME/.docker" >> "$GITHUB_ENV"
+          echo "$TOKEN" | podman login ghcr.io --username "$ACTOR" --password-stdin --authfile "$HOME/.docker/config.json"
 
       # A version is published once (IMG-24). There is no latest tag.
       - name: Refuse a version that already exists

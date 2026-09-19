@@ -147,6 +147,13 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- The reference image's release job logged in to the registry at a custom
+  credentials path, which the provenance action does not read. Release 0.1.0
+  was published, signed, and its bill of materials attested, but its
+  provenance attestation failed, so it does not meet IMG-22. The job now uses
+  the default location, and the fix is shipped as 0.1.1 rather than by
+  republishing 0.1.0, which the job refuses by design.
+
 - Corrected the process guide's register entry. Its title is *Container
   Hardening Process Guide*, V1R2, 24 August 2022, published by DISA under
   Distribution Statement A; the register had taken a title from the PDF's
