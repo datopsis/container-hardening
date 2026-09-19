@@ -63,6 +63,16 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   HST-04. It also tightened IMG-13 (default seccomp and SELinux) and IMG-25
   (every layer scanned).
 
+- Carried the nginx-ubi control model across as `docs/CONTROL-MODEL.md`, and
+  derived a control baseline for all 370 High-baseline controls and 9 more the
+  standard reaches. Most originations follow from the criteria's anchors
+  through the crosswalk; `artifacts/control-determinations.json` overrides the
+  rest, each with a reason, and the generator refuses an override that repeats
+  derivation. `scripts/check-component.py` checks an image's OSCAL component
+  definition against the baseline and the verification-pointer rule. Recorded
+  [ADR-0004](docs/adr/0004-derive-the-control-baseline-here-validate-components-there.md).
+- Added HST-05, clock synchronization, which the time-stamp controls needed.
+
 ### Fixed
 
 - Corrected the process guide's register entry. Its title is *Container

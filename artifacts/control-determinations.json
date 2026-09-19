@@ -1,0 +1,1091 @@
+{
+  "schema_version": 1,
+  "note": "Hand-written inputs to scripts/build-control-baseline.py. Most determinations are derived: a control an image criterion anchors to is image-owned, and one only a platform expectation anchors to takes that expectation's origination. This file holds what derivation cannot decide: a default for each family whose controls no image can meet, and an override, with its reason, wherever the derived answer would be wrong. The generator refuses an override that repeats what derivation already gives.",
+  "undetermined": "Not yet determined for images in general. Whether the image implements this depends on its function; a database authenticates users and a static file server does not. Each image determines it in its own component definition.",
+  "family_defaults": {
+    "at": {
+      "origination": "organization-inherited",
+      "reason": "Awareness and training concern people, not a software component."
+    },
+    "ca": {
+      "origination": "organization-inherited",
+      "reason": "Assessment, authorization, and monitoring are performed on the system by the organization; an image is assessed, it does not assess."
+    },
+    "cp": {
+      "origination": "organization-inherited",
+      "reason": "Contingency planning, backup, and recovery are planned and exercised by the organization operating the system. An image holds no state of its own; its data lives on volumes the deployment provides."
+    },
+    "ir": {
+      "origination": "organization-inherited",
+      "reason": "Incident response is an organizational capability."
+    },
+    "ma": {
+      "origination": "organization-inherited",
+      "reason": "Maintenance of the system is performed by the organization. An image is not maintained in place; it is replaced."
+    },
+    "mp": {
+      "origination": "organization-inherited",
+      "reason": "Media protection concerns physical and removable media the organization handles."
+    },
+    "pe": {
+      "origination": "organization-inherited",
+      "reason": "Physical and environmental protection belongs to the facility."
+    },
+    "pl": {
+      "origination": "organization-inherited",
+      "reason": "Security and privacy planning is performed by the organization for the system."
+    },
+    "pm": {
+      "origination": "organization-inherited",
+      "reason": "Program management is organization-wide by definition."
+    },
+    "ps": {
+      "origination": "organization-inherited",
+      "reason": "Personnel security concerns people."
+    },
+    "pt": {
+      "origination": "organization-inherited",
+      "reason": "Processing of personally identifiable information is determined by the system's purpose, which the organization decides."
+    },
+    "ra": {
+      "origination": "organization-inherited",
+      "reason": "Risk assessment is performed by the organization for the system."
+    },
+    "sa": {
+      "origination": "organization-inherited",
+      "reason": "System and services acquisition concerns how the organization acquires and manages systems."
+    },
+    "sr": {
+      "origination": "organization-inherited",
+      "reason": "Supply chain risk management plans and processes are organizational. The image's own supply chain properties are recorded against CM-14, CM-2, CM-8, and SI-7(15)."
+    }
+  },
+  "determinations": [
+    {
+      "control": "ac-1",
+      "origination": "organization-inherited",
+      "reason": "Policy and procedures are written and maintained by the organization for the system. The standard is an input to them, not a substitute."
+    },
+    {
+      "control": "ac-2.13",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ac-3",
+      "origination": "research-required",
+      "handoff": [
+        "PLT-06"
+      ],
+      "reason": "Reached only through the platform keystore rule, but whether the image enforces access depends on its function: a database enforces access to its data and a static file server may not. The platform half, access to the keystore holding the image's secrets, is PLT-06."
+    },
+    {
+      "control": "ac-4.4",
+      "origination": "deployment-configured",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-10"
+      ],
+      "reason": "Boundary protection is network policy at the platform (PLT-10). The image declares the flows it needs (IMG-30), which is what lets the policy be deny-by-default."
+    },
+    {
+      "control": "ac-5",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ac-6",
+      "origination": "image-owned",
+      "criteria": [
+        "IMG-11",
+        "IMG-13"
+      ],
+      "handoff": [
+        "PLT-02"
+      ],
+      "reason": "The service runs as a non-root user with no capabilities and no way to gain privilege, which is least privilege for the process acting on a user's behalf. Least privilege for the image's own users, if it has any, is determined per image under AC-6 enhancements."
+    },
+    {
+      "control": "ac-6.7",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ac-11",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "ac-11.1",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "ac-17",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-27"
+      ],
+      "handoff": [
+        "PLT-13"
+      ],
+      "reason": "Remote access to the system is administration of the platform (PLT-13). The image offers no remote access of its own (IMG-27)."
+    },
+    {
+      "control": "ac-17.1",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-27"
+      ],
+      "handoff": [
+        "PLT-13"
+      ],
+      "reason": "Remote access to the system is administration of the platform (PLT-13). The image offers no remote access of its own (IMG-27)."
+    },
+    {
+      "control": "ac-17.2",
+      "origination": "research-required",
+      "handoff": [
+        "PLT-01",
+        "PLT-10"
+      ],
+      "reason": "Cryptographic protection of remote sessions. The platform protects registry transport and traffic leaving it (PLT-01, PLT-10), but an image that terminates TLS itself, as nginx-ubi does, implements part of this. Which applies depends on the image."
+    },
+    {
+      "control": "ac-17.3",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-27"
+      ],
+      "handoff": [
+        "PLT-13"
+      ],
+      "reason": "Remote access to the system is administration of the platform (PLT-13). The image offers no remote access of its own (IMG-27)."
+    },
+    {
+      "control": "ac-17.4",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-27"
+      ],
+      "handoff": [
+        "PLT-13"
+      ],
+      "reason": "Remote access to the system is administration of the platform (PLT-13). The image offers no remote access of its own (IMG-27)."
+    },
+    {
+      "control": "ac-18",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "ac-18.1",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "ac-18.3",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "ac-18.4",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "ac-18.5",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "ac-19",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "ac-19.5",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "ac-20",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ac-20.1",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ac-20.2",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ac-21",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ac-22",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "au-1",
+      "origination": "organization-inherited",
+      "reason": "Policy and procedures are written and maintained by the organization for the system. The standard is an input to them, not a substitute."
+    },
+    {
+      "control": "au-4",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-5",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-5.1",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-5.2",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-6",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "reason": "Reviewing and analyzing audit records is done by the organization's people, using the platform's log store."
+    },
+    {
+      "control": "au-6.1",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "reason": "Reviewing and analyzing audit records is done by the organization's people, using the platform's log store."
+    },
+    {
+      "control": "au-6.3",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "reason": "Reviewing and analyzing audit records is done by the organization's people, using the platform's log store."
+    },
+    {
+      "control": "au-6.4",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its logs to standard streams, which is what makes central review possible. The review itself happens in the platform's log store."
+    },
+    {
+      "control": "au-6.5",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "reason": "Reviewing and analyzing audit records is done by the organization's people, using the platform's log store."
+    },
+    {
+      "control": "au-6.6",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "reason": "Reviewing and analyzing audit records is done by the organization's people, using the platform's log store."
+    },
+    {
+      "control": "au-7",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-7.1",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-9.2",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-9.3",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-9.4",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-11",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-12",
+      "origination": "research-required",
+      "handoff": [
+        "PLT-13"
+      ],
+      "reason": "The platform generates audit records for container creation and administration (PLT-13). Whether the image generates audit records of its own depends on its function: a database audits sessions and statements, a static file server has nothing to audit beyond its access log."
+    },
+    {
+      "control": "au-12.1",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-19"
+      ],
+      "handoff": [
+        "PLT-09"
+      ],
+      "reason": "The image writes its records to standard streams and keeps none. Storing, protecting, retaining, and processing them is the platform's log store (PLT-09)."
+    },
+    {
+      "control": "au-12.3",
+      "origination": "host-inherited",
+      "handoff": [
+        "PLT-13"
+      ],
+      "reason": "Deciding what is audited is a platform and organizational configuration; the image has no audit configuration a person changes at runtime."
+    },
+    {
+      "control": "cm-1",
+      "origination": "organization-inherited",
+      "reason": "Policy and procedures are written and maintained by the organization for the system. The standard is an input to them, not a substitute."
+    },
+    {
+      "control": "cm-2",
+      "origination": "image-owned",
+      "criteria": [
+        "IMG-01",
+        "IMG-02",
+        "IMG-23"
+      ],
+      "reason": "The image's baseline configuration is its lock, its build definition, and the labels that tie a built image to both. No SRG rule the standard cites reaches CM-2."
+    },
+    {
+      "control": "cm-2.2",
+      "origination": "image-owned",
+      "criteria": [
+        "IMG-01",
+        "IMG-02",
+        "IMG-04",
+        "IMG-23"
+      ],
+      "reason": "The baseline is maintained automatically: the lock records every input, the build verifies it, and drift is reported without review being bypassed."
+    },
+    {
+      "control": "cm-2.3",
+      "origination": "image-owned",
+      "criteria": [
+        "IMG-23",
+        "IMG-24"
+      ],
+      "reason": "Every released version is retained under an immutable tag, and the lock and build definition that produced it are in version control."
+    },
+    {
+      "control": "cm-2.7",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "cm-3",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-04"
+      ],
+      "reason": "Configuration change control, impact analysis, and the configuration management plan are organizational processes. The image contributes a reviewed change to its inputs (IMG-04), which is evidence for them, not the process itself."
+    },
+    {
+      "control": "cm-3.1",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-04"
+      ],
+      "reason": "Configuration change control, impact analysis, and the configuration management plan are organizational processes. The image contributes a reviewed change to its inputs (IMG-04), which is evidence for them, not the process itself."
+    },
+    {
+      "control": "cm-3.2",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-04"
+      ],
+      "reason": "Configuration change control, impact analysis, and the configuration management plan are organizational processes. The image contributes a reviewed change to its inputs (IMG-04), which is evidence for them, not the process itself."
+    },
+    {
+      "control": "cm-3.4",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-04"
+      ],
+      "reason": "Configuration change control, impact analysis, and the configuration management plan are organizational processes. The image contributes a reviewed change to its inputs (IMG-04), which is evidence for them, not the process itself."
+    },
+    {
+      "control": "cm-3.6",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-04"
+      ],
+      "reason": "Configuration change control, impact analysis, and the configuration management plan are organizational processes. The image contributes a reviewed change to its inputs (IMG-04), which is evidence for them, not the process itself."
+    },
+    {
+      "control": "cm-4",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-04"
+      ],
+      "reason": "Configuration change control, impact analysis, and the configuration management plan are organizational processes. The image contributes a reviewed change to its inputs (IMG-04), which is evidence for them, not the process itself."
+    },
+    {
+      "control": "cm-4.1",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-04"
+      ],
+      "reason": "Configuration change control, impact analysis, and the configuration management plan are organizational processes. The image contributes a reviewed change to its inputs (IMG-04), which is evidence for them, not the process itself."
+    },
+    {
+      "control": "cm-4.2",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-04"
+      ],
+      "reason": "Configuration change control, impact analysis, and the configuration management plan are organizational processes. The image contributes a reviewed change to its inputs (IMG-04), which is evidence for them, not the process itself."
+    },
+    {
+      "control": "cm-5",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-06",
+        "IMG-10"
+      ],
+      "handoff": [
+        "PLT-12",
+        "PLT-13"
+      ],
+      "reason": "Access restrictions on changing the system are the platform's: who may deploy, and who may push to the registry. The image cannot be changed in place."
+    },
+    {
+      "control": "cm-6",
+      "origination": "research-required",
+      "reason": "Configuration settings are established by a DoD security configuration guide, which for an image means an agreed SCAP rule selection. That is target IMG-T3; until it is required this cannot be image-owned."
+    },
+    {
+      "control": "cm-6.2",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-08",
+        "IMG-15"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "Detecting and responding to unauthorized changes or components at runtime is the platform's monitor. The image contributes an inventory and a read-only filesystem to compare against."
+    },
+    {
+      "control": "cm-7.1",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "cm-7.2",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-07",
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-01",
+        "PLT-16"
+      ],
+      "reason": "Preventing unauthorized program execution is enforced by the platform admitting only authorized images and monitoring processes. The image contains only declared software."
+    },
+    {
+      "control": "cm-7.5",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-07"
+      ],
+      "handoff": [
+        "PLT-01"
+      ],
+      "reason": "Execution allow-listing is enforced by the platform admitting only authorized images. The image contributes by containing only declared software, but enforces nothing itself."
+    },
+    {
+      "control": "cm-8",
+      "origination": "image-owned",
+      "criteria": [
+        "IMG-08",
+        "IMG-21",
+        "IMG-23"
+      ],
+      "reason": "The image carries an inventory of its packages, an SBOM, and labels identifying its inputs. No SRG rule the standard cites reaches CM-8."
+    },
+    {
+      "control": "cm-8.1",
+      "origination": "image-owned",
+      "criteria": [
+        "IMG-08",
+        "IMG-21"
+      ],
+      "reason": "The inventory is written at build time from what was actually installed, and regenerated with every build, so it cannot drift from the image."
+    },
+    {
+      "control": "cm-8.2",
+      "origination": "image-owned",
+      "criteria": [
+        "IMG-08",
+        "IMG-21"
+      ],
+      "reason": "The inventory is written at build time from what was actually installed, and regenerated with every build, so it cannot drift from the image."
+    },
+    {
+      "control": "cm-8.3",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-08",
+        "IMG-15"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "Detecting and responding to unauthorized changes or components at runtime is the platform's monitor. The image contributes an inventory and a read-only filesystem to compare against."
+    },
+    {
+      "control": "cm-8.4",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "cm-9",
+      "origination": "organization-inherited",
+      "criteria": [
+        "IMG-04"
+      ],
+      "reason": "Configuration change control, impact analysis, and the configuration management plan are organizational processes. The image contributes a reviewed change to its inputs (IMG-04), which is evidence for them, not the process itself."
+    },
+    {
+      "control": "cm-10",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "cm-11",
+      "origination": "image-owned",
+      "criteria": [
+        "IMG-06",
+        "IMG-10"
+      ],
+      "reason": "No software can be installed into a running image: it has no package manager and its software is not writable."
+    },
+    {
+      "control": "cm-12",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "cm-12.1",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ia-1",
+      "origination": "organization-inherited",
+      "reason": "Policy and procedures are written and maintained by the organization for the system. The standard is an input to them, not a substitute."
+    },
+    {
+      "control": "ia-2.1",
+      "origination": "research-required",
+      "handoff": [
+        "PLT-13"
+      ],
+      "reason": "Multifactor authentication for privileged accounts is the platform's for its administrators (PLT-13). An image with privileged accounts of its own, such as a database superuser, has to answer this for those accounts; one with no accounts does not."
+    },
+    {
+      "control": "ia-12",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ia-12.2",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ia-12.3",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ia-12.4",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ia-12.5",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "ra-5",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-25"
+      ],
+      "handoff": [
+        "PLT-08"
+      ],
+      "reason": "The image is scanned at build, but vulnerability monitoring of the running system is the platform's continuous scanning."
+    },
+    {
+      "control": "sc-1",
+      "origination": "organization-inherited",
+      "reason": "Policy and procedures are written and maintained by the organization for the system. The standard is an input to them, not a substitute."
+    },
+    {
+      "control": "sc-4",
+      "origination": "host-inherited",
+      "handoff": [
+        "PLT-02",
+        "PLT-07"
+      ],
+      "reason": "Preventing information transfer through shared resources is namespace and privilege isolation, which the platform provides. The two platform expectations reaching it disagree on origination; isolation is the orchestrator's, so host-inherited."
+    },
+    {
+      "control": "sc-5",
+      "origination": "deployment-configured",
+      "handoff": [
+        "PLT-05",
+        "PLT-10"
+      ],
+      "reason": "Denial-of-service protection for a workload is its resource limits and the platform's network controls in front of it."
+    },
+    {
+      "control": "sc-7",
+      "origination": "deployment-configured",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-10"
+      ],
+      "reason": "Boundary protection is network policy at the platform (PLT-10). The image declares the flows it needs (IMG-30), which is what lets the policy be deny-by-default."
+    },
+    {
+      "control": "sc-7.3",
+      "origination": "host-inherited",
+      "handoff": [
+        "PLT-10"
+      ],
+      "reason": "Access points and the behaviour of boundary devices when they fail belong to the platform's network, not to a workload on it."
+    },
+    {
+      "control": "sc-7.4",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "sc-7.5",
+      "origination": "deployment-configured",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-10"
+      ],
+      "reason": "Boundary protection is network policy at the platform (PLT-10). The image declares the flows it needs (IMG-30), which is what lets the policy be deny-by-default."
+    },
+    {
+      "control": "sc-7.7",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "sc-7.8",
+      "origination": "deployment-configured",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-10"
+      ],
+      "reason": "Boundary protection is network policy at the platform (PLT-10). The image declares the flows it needs (IMG-30), which is what lets the policy be deny-by-default."
+    },
+    {
+      "control": "sc-7.18",
+      "origination": "host-inherited",
+      "handoff": [
+        "PLT-10"
+      ],
+      "reason": "Access points and the behaviour of boundary devices when they fail belong to the platform's network, not to a workload on it."
+    },
+    {
+      "control": "sc-7.21",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-13"
+      ],
+      "handoff": [
+        "PLT-07",
+        "PLT-14"
+      ],
+      "reason": "Isolating system components from one another is the platform's namespace isolation and placement by sensitivity."
+    },
+    {
+      "control": "sc-12",
+      "origination": "deployment-configured",
+      "criteria": [
+        "IMG-16",
+        "IMG-17"
+      ],
+      "handoff": [
+        "PLT-06"
+      ],
+      "reason": "The keys an image uses are established, stored, and rotated by the deployment's secret store and mounted read-only. The image holds none of its own."
+    },
+    {
+      "control": "sc-12.1",
+      "origination": "deployment-configured",
+      "criteria": [
+        "IMG-16",
+        "IMG-17"
+      ],
+      "handoff": [
+        "PLT-06"
+      ],
+      "reason": "The keys an image uses are established, stored, and rotated by the deployment's secret store and mounted read-only. The image holds none of its own."
+    },
+    {
+      "control": "sc-15",
+      "origination": "not-applicable",
+      "reason": "Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's."
+    },
+    {
+      "control": "sc-17",
+      "origination": "deployment-configured",
+      "criteria": [
+        "IMG-17"
+      ],
+      "handoff": [
+        "PLT-06"
+      ],
+      "reason": "The trust anchors a deployment relies on are chosen and mounted by the deployment. The image contributes by adding none of its own."
+    },
+    {
+      "control": "sc-20",
+      "origination": "organization-inherited",
+      "reason": "Name resolution is infrastructure the organization runs for the whole system; a container uses the resolver the platform gives it."
+    },
+    {
+      "control": "sc-21",
+      "origination": "organization-inherited",
+      "reason": "Name resolution is infrastructure the organization runs for the whole system; a container uses the resolver the platform gives it."
+    },
+    {
+      "control": "sc-22",
+      "origination": "organization-inherited",
+      "reason": "Name resolution is infrastructure the organization runs for the whole system; a container uses the resolver the platform gives it."
+    },
+    {
+      "control": "sc-28",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-15"
+      ],
+      "handoff": [
+        "PLT-17"
+      ],
+      "reason": "Information at rest lives on volumes the platform provides and encrypts (PLT-17). The image confines persistent data to declared volumes."
+    },
+    {
+      "control": "sc-28.3",
+      "origination": "deployment-configured",
+      "criteria": [
+        "IMG-05",
+        "IMG-16"
+      ],
+      "handoff": [
+        "PLT-06"
+      ],
+      "reason": "Protected storage for keys is the platform's secret store. The image contributes by never storing a secret itself and reading keys only from read-only mounts."
+    },
+    {
+      "control": "si-1",
+      "origination": "organization-inherited",
+      "reason": "Policy and procedures are written and maintained by the organization for the system. The standard is an input to them, not a substitute."
+    },
+    {
+      "control": "si-2.2",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-25"
+      ],
+      "handoff": [
+        "PLT-08"
+      ],
+      "reason": "Automated determination of whether running components are current is the platform's continuous scanning. The image records its findings with each release."
+    },
+    {
+      "control": "si-3",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-28"
+      ],
+      "handoff": [
+        "PLT-08"
+      ],
+      "reason": "Malicious code protection for the running system is the platform's continuous scanning. The image is scanned for malware before it is released (IMG-28), which is evidence for this control but not the control."
+    },
+    {
+      "control": "si-4",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "System monitoring is the platform's container-aware runtime monitor (PLT-16). The image contributes a declaration of expected behaviour to monitor against."
+    },
+    {
+      "control": "si-4.2",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "System monitoring is the platform's container-aware runtime monitor (PLT-16). The image contributes a declaration of expected behaviour to monitor against."
+    },
+    {
+      "control": "si-4.4",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-10",
+        "PLT-16"
+      ],
+      "reason": "System monitoring is the platform's container-aware runtime monitor (PLT-16). The image contributes a declaration of expected behaviour to monitor against."
+    },
+    {
+      "control": "si-4.5",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "System monitoring is the platform's container-aware runtime monitor (PLT-16). The image contributes a declaration of expected behaviour to monitor against."
+    },
+    {
+      "control": "si-4.12",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "System monitoring is the platform's container-aware runtime monitor (PLT-16). The image contributes a declaration of expected behaviour to monitor against."
+    },
+    {
+      "control": "si-4.14",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "si-4.20",
+      "origination": "host-inherited",
+      "handoff": [
+        "PLT-13"
+      ],
+      "reason": "Monitoring of privileged users is monitoring of the platform's administrators."
+    },
+    {
+      "control": "si-4.22",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "System monitoring is the platform's container-aware runtime monitor (PLT-16). The image contributes a declaration of expected behaviour to monitor against."
+    },
+    {
+      "control": "si-5",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "si-5.1",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "si-7",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-22"
+      ],
+      "handoff": [
+        "PLT-01"
+      ],
+      "reason": "Integrity verification of software in use is the platform verifying the image signature at admission. The image contributes the signature."
+    },
+    {
+      "control": "si-7.1",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-15",
+        "IMG-22"
+      ],
+      "handoff": [
+        "PLT-01",
+        "PLT-16"
+      ],
+      "reason": "Integrity of software in use is checked by the platform: signature verification at admission (PLT-01) and runtime monitoring of protected binaries (PLT-16). The image contributes its signature and a read-only, declared filesystem."
+    },
+    {
+      "control": "si-7.2",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "System monitoring is the platform's container-aware runtime monitor (PLT-16). The image contributes a declaration of expected behaviour to monitor against."
+    },
+    {
+      "control": "si-7.5",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "System monitoring is the platform's container-aware runtime monitor (PLT-16). The image contributes a declaration of expected behaviour to monitor against."
+    },
+    {
+      "control": "si-7.7",
+      "origination": "host-inherited",
+      "criteria": [
+        "IMG-30"
+      ],
+      "handoff": [
+        "PLT-16"
+      ],
+      "reason": "System monitoring is the platform's container-aware runtime monitor (PLT-16). The image contributes a declaration of expected behaviour to monitor against."
+    },
+    {
+      "control": "si-7.15",
+      "origination": "image-owned",
+      "criteria": [
+        "IMG-02"
+      ],
+      "handoff": [
+        "PLT-01"
+      ],
+      "reason": "Every component is authenticated by digest and, where the publisher signs, by signature before it is installed into the image. No SRG rule the standard cites reaches SI-7(15)."
+    },
+    {
+      "control": "si-12",
+      "origination": "organization-inherited",
+      "reason": "An organizational process, performed for the system rather than by any component of it."
+    },
+    {
+      "control": "si-16",
+      "origination": "host-inherited",
+      "handoff": [
+        "PLT-07"
+      ],
+      "reason": "Memory protection, non-executable memory and address space randomization, is provided by the host kernel. It is reached through the platform's resource rule, which does not describe it."
+    }
+  ]
+}

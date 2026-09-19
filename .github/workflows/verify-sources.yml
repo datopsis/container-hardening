@@ -49,6 +49,9 @@ jobs:
       - name: Check the crosswalk matches the CCI list and catalogue
         run: python scripts/build-cci-crosswalk.py --check
 
+      - name: Check the control baseline matches the catalogue and High baseline
+        run: python scripts/build-control-baseline.py --check
+
       - name: Report a drifted or replaced source
         if: failure()
         env:

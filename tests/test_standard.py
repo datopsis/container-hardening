@@ -177,7 +177,11 @@ class AnchorTests(unittest.TestCase):
 
 class LinkTests(unittest.TestCase):
     def test_every_relative_link_resolves(self) -> None:
-        documents = list(STANDARD.glob("*.md")) + list((REPOSITORY / "docs" / "adr").glob("*.md"))
+        documents = (
+            list(STANDARD.glob("*.md"))
+            + list((REPOSITORY / "docs" / "adr").glob("*.md"))
+            + [REPOSITORY / "docs" / "CONTROL-MODEL.md", REPOSITORY / "docs" / "controls" / "README.md"]
+        )
         for document in documents:
             for target in LINK.findall(document.read_text(encoding="utf-8")):
                 if target.startswith(("http://", "https://", "mailto:")):

@@ -276,3 +276,13 @@ is one here.
   the signature the chain of trust extends to
 - **Anchors:** No rendered SRG rule. Serves SI-7.
 - **Source:** [SP 800-190 §4.6](nist-800-190.md#hardware)
+
+### HST-05 Clocks are synchronized
+
+The host synchronizes its clock with an authoritative time source, so that the
+timestamps on every container's logs, and on the platform's audit records, can
+be correlated. A container reads the host's clock; it has none of its own.
+
+- **Origination:** `host-inherited`
+- **Image contribution:** none.
+- **Anchors:** [V-233055](../srg/container-platform-srg/rules/V-233055.md) → [AU-8](../crosswalk/controls/au-8.md); [V-263601](../srg/container-platform-srg/rules/V-263601.md) → [SC-45](../crosswalk/controls/sc-45.md)
