@@ -22,6 +22,10 @@ A revision that does not bind (check-revision.py), or a violation from
 check-profile.py, check-component.py, or the decisions worksheet, is not a
 lower score but a failure. A decision not yet reviewed blocks a release.
 
+Where a criterion says a person's review may evidence it, --reviews adds the
+reviews that hold (reviews.py); a review of any other criterion, by anyone but
+a code owner, or of something since changed, is an error.
+
 With --draft, it is a draft assessment for an image still researching the
 standard: the profile may be incomplete, the component definition and
 requirements absent, and the revision may be any; each gap is reported as
@@ -203,6 +207,8 @@ def main() -> int:
     parser.add_argument("--requirement-pattern", default=None)
     parser.add_argument("--crosswalk", type=Path, help="the image's map from each criterion to its requirement identifiers")
     parser.add_argument("--decisions", type=Path, help="the image's decisions worksheet for the controls left to it")
+    parser.add_argument("--reviews", type=Path, help="the image's manual reviews, for the criteria that allow one")
+    parser.add_argument("--repository", type=Path, help="the image's repository, where a review's CODEOWNERS and subjects are")
     parser.add_argument("--candidate", action="append", default=[], metavar="ARCH=DIGEST",
                         help="the digest to be released for an architecture; that architecture's evidence must be about it")
     parser.add_argument("--draft", action="store_true",
@@ -249,12 +255,19 @@ def main() -> int:
         decision_errors, unreviewed = sheets.check_decisions(json.loads(args.decisions.read_text(encoding="utf-8")), component)
         component_violations += ["decisions: " + e for e in decision_errors]
 
+    reviewed: list[dict] = []
+    review_errors: list[str] = []
+    if args.reviews:
+        reviews = load("reviews")
+        base = (args.repository or args.reviews.resolve().parent).resolve()
+        reviewed, review_errors = reviews.check(json.loads(args.reviews.read_text(encoding="utf-8")), base, baseline, args.today)
+
     evidence = evidence_module.load(args.evidence, profile, baseline, draft=args.draft)
     if evidence.valid:
         evidence.errors.extend(scope_errors(evidence, mapping, args.candidate))
     # The exception register is judged here, from the profile itself, rather
     # than taken from the image's word for it (IMG-26).
-    results = evidence.results + [{
+    results = evidence.results + reviewed + [{
         "id": "conformance.exceptions", "criterion": "IMG-26", "architecture": GENERIC, "file": "(conformance)",
         "check": "every exception is a recorded deviation, none expired or over its limit",
         "passed": not profile_violations,
@@ -271,7 +284,7 @@ def main() -> int:
     scopes = score(baseline, results, deviated, architectures, roles, criteria_map, topologies) if evidence.valid else {}
 
     failed_rows = [s + " " + r["criterion"] for s, rows in scopes.items() for r in rows if r["status"] == "failed"]
-    failing = bool(revision_errors or profile_violations or component_violations or failed_rows)
+    failing = bool(revision_errors or profile_violations or component_violations or review_errors or failed_rows)
     stopping = [] if evidence.valid else ["the evidence is invalid"]
     release_blockers = stopping + (["the checks fail"] if failing else []) + blockers(scopes, active)
     if unreviewed:
@@ -304,7 +317,9 @@ def main() -> int:
         "release_blockers": release_blockers, "evidence_errors": evidence.errors,
         "revision_errors" if not args.draft else "drift": revision_errors,
         "profile_violations": profile_violations, "component_violations": component_violations,
-        "unreviewed_decisions": unreviewed, "scopes": summary,
+        "unreviewed_decisions": unreviewed, "review_errors": review_errors,
+        "manual_reviews": [r["review"] | {"criterion": r["criterion"], "passed": r["passed"]} for r in reviewed],
+        "scopes": summary,
     }, indent=2) + "\n", encoding="utf-8")
 
     colour, named = COLOURS[state]
@@ -331,6 +346,8 @@ def main() -> int:
         print(("  drift: " if args.draft else "  revision: ") + problem)
     for violation in profile_violations + component_violations:
         print("  " + prefix + ": " + violation)
+    for problem in review_errors:
+        print("  review: " + problem)
     for scope, rows in scopes.items():
         for row in rows:
             if row["status"] != "met":

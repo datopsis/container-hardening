@@ -85,6 +85,7 @@ class Item:
     verification: str = ""
     evidence: str = ""
     scope: str | None = None
+    manual_review: str | None = None
 
 
 @dataclass
@@ -127,6 +128,8 @@ def parse_standard(
         item.origination = origination.group(1) if origination else None
         item.verification = " ".join(field_line(section, "Verification").split())
         item.evidence = " ".join(field_line(section, "Evidence").split())
+        manual = field_line(section, "Manual review").strip()
+        item.manual_review = "examine" if manual.startswith("Allowed, by examine") else None
         scope = field_line(section, "Scope").strip()
         item.scope = "architecture" if scope.startswith("Per architecture") else "generic" if scope.startswith("Generic") else None
         items[identifier] = item
@@ -580,7 +583,8 @@ def assemble(resolved, criteria, expectations, register, version) -> dict:
         },
         "criteria": {
             c.id: {"title": c.title, "level": "required" if c.required else "target",
-                   **({"scope": c.scope} if c.required else {})}
+                   **({"scope": c.scope} if c.required else {}),
+                   **({"manual_review": c.manual_review} if c.manual_review else {})}
             for c in (criteria[i] for i in ordered(criteria))
         },
         "expectations": {

@@ -1,10 +1,10 @@
 ---
-status: proposed
-date: 2026-09-19
+status: accepted
+date: 2026-09-20
 decision-makers: Joey
 ---
 
-# Record manual reviews as expiring evidence
+# Record manual reviews as evidence that lapses when what it reviewed changes
 
 ## Context and Problem Statement
 
@@ -36,8 +36,8 @@ not met, so the answer cannot be to let an image assert it.
 
 ## Decision Outcome
 
-Proposed: **a review record, as expiring evidence, allowed only where the
-standard says so.**
+Chosen: **a review record, allowed only where the standard says so, valid until
+what it reviewed changes.**
 
 1. **The standard says where.** A criterion states whether a manual review may
    evidence it, and by which method, examine or interview. Most criteria state
@@ -46,19 +46,30 @@ standard says so.**
    each naming the criterion, the requirement, the method, what was inspected
    (by commit, digest, or setting), the result, who reviewed it and when, and
    an expiry no more than 180 days out, as for a deviation.
-3. **The scorer turns current reviews into results**, marked as reviews, for the
-   criteria that allow them. An expired review, a review of a criterion that
-   does not allow one, or a review naming a commit or digest other than the one
-   judged, is an error.
+3. **The scorer turns reviews that hold into results**, marked as reviews, for
+   the criteria that allow them. A review of a criterion that allows none, by
+   anyone but a code owner, or of a subject since changed, is an error.
 4. **SCAP rules not checked** by the scan become review items when the SCAP
    profile exists (IMG-T3).
 
-### Open question
+### What was decided
 
-Which criteria allow a review. Candidates are the process criteria, such as
-IMG-04 (refresh is a reviewed change) and IMG-33 (source protected and
-traceable), and none of the runtime criteria. Marking one is a change to the
-criteria, and so makes every profile's revision stale until it is reassessed.
+**One criterion: IMG-04.** IMG-33 was the other candidate; its branch
+protection is readable from an API, so it stays testable and takes no review.
+No runtime or build criterion allows one.
+
+**No expiry date; a review lapses when its subject changes.** A review names
+what it read by path and SHA-256. A fixed period would either expire a review
+of something untouched, or leave a review standing after the thing changed.
+Binding it to the subject is both stricter and less noisy.
+
+**A code owner reviews.** `reviewed_by` must appear in the repository's
+`CODEOWNERS`, the same list GitHub uses to require review before merge.
+
+**The intended end state is no review at all.** If a refresh publishes a
+candidate lock with attested provenance, a check can hold the committed lock to
+an attested candidate, and IMG-04 becomes testable like everything else. That
+is on the roadmap; when it lands, IMG-04 stops allowing a review.
 
 ### Consequences
 
@@ -70,6 +81,9 @@ criteria, and so makes every profile's revision stale until it is reassessed.
 
 ### Enforcement
 
-None yet: this record is proposed. On acceptance, the scorer's tests and the
-conformance self-test would each gain a case for a current, an expired, and a
-disallowed review.
+`scripts/reviews.py`, which the scorer calls, with `tests/test_reviews.py`:
+a review that holds, one of a criterion that allows none, one by someone who is
+not a code owner, one whose subject has changed, and a repository with no
+CODEOWNERS. `tests/test_standard.py` requires the *Manual review* line to name
+a method the standard allows, and the control baseline records which criteria
+allow one.

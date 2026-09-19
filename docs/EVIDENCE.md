@@ -142,6 +142,54 @@ does not close a criterion the image states in several requirements. A deviation
 score as a pass. The exception register itself, IMG-26, is judged by the
 conformance workflow from the profile, not taken from the image's evidence.
 
+## Manual reviews
+
+Almost every criterion is evidenced by a check. One cannot be:
+[IMG-04](standard/criteria.md#img-04-input-refresh-is-a-reviewed-change) asks
+that someone read the change that produced the lock, and no test tells a
+considered review from a rubber stamp. A criterion says so itself, under
+*Manual review*, and only then may a review evidence it.
+
+A review is recorded in the image's repository, as JSON, and merged like any
+other change:
+
+```json
+{
+  "schema": "container-hardening/reviews", "schema_version": 1,
+  "reviews": [
+    {
+      "id": "lock-2026-09-20",
+      "criterion": "IMG-04",
+      "requirements": ["RWS-004"],
+      "method": "examine",
+      "subject": {"path": "lock.json", "sha256": "…"},
+      "result": true,
+      "reviewed_by": "@a-code-owner",
+      "reviewed_on": "2026-09-20",
+      "notes": "Read the pull request that changed the lock: the versions and digests match the refresh's report, and nothing else changed."
+    }
+  ]
+}
+```
+
+Three rules hold it down:
+
+- **Only where the standard allows it.** A review of any other criterion is an
+  error, not weaker evidence.
+- **By a code owner.** `reviewed_by` must be named in the repository's
+  `CODEOWNERS`, so who may review is the list that already governs merging.
+  Requiring a code owner's approval in branch protection makes the two agree.
+- **Until what it reviewed changes.** The review names its subject by path and
+  SHA-256. While that file is unchanged, the review holds; the moment it
+  changes, the review is stale, and the criterion has no evidence until someone
+  reviews it again. A review has no expiry date: it is bound to the thing, not
+  the calendar.
+
+Pass the file as the conformance workflow's `reviews` input. Each review that
+holds becomes a generic result, and `score.json` records who reviewed what, so
+a reader can tell a reviewed criterion from a tested one. A review is weaker
+evidence than a test, and exists only where a test cannot.
+
 ## What fails
 
 A run fails on invalid evidence, and on any of these, which are not a lower
@@ -151,6 +199,8 @@ score but a failure because a number beside them would mislead:
 - [`check-profile.py`](../scripts/check-profile.py) reports a violation,
   including an expired deviation or a stale applicability determination.
 - [`check-component.py`](../scripts/check-component.py) reports a violation.
+- A manual review is of a criterion that allows none, by someone who is not a
+  code owner, or of something that has since changed.
 - Any check failed.
 
 ## Draft assessments
