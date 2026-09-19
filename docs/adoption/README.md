@@ -52,5 +52,6 @@ standard cites it.
 
 The score, the badge, and what an image's evidence must contain are defined in
 [Evidence](../EVIDENCE.md), and computed by the conformance workflow from the
-image's own evidence. An image repository shows its score by keeping the badge
-the workflow writes for each architecture.
+image's own evidence. An image repository publishes its badges to its own
+`badges` branch with the badges workflow, and shows them in its README, as
+[Show the badges](../ADOPTING.md#8-show-the-badges) describes.

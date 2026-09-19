@@ -1,8 +1,8 @@
 # Reference web server
 
-![hardening amd64](https://datopsis.github.io/container-hardening/reference-web-server/badge-amd64.svg)
-![hardening arm64](https://datopsis.github.io/container-hardening/reference-web-server/badge-arm64.svg)
-![hardening generic](https://datopsis.github.io/container-hardening/reference-web-server/badge-generic.svg)
+[![hardening amd64](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/datopsis/container-hardening/badges/reference-web-server/shields-amd64.json)](https://github.com/datopsis/container-hardening/actions/workflows/reference-image.yml?query=branch%3Amain)
+[![hardening arm64](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/datopsis/container-hardening/badges/reference-web-server/shields-arm64.json)](https://github.com/datopsis/container-hardening/actions/workflows/reference-image.yml?query=branch%3Amain)
+[![hardening generic](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/datopsis/container-hardening/badges/reference-web-server/shields-generic.json)](https://github.com/datopsis/container-hardening/actions/workflows/reference-image.yml?query=branch%3Amain)
 
 A generic, hardened HTTP server image, built to [the standard](../../docs/standard/README.md)
 and verified against [its criteria](../../docs/standard/criteria.md). It is the
@@ -59,8 +59,9 @@ on a native runner for each architecture, keeps each architecture's evidence
 separately, and passes it to the
 [conformance workflow](../../.github/workflows/conformance.yml), which judges
 this image exactly as it judges any other: `hardening amd64 31/34`,
-`hardening arm64 31/34`, release eligible. On main, the badges above are
-published from that run.
+`hardening arm64 31/34`. On main, that run publishes the badges above to this
+repository's `badges` branch, exactly as an adopting image publishes its own;
+see [Show the badges](../../docs/ADOPTING.md#8-show-the-badges).
 
 ## What it is not a template for
 

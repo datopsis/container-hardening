@@ -209,9 +209,14 @@ hardening arm64 | 31/34 · 0123456 · 2026-09-19
 ```
 
 Each names its scope, the revision, and the day it was scored, so it never
-reads as more, or more current, than it is. The reference image's badges are
-published to GitHub Pages from every run on main, under
-`https://datopsis.github.io/container-hardening/reference-web-server/`.
+reads as more, or more current, than it is.
+
+Each image publishes its own badges, from its own CI: the
+[badges workflow](../.github/workflows/badges.yml) commits them, on every run
+on the default branch, to a `badges` branch in the image's repository, and the
+image's README points at them. This repository hosts no image's badges but its
+own reference image's, published the same way. How to add them is
+[Show the badges](ADOPTING.md#8-show-the-badges).
 
 | Colour | Means |
 | --- | --- |

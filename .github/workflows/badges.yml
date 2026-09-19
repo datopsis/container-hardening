@@ -1,0 +1,110 @@
+name: Badges
+
+# Called by an image's CI, after the conformance workflow, to publish that
+# image's current badges in its own repository. The score and badges the
+# conformance run kept are committed to a branch of their own, `badges` by
+# default, which holds nothing else; the image's README points at them. Nothing
+# is published anywhere else, and this repository hosts no one's badges.
+#
+# It publishes only from a push to, or a dispatch on, the default branch: a
+# badge says where the image stands on main, never on a pull request.
+#
+#   badges:
+#     needs: conformance
+#     if: ${{ !cancelled() }}
+#     permissions:
+#       contents: write
+#     uses: datopsis/container-hardening/.github/workflows/badges.yml@<commit>
+#
+# See docs/ADOPTING.md, "Show the badges".
+
+on:
+  workflow_call:
+    inputs:
+      score-artifact:
+        description: Name of the artifact the conformance workflow kept the score and badges in
+        required: false
+        type: string
+        default: conformance
+      branch:
+        description: The branch the badges are published to; it holds nothing else
+        required: false
+        type: string
+        default: badges
+      path:
+        description: Directory within that branch, for a repository with more than one image; empty for the top
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: publish the badges
+    if: >-
+      github.event_name != 'pull_request' && github.event_name != 'pull_request_target' &&
+      github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    concurrency:
+      group: badges-${{ github.repository }}-${{ inputs.branch }}
+      cancel-in-progress: false
+    steps:
+      - name: Fetch the score and badges
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.score-artifact }}
+          path: score
+
+      - name: Commit them to the badges branch
+        env:
+          TOKEN: ${{ github.token }}
+          SERVER: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+          BRANCH: ${{ inputs.branch }}
+          TARGET: ${{ inputs.path }}
+          SHA: ${{ github.sha }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          case "$BRANCH" in ""|*..*|/*|*" "*) echo "not a usable branch name: $BRANCH" >&2; exit 1 ;; esac
+          case "$TARGET" in *..*|/*) echo "path must stay inside the branch: $TARGET" >&2; exit 1 ;; esac
+          if ! ls score/shields-*.json >/dev/null 2>&1; then
+            echo "::error::the conformance run kept no badges; nothing to publish" >&2
+            exit 1
+          fi
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+          git init -q site
+          cd site
+          git remote add origin "$SERVER/$REPOSITORY.git"
+          if git -c http.extraheader="$auth" ls-remote --exit-code --heads origin "$BRANCH" >/dev/null; then
+            git -c http.extraheader="$auth" fetch -q --depth 1 origin "$BRANCH"
+            git checkout -q -b "$BRANCH" FETCH_HEAD
+          else
+            # The branch shares no history with the code; it holds only badges.
+            git checkout -q --orphan "$BRANCH"
+          fi
+          destination="${TARGET:-.}"
+          mkdir -p "$destination"
+          rm -f "$destination"/badge-*.svg "$destination"/shields-*.json "$destination"/score.json
+          cp ../score/badge-*.svg ../score/shields-*.json ../score/score.json "$destination"/
+          cat > README.md <<EOF
+          # Badges
+
+          Written by the conformance workflow on every run on the default branch,
+          and nothing else. Do not edit by hand. The image's README points at the
+          \`shields-*.json\` files here.
+          EOF
+          git add -A
+          if git diff --cached --quiet; then
+            echo "the badges are unchanged"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Badges for $SHA" -m "From $RUN"
+          git -c http.extraheader="$auth" push -q origin "HEAD:refs/heads/$BRANCH"
+          echo "published to $BRANCH/${TARGET}"
