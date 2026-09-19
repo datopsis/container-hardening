@@ -43,3 +43,4 @@ record says so, because an unenforced decision decays quietly.
 | --- | --- | --- |
 | [0001](0001-render-catalogues-never-commit-packages.md) | Render requirement catalogues to Markdown and never commit the source packages | accepted |
 | [0002](0002-derive-800-53-cross-references-from-cci.md) | Derive SRG-to-800-53 cross-references from the DISA CCI list | accepted |
+| [0003](0003-secrets-reach-an-image-only-as-read-only-files.md) | Secrets reach an image only as read-only files | proposed |

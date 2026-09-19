@@ -6,15 +6,18 @@ build, and the expectations placed on the platform those containers run on.
 One standard, applied across repositories, tailored per application rather than
 reinvented per application.
 
-> **Status: scaffold.** The requirement catalogues render and the sources are
-> pinned. The standard itself and the control mapping are outstanding — see
-> [the roadmap](docs/ROADMAP.md). Nothing here is an authorization package, and
+> **Status: draft standard.** The requirement catalogues render, the sources
+> are pinned, and the standard is written. The control mapping is outstanding —
+> see [the roadmap](docs/ROADMAP.md). Nothing here is an authorization package, and
 > nothing here claims STIG certification.
 
 ## What is here
 
 | | |
 | --- | --- |
+| [**The standard**](docs/standard/README.md) | What a hardened Datopsis image is, and why. Start here. |
+| [Image criteria](docs/standard/criteria.md) | The standard as 26 testable properties, each anchored to an SRG rule. |
+| [Platform expectations](docs/standard/platform.md) | What the platform must impose for the image's properties to count. |
 | [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 391 rules today. |
 | [SRG to 800-53 crosswalk](docs/crosswalk/README.md) | Every rendered rule joined to NIST SP 800-53 Rev 5 through its CCIs. Derived, not hand-authored. |
 | [Source register](artifacts/sources.json) | Ten sources pinned by SHA-256, with role, rendering state, and redistribution terms. |

@@ -57,7 +57,7 @@ revision and a replaced package is visible rather than silent.
 | DISA CCI list | 2025-01-23 | Crosswalk | [Joined, 106 controls](crosswalk/README.md) |
 | DISA Container Platform SRG | V2R4 | Platform controls | Yes, 188 rules |
 | DISA GPOS SRG | V3R3 | **Image controls** | Yes, 203 rules |
-| DoD DevSecOps Enterprise Container Hardening Guide | 1.2 | Process guide | n/a, prose |
+| DISA Container Hardening Process Guide | V1R2 | Process guide | n/a, prose |
 | DISA RHEL 9 STIG | V2R4 | Host controls | Not yet |
 | DISA Web Server SRG | V3R3 | Conditional | Not yet |
 | DISA Application Server SRG | V4R5 | Conditional | Not yet |
@@ -93,23 +93,17 @@ an omission from it.
 
 ## Package 2: the hardening standard
 
-- [ ] Write the standard itself, in the style of the Minimus write-up: what a
-  hardened Datopsis image is, what it refuses to do, and why each position is
-  held. It should be readable end to end by an engineer who has never opened an
-  SRG.
-- [ ] State the criteria as testable properties, not aspirations. The
-  non-negotiables already proven in `datopsis/nginx-ubi` are the starting set:
-  digest-pinned base, no package manager in the final image, non-root with no
-  privilege transition, unprivileged ports, read-only root filesystem with
-  declared writable mounts, no required capabilities, `no-new-privileges`,
-  read-only mounted secrets and trust material, pinned and verified build
-  inputs, and hermetic assembly with networking disabled.
-- [ ] Define the platform expectations separately from the image expectations.
-  The Container Platform SRG governs the former and an image cannot satisfy it;
-  conflating the two is the failure this repository exists to prevent.
-- [ ] Fold in the DoD DevSecOps Enterprise Container Hardening Guide 1.2, which
-  is process guidance rather than a rule catalogue, and say where this standard
-  follows it and where it deliberately goes further.
+- [ ] Accept or amend [ADR-0003](adr/0003-secrets-reach-an-image-only-as-read-only-files.md),
+  secrets only as read-only files. It is proposed, and it breaks
+  compatibility for `lakekeeper-ubi` and `clickhouse-ubi`.
+- [ ] Agree a GPOS-derived OpenSCAP rule selection, so that
+  [IMG-T3](standard/criteria.md#img-t3-compliance-scan) can become required.
+  `clickhouse-ubi` and `postgresql-ubi` currently scan against different ones.
+- [ ] Decide whether to adopt antivirus scanning of retrieved build inputs,
+  which the DISA process guide asks for and the standard does not yet require.
+- [ ] Define the exception register format that
+  [IMG-26](standard/criteria.md#img-26-exceptions-expire) requires, together
+  with the Package 4 deviation format; they are the same mechanism.
 
 ## Package 3: the control mapping
 
@@ -142,6 +136,10 @@ an omission from it.
 - [ ] Reconcile the two repositories' source registers. `nginx-ubi` currently
   records the Container Platform SRG as unresolved at V2R1; the current release
   is **V2R4** and it retrieves normally.
+- [ ] Close the gaps in the [conformance snapshot](standard/conformance.md).
+  The largest are `clickhouse-ubi`'s build (IMG-02, IMG-03) and secrets
+  (IMG-16), and the missing release workflows in `seaweedfs-ubi` and
+  `lakekeeper-ubi` (IMG-21, IMG-22). No image yet asserts IMG-14.
 - [ ] Define what adoption costs a repository: which files it must add, which
   checks it must run, and what it must publish.
 
@@ -178,6 +176,13 @@ an omission from it.
   catalogues on every pull request; `verify-sources.yml` compares the committed
   Markdown against the real packages weekly.
 - `.gitignore` keeps source packages out of the repository.
+- [`docs/standard/`](standard/README.md) holds the standard: the prose account,
+  26 required image criteria and three targets, 11 platform expectations, a
+  comparison with the DISA Container Hardening Process Guide, and a conformance
+  snapshot of the five image repositories. `tests/test_standard.py` checks that
+  every cited SRG rule reaches the 800-53 control cited beside it, that image
+  criteria cite only image rules and platform expectations only platform rules,
+  and that every link and anchor resolves.
 
 Two findings from building it, recorded so they are not rediscovered:
 
