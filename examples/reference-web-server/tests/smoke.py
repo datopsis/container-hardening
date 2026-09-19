@@ -262,9 +262,13 @@ def tls(suite: Suite) -> None:
     with tempfile.TemporaryDirectory() as scratch:
         work = Path(scratch)
         (work / "tls").mkdir()
-        suite.podman("run", "--rm", "--volume", str(work / "tls") + ":/out:Z", PROBE, "openssl", "req", "-x509",
-                     "-newkey", "rsa:2048", "-nodes", "-days", "1", "-subj", "/CN=reference-web-server",
-                     "-keyout", "/out/server.key", "-out", "/out/server.crt", check=True)
+        # Mounted the way a platform mounts a secret for an arbitrary UID in
+        # group 0: readable by the group, not by others (ADR-0003, amended).
+        suite.podman("run", "--rm", "--volume", str(work / "tls") + ":/out:Z", PROBE, "bash", "-euc",
+                     "openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj /CN=reference-web-server "
+                     "-keyout /out/server.key -out /out/server.crt 2>/dev/null; "
+                     "chown 0:0 /out/server.key /out/server.crt; chmod 0640 /out/server.key; chmod 0644 /out/server.crt",
+                     check=True)
         (work / "tls.conf").write_text(
             "server {\n    listen 8443 ssl;\n    ssl_certificate /etc/nginx/tls/server.crt;\n"
             "    ssl_certificate_key /etc/nginx/tls/server.key;\n    ssl_protocols TLSv1.2 TLSv1.3;\n"

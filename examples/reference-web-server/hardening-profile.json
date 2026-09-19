@@ -142,7 +142,7 @@
       "id": "DEV-011",
       "kind": "criterion",
       "target": "IMG-16",
-      "reason": "nginx does not refuse a group- or world-readable key file, which the criterion requires. It does refuse a missing or empty one.",
+      "reason": "nginx does not refuse a world-readable key file, which the criterion requires. It does refuse a missing or empty one.",
       "compensating": "The key is mounted read-only and never reaches arguments, environment, or logs; the platform mounts it with restrictive permissions (PLT-06).",
       "owner": "Joey",
       "approved_by": "Joey",

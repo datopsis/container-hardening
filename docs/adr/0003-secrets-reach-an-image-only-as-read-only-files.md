@@ -66,8 +66,9 @@ deployment chose well. Refusing the environment variable is the only form of
 the rule the image itself can enforce.
 
 The file must be on a read-only mount, not writable by the runtime identity,
-and not group- or world-readable. Otherwise the process that reads the secret
-could also replace it.
+and not world-readable. Otherwise the process that reads the secret could also
+replace it, or anything else on the host could read it. See the amendment
+below on group read.
 
 ### Consequences
 
@@ -90,3 +91,17 @@ the test each image must carry. Nothing in this repository runs it: it is
 enforced in each adopting image repository, and adoption is tracked under
 Package 5 of the roadmap. Until an image carries the test, this decision is
 unenforced for that image.
+
+## Amendment, 2026-09-19
+
+This record first said a secret file must be neither group- nor
+world-readable. That contradicts
+[IMG-12](../standard/criteria.md#img-12-runs-under-an-arbitrary-uid): an image
+running under an arbitrary UID in group 0 cannot own a mounted secret, so it
+reads one through its group, and Kubernetes mounts secrets group-readable with
+an `fsGroup` for exactly that reason. Building the reference image found it:
+its TLS key, mounted owner-only, was unreadable to the server.
+
+The rule is now: not writable by the runtime identity, not world-readable, and
+readable by no group other than the runtime group. The decision itself, files
+and never the environment, is unchanged.
