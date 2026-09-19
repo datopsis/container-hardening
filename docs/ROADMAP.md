@@ -123,9 +123,6 @@ standard, not an omission from it.
 
 ## Package 4: per-application tailoring
 
-- [ ] Accept or amend [ADR-0005](adr/0005-tailor-by-profile-deviations-expire.md),
-  the hardening profile and its expiry limits of 180 days for a criterion or
-  control and 90 for a vulnerability.
 - [ ] Pin a conditional source for each image function the register does not
   yet cover. Databases have none; the DISA Database SRG is the likely
   candidate. Object storage and API or catalog services likewise need their
