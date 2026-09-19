@@ -84,6 +84,12 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   standard, the control model, or the ADRs now depends on or names one. The
   conformance snapshot moved to `docs/adoption/` as an adoption record, with a
   plan for a conformance score and badge.
+- Defined per-image tailoring in `docs/TAILORING.md`. Each image keeps a
+  hardening profile recording an applicability determination for every
+  conditional source, tied to the source's pinned digest, and deviations that
+  expire within 180 days, or 90 for a vulnerability. `scripts/check-profile.py`
+  checks it; `check-component.py --profile` honours active deviations.
+  Proposed [ADR-0005](docs/adr/0005-tailor-by-profile-deviations-expire.md).
 
 ### Fixed
 

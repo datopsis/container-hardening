@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "image": "datopsis/nginx-ubi",
+  "standard": {
+    "revision": "2557157ba17976a93057fe3e41cbaffadca34e37"
+  },
+  "function": "Serves static content and reverse-proxies HTTP. It has no management interface, no user accounts, and hosts no application runtime.",
+  "applicability": [
+    {
+      "source": "disa-application-server-srg",
+      "release": "V4R5",
+      "sha256": "ea33d7f18f950e86c9e0cc63835cf8802d319804ac143b2020b1fbac13ff2643",
+      "applies": false,
+      "basis": "Of the 137 rules in V4R5, 27 presuppose a management interface or hosted applications and 18 refer to accounts. This image has none of those, so those rules govern objects that do not exist here. What remains, logging, TLS, and session handling, the Web Server SRG states in terms that match this image.",
+      "evidence": "https://github.com/datopsis/nginx-ubi/blob/main/docs/adr/0010-application-server-srg-not-applicable.md",
+      "reviewed_on": "2026-09-18",
+      "reviewed_by": "Joey"
+    },
+    {
+      "source": "disa-web-server-srg",
+      "release": "V3R3",
+      "sha256": "7345e31a61c162ee4ca0253e3f44b729c18bb45b3a17cb364e5d08422412b409",
+      "applies": true,
+      "basis": "The image's function is serving and proxying HTTP, which is the subject of the Web Server SRG.",
+      "evidence": "https://github.com/datopsis/nginx-ubi/blob/main/docs/adr/0010-application-server-srg-not-applicable.md",
+      "reviewed_on": "2026-09-18",
+      "reviewed_by": "Joey"
+    }
+  ],
+  "deviations": []
+}

@@ -369,8 +369,10 @@ the file that was reviewed, not that the file is benign.
 exception: scoped to one image digest, with a reason, an owner, and an expiry
 date. An expired exception fails the build.
 
-- **Test:** the exception register is machine-readable and checked in CI; an
-  entry past its expiry fails.
+- **Test:** exceptions are the `deviations` in the image's
+  [hardening profile](../TAILORING.md#deviations), checked in CI by
+  `check-profile.py`; an entry past its expiry, or recorded for longer than
+  its kind allows, fails.
 - **Anchors:** [V-259333](../srg/general-purpose-operating-system-srg/rules/V-259333.md) → [SI-2](../crosswalk/controls/si-2.md)
 
 ## Targets

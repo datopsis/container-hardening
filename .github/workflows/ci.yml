@@ -35,8 +35,8 @@ jobs:
       # consistency of the rendered catalogues. Verifying the Markdown against
       # the packages it derives from needs the packages, and is done by
       # verify-sources.yml.
-      - name: Validate the register, catalogues, crosswalk, standard, and control baseline
-        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls -v
+      - name: Validate the register, catalogues, crosswalk, standard, controls, and tailoring
+        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls tests.test_tailoring -v
 
       - name: Audit GitHub Actions security
         uses: zizmorcore/zizmor-action@70fb788f84895a7701f5643d103d587e460b5c99 # v0.6.3

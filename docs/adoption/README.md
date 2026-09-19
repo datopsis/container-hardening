@@ -12,7 +12,7 @@ checks, each against a pinned revision of this repository:
 
 | File | Checked by | Defined in |
 | --- | --- | --- |
-| A hardening profile | `scripts/check-profile.py` | Tailoring, Package 4 of the [roadmap](../ROADMAP.md) |
+| A hardening profile | `scripts/check-profile.py` | [Tailoring](../TAILORING.md) |
 | An OSCAL component definition | `scripts/check-component.py` | [Control model](../CONTROL-MODEL.md) |
 | Its own tests for each required criterion | Its own CI | [Criteria](../standard/criteria.md) |
 

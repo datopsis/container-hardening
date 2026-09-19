@@ -11,7 +11,8 @@ the rules in docs/CONTROL-MODEL.md:
   verification pointer
 - only an `image-owned` control carries an assessment method
 - a control's origination matches the baseline, except where the baseline
-  leaves it `research-required` for the image to decide
+  leaves it `research-required` for the image to decide, or the image's
+  hardening profile records an active deviation for it
 - every control in the baseline is present, unless --allow-incomplete
 - a cross-reference to a rendered SRG names a rule that exists in it
 
@@ -25,6 +26,8 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import datetime
+import importlib.util
 import json
 import re
 import sys
@@ -69,9 +72,12 @@ def check(
     baseline: dict,
     requirements: set[str] | None,
     allow_incomplete: bool = False,
+    deviations: list[dict] = (),
     rules: dict[str, set[str]] | None = None,
 ) -> tuple[list[str], list[str]]:
-    """Return (violations, warnings)."""
+    """Return (violations, warnings). Deviations are the profile's active ones."""
+    deviated_controls = {d["target"]: d["origination"] for d in deviations if d.get("kind") == "control"}
+    deviated_criteria = {d["target"] for d in deviations if d.get("kind") == "criterion"}
     namespace = baseline["model"]["namespace"]
     roles = {k: v["responsible_role"] for k, v in baseline["model"]["originations"].items()}
     required = {k for k, v in baseline["criteria"].items() if v["level"] == "required"}
@@ -116,6 +122,8 @@ def check(
             for criterion in criteria:
                 if criterion in baseline["criteria"] and criterion not in required:
                     violations.append(where + ": image-owned on the strength of target " + criterion)
+                if criterion in deviated_criteria:
+                    violations.append(where + ": cites " + criterion + ", which the profile records a deviation from")
             if not pointers:
                 violations.append(where + ": image-owned without a requirement pointer")
             if requirements is not None:
@@ -146,11 +154,13 @@ def check(
             continue
         base = expected[control]
         if base["origination"] != "research-required" and origination != base["origination"]:
-            violations.append(
-                where + ": baseline is " + base["origination"] + ", component says " + origination
-            )
+            if deviated_controls.get(control) != origination:
+                violations.append(
+                    where + ": baseline is " + base["origination"] + ", component says " + origination
+                    + ", and the profile records no active deviation for it"
+                )
         if origination == "image-owned" and base["origination"] == "image-owned":
-            missing = [c for c in base["criteria"] if c not in criteria]
+            missing = [c for c in base["criteria"] if c not in criteria and c not in deviated_criteria]
             if missing:
                 violations.append(where + ": does not cite baseline criteria " + ", ".join(missing))
 
@@ -175,7 +185,16 @@ def main() -> int:
     parser.add_argument("--requirements", type=Path, nargs="*", help="files stating the image's requirement identifiers")
     parser.add_argument("--requirement-pattern", default=DEFAULT_PATTERN, help="regular expression capturing one identifier per match")
     parser.add_argument("--allow-incomplete", action="store_true", help="report absent baseline controls as warnings")
+    parser.add_argument("--profile", type=Path, help="the image's hardening profile, whose active deviations are honoured")
+    parser.add_argument("--today", type=datetime.date.fromisoformat, default=datetime.date.today(), help="evaluate deviation expiry as of this date")
     args = parser.parse_args()
+
+    deviations: list[dict] = []
+    if args.profile:
+        spec = importlib.util.spec_from_file_location("check_profile", REPOSITORY / "scripts" / "check-profile.py")
+        profiles = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(profiles)
+        deviations = profiles.active_deviations(json.loads(args.profile.read_text(encoding="utf-8")), args.today)
 
     component = json.loads(args.component.read_text(encoding="utf-8"))
     baseline = json.loads(args.baseline.read_text(encoding="utf-8"))
@@ -184,7 +203,9 @@ def main() -> int:
         print("no requirement identifiers found; check --requirement-pattern", file=sys.stderr)
         return 2
 
-    violations, warnings = check(component, baseline, requirements, args.allow_incomplete, rendered_rules())
+    violations, warnings = check(
+        component, baseline, requirements, args.allow_incomplete, deviations, rendered_rules()
+    )
     for warning in warnings:
         print("warning: " + warning)
     for violation in violations:
