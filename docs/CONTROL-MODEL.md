@@ -128,9 +128,10 @@ against it.
 An `image-owned` control with no `remarks` draws a warning. One with no
 limitations is usually one nobody has thought about.
 
-A position that differs from the baseline is a **deviation**. Package 4 of the
-[roadmap](ROADMAP.md) defines how an image records one, with a reason and an
-expiry. Until then, the checker reports it as a violation.
+A position that differs from the baseline is a **deviation**, recorded in the
+image's [hardening profile](TAILORING.md#deviations) with a reason and an
+expiry. Run with `--profile`, the checker honours active deviations; without
+one, or once it expires, the difference is a violation.
 
 ## Running it
 
@@ -139,7 +140,8 @@ From an image repository, against a pinned revision of this one:
 ```sh
 python ../container-hardening/scripts/check-component.py \
     artifacts/oscal/component-definition.json \
-    --requirements docs/L1-REQ.md docs/L2-REQ.md docs/L3-REQ.md
+    --requirements docs/L1-REQ.md docs/L2-REQ.md docs/L3-REQ.md \
+    --profile artifacts/hardening-profile.json
 ```
 
 `--requirement-pattern` sets the regular expression that finds requirement

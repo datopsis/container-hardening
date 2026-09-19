@@ -181,7 +181,12 @@ class LinkTests(unittest.TestCase):
             list(STANDARD.glob("*.md"))
             + list((REPOSITORY / "docs" / "adr").glob("*.md"))
             + list((REPOSITORY / "docs" / "adoption").glob("*.md"))
-            + [REPOSITORY / "docs" / "CONTROL-MODEL.md", REPOSITORY / "docs" / "controls" / "README.md"]
+            + list((REPOSITORY / "docs" / "applicability").glob("*.md"))
+            + [
+                REPOSITORY / "docs" / "CONTROL-MODEL.md",
+                REPOSITORY / "docs" / "TAILORING.md",
+                REPOSITORY / "docs" / "controls" / "README.md",
+            ]
         )
         for document in documents:
             for target in LINK.findall(document.read_text(encoding="utf-8")):

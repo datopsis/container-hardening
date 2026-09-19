@@ -99,9 +99,6 @@ standard, not an omission from it.
   [IMG-T3](standard/criteria.md#img-t3-compliance-scan) can become required.
   It is built first as the reference image's SCAP tailoring, starting from the
   SCAP Security Guide's RHEL 9 DISA STIG profile with host-only rules removed.
-- [ ] Define the exception register format that
-  [IMG-26](standard/criteria.md#img-26-exceptions-expire) requires, together
-  with the Package 4 deviation format; they are the same mechanism.
 
 ## Package 3: the control mapping
 
@@ -114,17 +111,18 @@ standard, not an omission from it.
 
 ## Package 4: per-application tailoring
 
-- [ ] Define how an image selects from the standard. Every image takes the
-  image-level baseline; function-specific sources are added by declaration.
-- [ ] Define how an applicability determination is recorded and reviewed, using
-  the Application Server SRG determination as the worked example.
-- [ ] Define how an image declares a deviation, with a reason and an expiry.
-  A deviation with no expiry is a silent permanent exception.
+- [ ] Pin a conditional source for the database images. `postgresql-ubi` and
+  `clickhouse-ubi` have no function-specific source in the register; the DISA
+  Database SRG is the likely candidate, and each would then record a
+  determination for it. `seaweedfs-ubi` and `lakekeeper-ubi` likewise need
+  their function's source identified.
 
 ## Package 5: adoption
 
 - [ ] Adopt in the image repositories, in the order and with the per-repository
   notes in [adoption](adoption/README.md#planned-order).
+- [ ] Add a hardening profile to each image repository and run
+  `scripts/check-profile.py` in its CI.
 - [ ] Run `scripts/check-component.py` in each image repository's CI, against a
   pinned revision of this one.
 - [ ] Close the gaps in the [adoption snapshot](adoption/snapshot-2026-09-18.md),
@@ -185,6 +183,13 @@ standard, not an omission from it.
   50 host-inherited, 228 organization-inherited, 11 not applicable, and 57
   left to each image. `scripts/check-component.py` checks an image's OSCAL
   component definition against it.
+- [`docs/TAILORING.md`](TAILORING.md) defines the hardening profile each image
+  keeps: an applicability determination for every conditional source, tied to
+  its pinned digest, and deviations that each expire. `scripts/check-profile.py`
+  checks it, and `check-component.py --profile` honours active deviations. The
+  reference web server's profile is the worked example, and its Application
+  Server SRG determination rests on this repository's own
+  [analysis](applicability/application-server-srg.md) of the rendered rules.
 
 Two findings from building it, recorded so they are not rediscovered:
 

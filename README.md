@@ -8,7 +8,7 @@ reinvented per application.
 
 > **Status: draft standard.** The requirement catalogues render, the sources
 > are pinned, the standard is written, and the control baseline is derived.
-> Per-application tailoring and adoption are outstanding — see
+> Adoption in the image repositories is outstanding — see
 > [the roadmap](docs/ROADMAP.md). Nothing here is an authorization package, and
 > nothing here claims STIG certification.
 
@@ -22,6 +22,7 @@ reinvented per application.
 | [NIST SP 800-190](docs/standard/nist-800-190.md) | Every countermeasure of the Application Container Security Guide, and what implements it. |
 | [Control baseline](docs/controls/README.md) | Every High-baseline control: who satisfies it, derived from the standard. |
 | [Control model](docs/CONTROL-MODEL.md) | How an image states its controls, and the checker that holds it to them. |
+| [Tailoring](docs/TAILORING.md) | How an image records which sources apply to it and where it deviates, with an expiry. |
 | [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 630 rules across four SRGs. |
 | [SRG to 800-53 crosswalk](docs/crosswalk/README.md) | Every rendered rule joined to NIST SP 800-53 Rev 5 through its CCIs. Derived, not hand-authored. |
 | [Adoption](docs/adoption/README.md) | How image repositories take the standard up, and the planned conformance badge. |
