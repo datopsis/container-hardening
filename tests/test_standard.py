@@ -106,6 +106,15 @@ class CriteriaShapeTests(unittest.TestCase):
                     self.assertRegex(section, r"(?m)^- \*\*" + field + r":\*\* \S", field)
                 self.assertTrue(anchors_line(section).strip())
 
+    def test_every_required_criterion_states_its_scope(self) -> None:
+        # The scorer holds evidence to it: a per-architecture criterion is met
+        # only on the architecture its evidence came from.
+        for identifier, section in sections(CRITERIA).items():
+            if identifier.startswith("IMG-T"):
+                continue
+            with self.subTest(criterion=identifier):
+                self.assertRegex(section, r"(?m)^- \*\*Scope:\*\* (Per architecture|Generic)\. ")
+
     def test_every_platform_expectation_names_the_image_contribution(self) -> None:
         for identifier, section in sections(PLATFORM).items():
             with self.subTest(expectation=identifier):

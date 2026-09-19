@@ -31,6 +31,19 @@ What does vary per image is:
    decided in the image's own
    [component definition](CONTROL-MODEL.md#what-an-images-component-definition-must-do).
 3. **Deviations**, each temporary.
+4. **Its architectures, and the evidence its CI writes**, so the scorer can
+   tell a missing file from an absent one.
+
+## Architectures and evidence
+
+| Field | Meaning |
+| --- | --- |
+| `schema_version` | `2` |
+| `architectures` | The architectures the image is built for: `amd64`, `arm64`, or both. Each is scored separately |
+| `evidence` | Each evidence file the image's CI writes, as `{"file": "smoke.json", "scope": "architecture"}`. Scope `architecture` means one copy per architecture; `generic`, one copy in all |
+| `roles`, `topologies`, `platforms` | Only for an image with more than one of any, such as `"roles": ["server", "worker"]`; every evidence file then names which it is about |
+
+What the evidence must contain, and how it is scored, is [Evidence](EVIDENCE.md).
 
 ## Applicability
 
@@ -182,8 +195,11 @@ python ../container-hardening/scripts/check-component.py \
 ```
 
 `standard.revision` in the profile records the commit of this repository the
-image was checked against, so a reader can reproduce the check. Both scripts
-take `--today` to evaluate expiry as of a given date.
+image was assessed against, so a reader can reproduce the check. It stays valid
+at later commits until the criteria, platform expectations, baseline, or
+register change; [`scripts/check-revision.py`](../scripts/check-revision.py)
+says when it has gone stale. Both scripts take `--today` to evaluate expiry as
+of a given date.
 
 ## Enforcement
 

@@ -18,6 +18,8 @@ import re
 import subprocess
 from pathlib import Path
 
+import evidence
+
 HERE = Path(__file__).resolve().parent.parent
 IMAGE = "ghcr.io/datopsis/reference-web-server"
 REPOSITORY = "datopsis/container-hardening"
@@ -38,38 +40,38 @@ def main() -> int:
     cosign = str(args.bin / "cosign")
     results = []
 
-    def record(criterion: str, check: str, passed: bool, detail: str = "") -> None:
-        results.append({"criterion": criterion, "check": check, "passed": bool(passed), "detail": detail})
+    def record(criterion: str, check_id: str, check: str, passed: bool, detail: str = "", architecture: str | None = None) -> None:
+        results.append({"id": check_id, "criterion": criterion, "check": check, "passed": bool(passed), "detail": detail,
+                        **({"architecture": architecture} if architecture else {})})
         print(("PASS " if passed else "FAIL ") + criterion + "  " + check + ("  (" + detail + ")" if detail and not passed else ""))
 
     listing = run("skopeo", "list-tags", "docker://" + IMAGE)
     tags = json.loads(listing.stdout).get("Tags", []) if listing.returncode == 0 else []
     versions = sorted((t for t in tags if VERSION.match(t)), key=lambda t: tuple(int(p) for p in t.split(".")))
-    record("IMG-24", "the registry carries version tags only, and no latest", bool(versions) and "latest" not in tags,
+    record("IMG-24", "release.version-tags-only", "the registry carries version tags only, and no latest", bool(versions) and "latest" not in tags,
            ", ".join(tags) or listing.stderr.strip()[-200:])
     if not versions:
-        args.evidence.parent.mkdir(parents=True, exist_ok=True)
-        args.evidence.write_text(json.dumps({"results": results}, indent=2) + "\n", encoding="utf-8")
+        evidence.write(args.evidence, evidence.subject("generic"), results)
         return 1
 
     latest = versions[-1]
-    digest = json.loads(run("skopeo", "inspect", "docker://" + IMAGE + ":" + latest).stdout)["Digest"]
+    inspected = json.loads(run("skopeo", "inspect", "docker://" + IMAGE + ":" + latest).stdout)
+    digest = inspected["Digest"]
     subject = IMAGE + "@" + digest
     signature = run(cosign, "verify", "--certificate-identity-regexp", IDENTITY, "--certificate-oidc-issuer", ISSUER, subject)
-    record("IMG-22", "the latest release's keyless signature verifies against the release workflow", signature.returncode == 0,
+    record("IMG-22", "release.latest-signature", "the latest release's keyless signature verifies against the release workflow", signature.returncode == 0,
            signature.stderr.strip()[-200:])
     sbom = run(cosign, "verify-attestation", "--type", "spdxjson", "--certificate-identity-regexp", IDENTITY,
                "--certificate-oidc-issuer", ISSUER, subject)
-    record("IMG-21", "the latest release's bill of materials is attested and retrievable by digest", sbom.returncode == 0,
-           sbom.stderr.strip()[-200:])
+    # A bill of materials describes one architecture's image; say which.
+    record("IMG-21", "release.latest-sbom-attested", "the latest release's bill of materials is attested and retrievable by digest", sbom.returncode == 0,
+           sbom.stderr.strip()[-200:], inspected["Architecture"])
     provenance = run("gh", "attestation", "verify", "oci://" + subject, "--repo", REPOSITORY)
-    record("IMG-22", "the latest release's SLSA provenance verifies", provenance.returncode == 0,
+    record("IMG-22", "release.latest-provenance", "the latest release's SLSA provenance verifies", provenance.returncode == 0,
            (provenance.stdout + provenance.stderr).strip()[-200:])
 
     failed = [r for r in results if not r["passed"]]
-    args.evidence.parent.mkdir(parents=True, exist_ok=True)
-    args.evidence.write_text(json.dumps({"image": subject, "version": latest, "results": results}, indent=2) + "\n",
-                             encoding="utf-8")
+    evidence.write(args.evidence, evidence.subject("generic"), results, release={"image": subject, "version": latest})
     print(latest + " " + digest + ": " + str(len(results) - len(failed)) + " passed, " + str(len(failed)) + " failed")
     return 1 if failed else 0
 

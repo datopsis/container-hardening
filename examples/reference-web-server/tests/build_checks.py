@@ -22,6 +22,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import evidence
+
 HERE = Path(__file__).resolve().parent.parent
 LOCK = json.loads((HERE / "lock.json").read_text(encoding="utf-8"))
 # A retrieval tool or package manager in command position: at the start of a
@@ -43,24 +45,24 @@ def main() -> int:
     args = parser.parse_args()
     results = []
 
-    def record(criterion: str, check: str, passed: bool, detail: str = "") -> None:
-        results.append({"criterion": criterion, "check": check, "passed": bool(passed), "detail": detail})
+    def record(criterion: str, check_id: str, check: str, passed: bool, detail: str = "") -> None:
+        results.append({"id": check_id, "criterion": criterion, "check": check, "passed": bool(passed), "detail": detail})
         print(("PASS " if passed else "FAIL ") + criterion + "  " + check + ("  (" + detail + ")" if detail and not passed else ""))
 
     containerfile = (HERE / "Containerfile").read_text(encoding="utf-8")
     run_lines = "\n".join(line for line in containerfile.splitlines() if not line.lstrip().startswith("#"))
     fetch = sorted(set(FETCHERS.findall(run_lines)))
-    record("IMG-03", "the build definition runs no retrieval tool or package manager", not fetch, ", ".join(fetch))
+    record("IMG-03", "build.no-fetch-in-definition", "the build definition runs no retrieval tool or package manager", not fetch, ", ".join(fetch))
     froms = re.findall(r"^ARG (BUILDER|RUNTIME)=(\S+)", containerfile, re.M)
     pinned = {name: ref for name, ref in froms}
     expected = {name.upper(): "registry.access.redhat.com/" + b["repository"] + "@" + b["digest"] for name, b in LOCK["bases"].items()}
-    record("IMG-01", "every base is referenced by its locked manifest-list digest", pinned == expected, str(pinned))
-    record("IMG-05", "no credential-shaped build argument or environment variable", not CREDENTIAL.search(containerfile))
+    record("IMG-01", "build.bases-pinned", "every base is referenced by its locked manifest-list digest", pinned == expected, str(pinned))
+    record("IMG-05", "build.no-credential-arguments", "no credential-shaped build argument or environment variable", not CREDENTIAL.search(containerfile))
     # Drift automation reports; it must not be able to change the lock (IMG-04).
     drift = (HERE.parent.parent / ".github" / "workflows" / "reference-drift.yml").read_text(encoding="utf-8")
     permissions = re.findall(r"^\s+([a-z-]+):\s*(read|write|none)\s*$", drift, re.M)
     writes = re.search(r"git push|git commit|gh pr create|create-pull-request", drift)
-    record("IMG-04", "drift automation holds only read permission and changes nothing",
+    record("IMG-04", "build.drift-automation-read-only", "drift automation holds only read permission and changes nothing",
            permissions == [("contents", "read")] and not writes, str(permissions))
 
     victim = LOCK["rpms"][0]["file"]
@@ -72,7 +74,7 @@ def main() -> int:
         (tampered / victim).write_bytes(bytes(data))
         result = build(tampered, "reference-web-server:tampered")
         output = result.stdout + result.stderr
-        record("IMG-02", "a tampered input stops the build",
+        record("IMG-02", "build.tampered-input-refused", "a tampered input stops the build",
                result.returncode != 0 and victim in output and "FAILED" in output, output[-200:])
 
         missing = Path(scratch) / "missing"
@@ -82,13 +84,13 @@ def main() -> int:
         output = result.stdout + result.stderr
         # It must fail at the missing file, not for some unrelated reason that
         # would make this check pass without testing anything.
-        record("IMG-03", "a missing input stops the build rather than being fetched",
+        record("IMG-03", "build.missing-input-refused", "a missing input stops the build rather than being fetched",
                result.returncode != 0 and victim in output and "No such file" in output, output[-200:])
 
     failed = [r for r in results if not r["passed"]]
-    args.evidence.parent.mkdir(parents=True, exist_ok=True)
-    args.evidence.write_text(json.dumps({"passed": len(results) - len(failed), "failed": len(failed), "results": results}, indent=2) + "\n",
-                             encoding="utf-8")
+    # The bundle holds this machine's architecture's inputs, and the builds
+    # above ran natively on it.
+    evidence.write(args.evidence, evidence.subject(evidence.host_architecture()), results)
     print(str(len(results) - len(failed)) + " passed, " + str(len(failed)) + " failed")
     return 1 if failed else 0
 

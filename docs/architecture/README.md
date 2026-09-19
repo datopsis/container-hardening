@@ -125,9 +125,11 @@ came from and how it was made
 The [reference web server](../../examples/reference-web-server/README.md) in
 this repository runs these stages on every change, in
 [`reference-image.yml`](../../.github/workflows/reference-image.yml), and an
-adopting image copies it. Each stage leaves evidence, and the last scores it.
+adopting image copies it. Each stage leaves evidence; the conformance
+workflow validates and scores it, as it would for any image, and a release
+happens only if it finds the image [release eligible](../EVIDENCE.md#release-eligibility).
 
-![The reference image's pipeline, from checking its profile to scoring its evidence and, on a version tag, releasing it](diagrams/reference-pipeline.svg)
+![The reference image's pipeline, from checking its profile to scoring its evidence and, on a version tag and only if release eligible, releasing it](diagrams/reference-pipeline.svg)
 
 ### The same stages on another stack
 

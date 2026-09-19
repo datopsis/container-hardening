@@ -28,6 +28,7 @@ management interface, no user accounts, and hosts no application runtime.
 | [`requirements.md`](requirements.md) | What the image commits to, one requirement per criterion, each naming its checks | the verification pointer |
 | [`scripts/component.py`](scripts/component.py), [`oscal/component-definition.json`](oscal/component-definition.json) | Its OSCAL component definition: every baseline control, and its own decisions for the ones the baseline leaves open | the control model |
 | [`tests/smoke.py`](tests/smoke.py) | Reads every runtime property back from the running image, and records the evidence | IMG-06 to IMG-20, IMG-27, IMG-30, IMG-32 |
+| [`tests/evidence.py`](tests/evidence.py) | Writes each check's results with the header the scorer requires: commit, run, architecture, and image | [Evidence](../../docs/EVIDENCE.md) |
 
 ## Building and verifying it
 
@@ -46,7 +47,13 @@ The gates need Linux, because the scanners are pinned as Linux binaries.
 
 It needs Podman and Python 3. CI does the same on every change to this
 directory, in [`reference-image.yml`](../../.github/workflows/reference-image.yml),
-and keeps the evidence files each step writes.
+keeps the evidence files each step writes, and passes them to the
+[conformance workflow](../../.github/workflows/conformance.yml), which judges
+this image exactly as it judges any other: `hardening amd64 31/34`, release
+eligible.
+
+It is built for amd64 only, and its release path is a single-architecture
+example: it publishes one image, not a multi-architecture index.
 
 ## Running it
 
@@ -106,8 +113,10 @@ repository, and refusing a world-readable key file.
 ## Releases
 
 Released images are published as `ghcr.io/datopsis/reference-web-server`,
-under version tags only. Each is signed keylessly by the release workflow,
-with its bill of materials and SLSA provenance attested. To verify one:
+under version tags only, and only when the conformance workflow finds the
+verified image release eligible. Each is signed keylessly by the release
+workflow, with its bill of materials and SLSA provenance attested. To verify
+one:
 
 ```sh
 cosign verify ghcr.io/datopsis/reference-web-server:0.1.1 \

@@ -1,24 +1,35 @@
 #!/usr/bin/env python3
 """Score an image's conformance to the standard, from its evidence.
 
-The score is the number of required criteria met, out of the number required
-by the pinned revision of the standard. A criterion is met only when:
+It answers three questions separately, because they are different claims:
 
-- at least one recorded check names it,
-- every check that names it passed, and none was merely skipped, and
-- the image's hardening profile records no active deviation from it.
+- **Is the evidence valid?** Read strictly by evidence.py, against what the
+  hardening profile says to expect. Invalid evidence is not scored.
+- **What is the score?** For each architecture the image is built for, the
+  required criteria met, out of those required. A per-architecture criterion
+  is met only by evidence from that architecture; a generic one by evidence
+  from anywhere. A generic score covers the generic criteria alone. A
+  criterion is met only when at least one check names it, every check that
+  names it passed, none was merely skipped, and the profile records no active
+  deviation from it. A deviation is visible and temporary, and is not a pass.
+- **Is the image release eligible?** Only when the evidence is valid, nothing
+  fails, and every required criterion on every architecture is met or covered
+  by an active deviation that is not about a vulnerability. A deviation from
+  the vulnerability gate, or an active vulnerability deviation, blocks a
+  release whatever the score.
 
-A deviation is visible and temporary, and not the same as meeting the
-criterion, so it does not score as one. A violation from check-profile.py or
-check-component.py is not a lower score but a failure: the badge says so.
+A revision that does not bind (check-revision.py), or a violation from
+check-profile.py or check-component.py, is not a lower score but a failure.
+The score itself, and so a successful run, never implies release eligibility;
+see docs/EVIDENCE.md.
 
-Evidence is any JSON file in EVIDENCE_DIR with a "results" list of
-{criterion, check, passed} entries, which is what the reference image's checks
-write. The badge is written as a standalone SVG and as a Shields endpoint file.
+Writes score.json, and for each scope a standalone SVG badge and a Shields
+endpoint file.
 
 Usage:
     python scripts/score.py EVIDENCE_DIR --profile PROFILE --component COMPONENT \\
-        --requirements FILE... [--requirement-pattern REGEX] [--out DIR]
+        --requirements FILE... [--requirement-pattern REGEX] [--out DIR] \\
+        [--standard-ref SHA --workflow-sha SHA]
 """
 
 from __future__ import annotations
@@ -27,7 +38,6 @@ import argparse
 import datetime
 import importlib.util
 import json
-import subprocess
 import sys
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -35,6 +45,8 @@ from xml.sax.saxutils import escape
 REPOSITORY = Path(__file__).resolve().parent.parent
 BASELINE = REPOSITORY / "artifacts" / "control-baseline.json"
 REGISTER = REPOSITORY / "artifacts" / "sources.json"
+# The criterion a vulnerability deviation stands in for.
+VULNERABILITY_GATE = "IMG-25"
 
 
 def load(name: str):
@@ -45,39 +57,53 @@ def load(name: str):
     return module
 
 
-def evidence(directory: Path) -> dict[str, list[dict]]:
-    by_criterion: dict[str, list[dict]] = {}
-    for path in sorted(directory.glob("*.json")):
-        try:
-            document = json.loads(path.read_text(encoding="utf-8"))
-        except (ValueError, UnicodeDecodeError):
-            continue
-        if not isinstance(document, dict):
-            continue
-        for result in document.get("results", []):
-            if isinstance(result, dict) and "criterion" in result:
-                by_criterion.setdefault(result["criterion"], []).append(result | {"file": path.name})
-    return by_criterion
+evidence_module = load("evidence")
+GENERIC = evidence_module.GENERIC
 
 
-def score(baseline: dict, results: dict[str, list[dict]], deviated: set[str]) -> list[dict]:
-    rows = []
-    for criterion, meta in baseline["criteria"].items():
-        if meta["level"] != "required":
-            continue
-        checks = results.get(criterion, [])
-        if criterion in deviated:
-            status = "deviated"
-        elif not checks:
-            status = "no evidence"
-        elif any(c.get("passed") is False for c in checks):
-            status = "failed"
-        elif any(c.get("passed") is None for c in checks):
-            status = "skipped"
-        else:
-            status = "met"
-        rows.append({"criterion": criterion, "title": meta["title"], "status": status, "checks": len(checks)})
-    return rows
+def status(checks: list[dict], deviated: bool) -> str:
+    if deviated:
+        return "deviated"
+    if not checks:
+        return "no evidence"
+    if any(c["passed"] is False for c in checks):
+        return "failed"
+    if any(c["passed"] is None for c in checks):
+        return "skipped"
+    return "met"
+
+
+def score(baseline: dict, results: list[dict], deviated: set[str], architectures: list[str]) -> dict[str, list[dict]]:
+    """Rows per scope: each architecture, then generic."""
+    required = {c: m for c, m in baseline["criteria"].items() if m["level"] == "required"}
+    scopes: dict[str, list[dict]] = {}
+    for scope in [*architectures, GENERIC]:
+        rows = []
+        for criterion, meta in required.items():
+            per_architecture = meta.get("scope") == "architecture"
+            if scope == GENERIC and per_architecture:
+                continue
+            checks = [r for r in results if r["criterion"] == criterion
+                      and (not per_architecture or r["architecture"] == scope)]
+            rows.append({"criterion": criterion, "title": meta["title"], "status": status(checks, criterion in deviated),
+                         "checks": len(checks)})
+        scopes[scope] = rows
+    return scopes
+
+
+def blockers(scopes: dict[str, list[dict]], active: list[dict]) -> list[str]:
+    """What stands between a valid, passing image and a release."""
+    found = []
+    for scope, rows in scopes.items():
+        for row in rows:
+            if row["status"] in ("no evidence", "skipped", "failed"):
+                found.append(row["criterion"] + " on " + scope + ": " + row["status"])
+    for deviation in active:
+        if deviation.get("kind") == "vulnerability":
+            found.append(deviation.get("id", "?") + ": an active vulnerability deviation (" + str(deviation.get("target")) + ")")
+        elif deviation.get("kind") == "criterion" and deviation.get("target") == VULNERABILITY_GATE:
+            found.append(deviation.get("id", "?") + ": a deviation from the vulnerability gate, " + VULNERABILITY_GATE)
+    return found
 
 
 def badge(label: str, message: str, colour: str) -> str:
@@ -94,12 +120,8 @@ def badge(label: str, message: str, colour: str) -> str:
     )
 
 
-def revision() -> str:
-    try:
-        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=REPOSITORY, text=True,
-                              capture_output=True, check=True).stdout.strip()
-    except (OSError, subprocess.CalledProcessError):
-        return "unknown"
+COLOURS = {"invalid": ("#6e7781", "lightgrey"), "failing": ("#cf222e", "red"),
+           "eligible": ("#2da44e", "green"), "not eligible": ("#bf8700", "yellow")}
 
 
 def main() -> int:
@@ -111,46 +133,100 @@ def main() -> int:
     parser.add_argument("--requirement-pattern", default=None)
     parser.add_argument("--out", type=Path, default=Path("score"))
     parser.add_argument("--today", type=datetime.date.fromisoformat, default=datetime.date.today())
+    parser.add_argument("--standard-ref", help="the commit the caller names; required with --workflow-sha")
+    parser.add_argument("--workflow-sha", help="the commit the conformance workflow ran from (job.workflow_sha)")
     args = parser.parse_args()
 
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
-    profiles, components = load("check-profile"), load("check-component")
+    profiles, components, revisions = load("check-profile"), load("check-component"), load("check-revision")
     profile = json.loads(args.profile.read_text(encoding="utf-8"))
+    head = revisions.git(REPOSITORY, "rev-parse", "HEAD").stdout.strip() or "unknown"
+
+    revision_errors = revisions.check(REPOSITORY, (profile.get("standard") or {}).get("revision"),
+                                      args.standard_ref, args.workflow_sha)
     profile_violations, _ = profiles.check(profile, json.loads(REGISTER.read_text(encoding="utf-8")), baseline, args.today)
     active = profiles.active_deviations(profile, args.today)
-    pattern = args.requirement_pattern or components.DEFAULT_PATTERN
-    stated = components.stated_requirements(args.requirements, pattern)
+    stated = components.stated_requirements(args.requirements, args.requirement_pattern or components.DEFAULT_PATTERN)
     component_violations, _ = components.check(
         json.loads(args.component.read_text(encoding="utf-8")), baseline, stated, False, active, components.rendered_rules()
     )
+    if not stated:
+        component_violations.append("no requirement identifiers found; check the requirement pattern")
 
-    rows = score(baseline, evidence(args.evidence), {d["target"] for d in active if d["kind"] == "criterion"})
-    met = sum(r["status"] == "met" for r in rows)
-    failing = bool(profile_violations or component_violations or any(r["status"] == "failed" for r in rows))
-    version = revision()
-    message = "failing" if failing else f"{met}/{len(rows)}"
-    colour = "#cf222e" if failing else ("#2da44e" if met == len(rows) else "#bf8700")
+    evidence = evidence_module.load(args.evidence, profile, baseline)
+    # The exception register is judged here, from the profile itself, rather
+    # than taken from the image's word for it (IMG-26).
+    results = evidence.results + [{
+        "id": "conformance.exceptions", "criterion": "IMG-26", "architecture": GENERIC, "file": "(conformance)",
+        "check": "every exception is a recorded deviation, none expired or over its limit",
+        "passed": not profile_violations,
+    }]
+    architectures = [a for a in profile.get("architectures", []) if a in evidence_module.ARCHITECTURES] \
+        if isinstance(profile.get("architectures"), list) else []
+    deviated = {d["target"] for d in active if d.get("kind") == "criterion"}
+    scopes = score(baseline, results, deviated, architectures) if evidence.valid else {}
+
+    failed_rows = [s + " " + r["criterion"] for s, rows in scopes.items() for r in rows if r["status"] == "failed"]
+    failing = bool(revision_errors or profile_violations or component_violations or failed_rows)
+    stopping = [] if evidence.valid else ["the evidence is invalid"]
+    release_blockers = stopping + (["the checks fail"] if failing else []) + blockers(scopes, active)
+    eligible = evidence.valid and not failing and not release_blockers
+    state = "invalid" if not evidence.valid else "failing" if failing else "eligible" if eligible else "not eligible"
+
+    per_architecture = {s: rows for s, rows in scopes.items() if s != GENERIC}
+    evidenced = sum(r["status"] != "no evidence" for rows in per_architecture.values() for r in rows)
+    total = sum(len(rows) for rows in per_architecture.values())
+    summary = {
+        s: {"met": sum(r["status"] == "met" for r in rows), "required": len(rows),
+            "evidenced": sum(r["status"] != "no evidence" for r in rows), "criteria": rows}
+        for s, rows in scopes.items()
+    }
 
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "score.json").write_text(json.dumps({
-        "standard_revision": version, "scored_on": args.today.isoformat(),
-        "met": met, "required": len(rows), "failing": failing,
-        "profile_violations": profile_violations, "component_violations": component_violations,
-        "criteria": rows,
+        "schema_version": 2, "standard_revision": head, "scored_on": args.today.isoformat(),
+        "source_commit": evidence.source_commit, "state": state,
+        "evidence_valid": evidence.valid, "failing": failing, "release_eligible": eligible,
+        "coverage": {"evidenced": evidenced, "required": total},
+        "release_blockers": release_blockers, "evidence_errors": evidence.errors,
+        "revision_errors": revision_errors, "profile_violations": profile_violations,
+        "component_violations": component_violations, "scopes": summary,
     }, indent=2) + "\n", encoding="utf-8")
-    (args.out / "badge.svg").write_text(badge("hardening", message + " · " + version, colour), encoding="utf-8")
-    (args.out / "shields.json").write_text(json.dumps({
-        "schemaVersion": 1, "label": "hardening", "message": message + " · " + version,
-        "color": "red" if failing else ("green" if met == len(rows) else "yellow"),
-    }) + "\n", encoding="utf-8")
 
-    for row in rows:
-        if row["status"] != "met":
-            print(f"  {row['criterion']:7} {row['status']:12} {row['title']}")
+    colour, named = COLOURS[state]
+    for scope in [*architectures, GENERIC]:
+        label = "hardening " + scope
+        if state == "invalid":
+            message = "evidence invalid"
+        elif state == "failing":
+            message = "failing"
+        else:
+            message = str(summary[scope]["met"]) + "/" + str(summary[scope]["required"])
+        # Scoped to one architecture, and dated, so a badge never reads as
+        # more, or more current, than it is.
+        message += " · " + head[:7] + " · " + args.today.isoformat()
+        (args.out / ("badge-" + scope + ".svg")).write_text(badge(label, message, colour), encoding="utf-8")
+        (args.out / ("shields-" + scope + ".json")).write_text(json.dumps({
+            "schemaVersion": 1, "label": label, "message": message, "color": named,
+        }) + "\n", encoding="utf-8")
+
+    for error in evidence.errors:
+        print("  evidence: " + error)
+    for problem in revision_errors:
+        print("  revision: " + problem)
     for violation in profile_violations + component_violations:
         print("  violation: " + violation)
-    print(f"hardening {message} against revision {version}")
-    return 1 if failing else 0
+    for scope, rows in scopes.items():
+        for row in rows:
+            if row["status"] != "met":
+                print(f"  {scope:8} {row['criterion']:7} {row['status']:12} {row['title']}")
+    for scope in scopes:
+        print(f"hardening {scope}: {summary[scope]['met']}/{summary[scope]['required']}")
+    print("evidence " + ("valid" if evidence.valid else "invalid") + "; coverage " + str(evidenced) + "/" + str(total)
+          + "; " + ("failing" if failing else "passing") + "; release " + ("eligible" if eligible else "not eligible"))
+    for blocker in release_blockers:
+        print("  release blocker: " + blocker)
+    return 1 if state in ("invalid", "failing") else 0
 
 
 if __name__ == "__main__":

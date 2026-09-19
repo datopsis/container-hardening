@@ -11,6 +11,11 @@ Each carries:
   required by amending this document, not by drift.
 - **A test.** What a check must do to establish the property. A criterion
   whose only evidence is a sentence in a README is not met.
+- **A scope.** *Per architecture* where the property belongs to the built
+  image, so each architecture's image is evidenced on its own and a passing
+  result on one never fills a gap on another; *generic* where it belongs to the
+  source, the process, or the release as a whole. The scorer holds evidence to
+  it; see [Evidence](../EVIDENCE.md).
 - **Anchors.** The SRG rules the criterion serves, and the 800-53 controls those
   rules reach through the [crosswalk](../crosswalk/README.md). A criterion
   that no rendered SRG rule reaches says so, rather than borrowing a rule that
@@ -45,6 +50,8 @@ cut only from reviewed commits on that branch.
 - **Expected:** Both attempts are refused, and every release commit is reviewed.
 - **Evidence:** The branch-protection settings and the release commit's review
   record.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
 - **Anchors:** No rendered SRG rule. Serves CM-3 and SA-10, and the SLSA v1.2
   Source Track.
 - **Source:** [SLSA v1.2](../../artifacts/sources.json); NIST SP 800-218 (SSDF)
@@ -62,6 +69,8 @@ dependencies it declares for known vulnerabilities.
   branch.
 - **Expected:** The pipeline fails before building.
 - **Evidence:** The scanners' reports and the failed run.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
 - **Anchors:** No rendered SRG rule. Serves SA-11 and RA-5.
 - **Source:** NIST SP 800-218 (SSDF)
 
@@ -81,6 +90,8 @@ that digest, not a tag.
   nothing.
 - **Evidence:** The lock file; the build log showing the base resolved from
   local storage.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
 - **Anchors:** [V-203720](../srg/general-purpose-operating-system-srg/rules/V-203720.md) → [CM-14](../crosswalk/controls/cm-14.md); [V-278977](../srg/general-purpose-operating-system-srg/rules/V-278977.md) → [SA-22](../crosswalk/controls/sa-22.md)
 
 ### IMG-02 Every build input pinned and verified
@@ -102,6 +113,8 @@ origin as the artifact is not verification.
   clean build's installed set equals the lock.
 - **Evidence:** The lock; the negative-test results; the installed-versus-locked
   comparison from the build log.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203720](../srg/general-purpose-operating-system-srg/rules/V-203720.md) → [CM-14](../crosswalk/controls/cm-14.md)
 
 ### IMG-03 Hermetic assembly
@@ -120,6 +133,8 @@ the build, and no layer cache restored from outside the build is used.
   without fetching when one is missing.
 - **Evidence:** The build invocation; the negative-build result; the static
   check's report.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203720](../srg/general-purpose-operating-system-srg/rules/V-203720.md) → [CM-14](../crosswalk/controls/cm-14.md)
 
 ### IMG-04 Input refresh is a reviewed change
@@ -136,6 +151,8 @@ that merges without review.
 - **Expected:** The drift job reports newer inputs and changes nothing.
 - **Evidence:** The drift job's permissions and report; the pull request that
   changed the lock.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
 - **Anchors:** [V-203720](../srg/general-purpose-operating-system-srg/rules/V-203720.md) → [CM-14](../crosswalk/controls/cm-14.md)
 
 ### IMG-29 Base kept current
@@ -153,6 +170,8 @@ carries fixes nobody has scanned for yet.
   a release whose base is more than 30 days behind fails.
 - **Expected:** No release is published with a base more than 30 days behind.
 - **Evidence:** The drift report with the base age; the release check's result.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
 - **Anchors:** [V-259333](../srg/general-purpose-operating-system-srg/rules/V-259333.md) → [SI-2](../crosswalk/controls/si-2.md); [V-278977](../srg/general-purpose-operating-system-srg/rules/V-278977.md) → [SA-22](../crosswalk/controls/sa-22.md)
 - **Source:** [NIST SP 800-190 §4.1.2](nist-800-190.md#image)
 
@@ -169,6 +188,8 @@ or recorded in a label or in image history.
 - **Expected:** No credential-shaped name in the build definition, and no
   credential in history or labels.
 - **Evidence:** The static check's report; the history and label scan output.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
 - **Anchors:** [V-263660](../srg/general-purpose-operating-system-srg/rules/V-263660.md) → [SC-28(3)](../crosswalk/controls/sc-28.3.md)
 
 ## Contents
@@ -187,6 +208,8 @@ repository signing keys.
 - **Expected:** None of the package-management binaries, repository files, or
   keys is present.
 - **Evidence:** The smoke-test output listing each absence.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203716](../srg/general-purpose-operating-system-srg/rules/V-203716.md) → [CM-11(2)](../crosswalk/controls/cm-11.2.md); [V-203637](../srg/general-purpose-operating-system-srg/rules/V-203637.md) → [CM-7](../crosswalk/controls/cm-7.md)
 
 ### IMG-07 Only what the function needs
@@ -203,6 +226,8 @@ features are declared and compared against the built image.
 - **Expected:** No compiler or retrieval tool is present, and the reported
   feature set equals the declaration.
 - **Evidence:** The smoke-test output; the declared and reported feature sets.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203637](../srg/general-purpose-operating-system-srg/rules/V-203637.md) → [CM-7](../crosswalk/controls/cm-7.md); [V-203722](../srg/general-purpose-operating-system-srg/rules/V-203722.md) → [CM-7(5)](../crosswalk/controls/cm-7.5.md)
 
 ### IMG-27 No remote administration
@@ -221,6 +246,8 @@ administered by replacing it, or through the runtime's own interface.
 - **Expected:** No such daemon is present, and no declared or open port is an
   administrative one.
 - **Evidence:** The smoke-test output; the behaviour declaration.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203655](../srg/general-purpose-operating-system-srg/rules/V-203655.md) → [SC-2](../crosswalk/controls/sc-2.md); [V-203637](../srg/general-purpose-operating-system-srg/rules/V-203637.md) → [CM-7](../crosswalk/controls/cm-7.md)
 - **Source:** [NIST SP 800-190 §4.1.2](nist-800-190.md#image)
 
@@ -237,6 +264,8 @@ packages, written at build time and matching the lock.
 - **Expected:** The inventory is present, read-only, and matches the lock by
   hash.
 - **Evidence:** The inventory file; the build log's comparison.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** No rendered SRG rule. Serves CM-8 (system component inventory).
 
 ### IMG-09 No privilege-raising files
@@ -251,6 +280,8 @@ declared writable mount is world-writable.
   declared mounts) return nothing.
 - **Expected:** Both searches return nothing.
 - **Evidence:** The smoke-test output of both searches.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203696](../srg/general-purpose-operating-system-srg/rules/V-203696.md) → [AC-6(8)](../crosswalk/controls/ac-6.8.md)
 
 ### IMG-10 Software and configuration not writable by the service
@@ -265,6 +296,8 @@ are not writable by the runtime identity.
   `test -w`.
 - **Expected:** Every write test fails for the runtime user.
 - **Evidence:** The smoke-test output.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203675](../srg/general-purpose-operating-system-srg/rules/V-203675.md) → [CM-5(6)](../crosswalk/controls/cm-5.6.md)
 
 ## Runtime
@@ -284,6 +317,8 @@ startup and no `su`, `sudo`, `gosu`, or equivalent in the image.
   0.
 - **Evidence:** The image configuration; the per-process `/proc` report from the
   smoke test.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203696](../srg/general-purpose-operating-system-srg/rules/V-203696.md) → [AC-6(8)](../crosswalk/controls/ac-6.8.md); [V-203695](../srg/general-purpose-operating-system-srg/rules/V-203695.md) → [AC-6(10)](../crosswalk/controls/ac-6.10.md)
 - **Platform:** [PLT-02](platform.md#plt-02-least-privilege-is-imposed)
 
@@ -297,6 +332,8 @@ non-root UID in group 0.
 - **Verification:** The smoke suite passes under `--user <arbitrary>:0`.
 - **Expected:** The smoke suite passes under an arbitrary UID.
 - **Evidence:** The smoke-test output for the arbitrary-UID run.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203696](../srg/general-purpose-operating-system-srg/rules/V-203696.md) → [AC-6(8)](../crosswalk/controls/ac-6.8.md)
 - **Platform:** [PLT-02](platform.md#plt-02-least-privilege-is-imposed)
 
@@ -319,6 +356,8 @@ non-root UID in group 0.
 - **Evidence:** The per-process `/proc` report; the runtime's recorded security
   options.
 - **Source:** [NIST SP 800-190 §4.4.3](nist-800-190.md#container)
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203696](../srg/general-purpose-operating-system-srg/rules/V-203696.md) → [AC-6(8)](../crosswalk/controls/ac-6.8.md)
 - **Platform:** [PLT-02](platform.md#plt-02-least-privilege-is-imposed)
 
@@ -339,6 +378,8 @@ profile, privilege escalation disallowed, and no host namespace or host path.
 - **Evidence:** The admission results, the smoke-test output, and the cluster
   and
   policy versions.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203696](../srg/general-purpose-operating-system-srg/rules/V-203696.md) → [AC-6(8)](../crosswalk/controls/ac-6.8.md); [V-203695](../srg/general-purpose-operating-system-srg/rules/V-203695.md) → [AC-6(10)](../crosswalk/controls/ac-6.10.md)
 - **Platform:** [PLT-02](platform.md#plt-02-least-privilege-is-imposed)
 - **Source:** [Kubernetes Pod Security Standards](../../artifacts/sources.json);
@@ -361,6 +402,8 @@ reached, is not UID 0 on the host.
   suite passes.
 - **Evidence:** The admission result, the container's `/proc/self/uid_map`, and
   the smoke-test output.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203696](../srg/general-purpose-operating-system-srg/rules/V-203696.md) → [AC-6(8)](../crosswalk/controls/ac-6.8.md)
 - **Platform:** [PLT-02](platform.md#plt-02-least-privilege-is-imposed)
 - **Source:** OpenShift security context constraints, from 4.20
@@ -378,6 +421,8 @@ reached, is not UID 0 on the host.
   `net.ipv4.ip_unprivileged_port_start` to 0.
 - **Expected:** Every listening socket is at or above 1024 and is declared.
 - **Evidence:** The socket report from `/proc/net`.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203638](../srg/general-purpose-operating-system-srg/rules/V-203638.md) → [CM-7](../crosswalk/controls/cm-7.md)
 - **Platform:** [PLT-04](platform.md#plt-04-ports-are-non-privileged-and-declared)
 
@@ -398,6 +443,8 @@ mount makes the service exit non-zero naming the path.
   fails naming its path.
 - **Evidence:** The smoke-test output for the read-only, write-probe, and
   missing-mount runs.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203675](../srg/general-purpose-operating-system-srg/rules/V-203675.md) → [CM-5(6)](../crosswalk/controls/cm-5.6.md)
 - **Platform:** [PLT-03](platform.md#plt-03-the-root-filesystem-is-read-only)
 
@@ -421,6 +468,8 @@ instead. See [ADR-0003](../adr/0003-secrets-reach-an-image-only-as-read-only-fil
 - **Expected:** No secret value appears in any process's arguments, in PID 1's
   environment, or in the logs; a malformed secret file stops startup.
 - **Evidence:** The secret-leak scan output; the negative-case results.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-263660](../srg/general-purpose-operating-system-srg/rules/V-263660.md) → [SC-28(3)](../crosswalk/controls/sc-28.3.md)
 - **Platform:** [PLT-06](platform.md#plt-06-secrets-are-delivered-as-read-only-files)
 
@@ -477,6 +526,8 @@ base.
 - **Expected:** Mounted trust material is not writable, and the trust store
   equals the base's.
 - **Evidence:** The smoke-test output; the trust-store comparison.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-263659](../srg/general-purpose-operating-system-srg/rules/V-263659.md) → [SC-17](../crosswalk/controls/sc-17.md)
 - **Platform:** [PLT-06](platform.md#plt-06-secrets-are-delivered-as-read-only-files)
 
@@ -494,6 +545,8 @@ start a shell.
   exit and a message naming it.
 - **Expected:** Each defect produces a non-zero exit and a message naming it.
 - **Evidence:** The negative-case results.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203677](../srg/general-purpose-operating-system-srg/rules/V-203677.md) → [SC-24](../crosswalk/controls/sc-24.md)
 
 ### IMG-19 Logs to standard streams, without secrets
@@ -510,6 +563,8 @@ error, for the platform to collect. No log line contains a secret.
 - **Expected:** No log file is written inside the image, and no secret reaches
   the logs.
 - **Evidence:** The smoke-test output; the secret-leak scan.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203613](../srg/general-purpose-operating-system-srg/rules/V-203613.md) → [AU-6(4)](../crosswalk/controls/au-6.4.md)
 - **Platform:** [PLT-09](platform.md#plt-09-logs-are-collected-centrally)
 
@@ -527,6 +582,8 @@ image's documentation states what the healthcheck proves.
 - **Expected:** Both are present, and a stop exits cleanly within the documented
   timeout.
 - **Evidence:** The image configuration; the stop-test result.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** No rendered SRG rule. Required by the
   [DISA process guide](process-guide.md), which asks for a healthcheck.
 
@@ -549,6 +606,8 @@ compromise that happens during the learning period from the baseline.
   is at least 1024 ([IMG-14](#img-14-unprivileged-ports)).
 - **Expected:** Observed behaviour equals the declaration.
 - **Evidence:** The declaration; the smoke test's comparison report.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-203638](../srg/general-purpose-operating-system-srg/rules/V-203638.md) → [CM-7](../crosswalk/controls/cm-7.md)
 - **Platform:** [PLT-16](platform.md#plt-16-runtime-behaviour-is-monitored)
 - **Source:** [NIST SP 800-190 §4.4.2, §4.4.4](nist-800-190.md#container)
@@ -567,6 +626,8 @@ generated from the built image and attached to it as an attestation.
   a verification step retrieves it by digest.
 - **Expected:** An SBOM attestation is retrievable by digest and validates.
 - **Evidence:** The SBOM; its attestation; the verification step's output.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** No rendered SRG rule. Serves CM-8 and SR-4.
 
 ### IMG-22 Signed, with provenance
@@ -585,6 +646,8 @@ before it finishes.
   identity and issuer.
 - **Evidence:** The signature; the provenance attestation; the verification
   output.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
 - **Anchors:** [V-203720](../srg/general-purpose-operating-system-srg/rules/V-203720.md) → [CM-14](../crosswalk/controls/cm-14.md)
 - **Platform:** [PLT-01](platform.md#plt-01-images-are-admitted-by-verified-digest)
 
@@ -600,6 +663,8 @@ creation time, plus the base digest and lock digest it was built from.
 - **Expected:** Every label is present and the revision equals the release
   commit.
 - **Evidence:** The image configuration.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** No rendered SRG rule. Serves CM-8.
 
 ### IMG-24 Immutable tags
@@ -614,6 +679,8 @@ There is no `latest` tag.
   pushes `latest`.
 - **Expected:** No tag is ever overwritten, and no `latest` tag exists.
 - **Evidence:** The release workflow; the registry's tag list.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
 - **Anchors:** No rendered SRG rule. Serves CM-2 (baseline configuration).
 - **Platform:** [PLT-01](platform.md#plt-01-images-are-admitted-by-verified-digest)
 
@@ -636,6 +703,8 @@ and 30 days otherwise.
   finding is recorded.
 - **Evidence:** The scan report attached to the release.
 - **Source:** [NIST SP 800-190 §4.1.1](nist-800-190.md#image)
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** [V-259333](../srg/general-purpose-operating-system-srg/rules/V-259333.md) → [SI-2](../crosswalk/controls/si-2.md); [V-203755](../srg/general-purpose-operating-system-srg/rules/V-203755.md) → [SI-2(6)](../crosswalk/controls/si-2.6.md)
 - **Platform:** [PLT-08](platform.md#plt-08-images-are-scanned-and-replaced)
 
@@ -653,6 +722,8 @@ the file that was reviewed, not that the file is benign.
   the same run, and fails on any detection.
 - **Expected:** No detection; a detection fails the build.
 - **Evidence:** The scan reports with the signature database version.
+- **Scope:** Per architecture. Each architecture's image is evidenced
+  separately; a result for one does not stand for another.
 - **Anchors:** No rendered SRG rule. Serves SI-3 (malicious code protection).
 - **Platform:** [PLT-08](platform.md#plt-08-images-are-scanned-and-replaced)
 - **Source:** [NIST SP 800-190 §4.1.3](nist-800-190.md#image); DISA process
@@ -672,6 +743,8 @@ date. An expired exception fails the build.
   its kind allows, fails.
 - **Expected:** No expired or over-long deviation exists.
 - **Evidence:** The profile; the checker's output.
+- **Scope:** Generic. Evidenced once for the image, whatever its
+  architectures.
 - **Anchors:** [V-259333](../srg/general-purpose-operating-system-srg/rules/V-259333.md) → [SI-2](../crosswalk/controls/si-2.md)
 
 ## Targets

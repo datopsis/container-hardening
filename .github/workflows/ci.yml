@@ -24,6 +24,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -36,7 +37,12 @@ jobs:
       # the packages it derives from needs the packages, and is done by
       # verify-sources.yml.
       - name: Validate the register, catalogues, crosswalk, standard, controls, and tailoring
-        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls tests.test_tailoring tests.test_applicability tests.test_score -v
+        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls tests.test_tailoring tests.test_applicability tests.test_score tests.test_revision -v
+
+      # A change to the criteria makes the reference image's assessment stale
+      # until its profile names the new revision.
+      - name: Check the reference profile names a current revision
+        run: python scripts/check-revision.py --profile examples/reference-web-server/hardening-profile.json
 
       # The diagrams need no source package, so their drift is checked here.
       - name: Check the diagrams match their generator
