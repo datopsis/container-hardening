@@ -1,0 +1,566 @@
+{
+  "schema_version": 2,
+  "standard_revision": "94665340d9027f20b79a59e3ed20eecd4c783057",
+  "scored_on": "2026-09-19",
+  "mode": "audit",
+  "source_commit": "94665340d9027f20b79a59e3ed20eecd4c783057",
+  "state": "not eligible",
+  "evidence_valid": true,
+  "failing": false,
+  "release_eligible": false,
+  "coverage": {
+    "evidenced": 68,
+    "required": 68
+  },
+  "release_blockers": [
+    "57 decisions not yet reviewed: ac-2, ac-2.1, ac-2.2, ac-2.3, ac-2.4, ac-2.5 and more"
+  ],
+  "evidence_errors": [],
+  "revision_errors": [],
+  "profile_violations": [],
+  "component_violations": [],
+  "unreviewed_decisions": [
+    "ac-2",
+    "ac-2.1",
+    "ac-2.2",
+    "ac-2.3",
+    "ac-2.4",
+    "ac-2.5",
+    "ac-2.11",
+    "ac-2.12",
+    "ac-3",
+    "ac-6.1",
+    "ac-6.2",
+    "ac-6.3",
+    "ac-6.5",
+    "ac-6.9",
+    "ac-7",
+    "ac-8",
+    "ac-10",
+    "ac-12",
+    "ac-14",
+    "ac-17.2",
+    "au-2",
+    "au-3",
+    "au-3.1",
+    "au-10",
+    "au-12",
+    "cm-6",
+    "cm-6.1",
+    "ia-2",
+    "ia-2.1",
+    "ia-2.2",
+    "ia-2.5",
+    "ia-2.8",
+    "ia-2.12",
+    "ia-4",
+    "ia-4.4",
+    "ia-5",
+    "ia-5.1",
+    "ia-5.2",
+    "ia-5.6",
+    "ia-6",
+    "ia-7",
+    "ia-8",
+    "ia-8.1",
+    "ia-8.2",
+    "ia-8.4",
+    "ia-11",
+    "sc-8",
+    "sc-8.1",
+    "sc-10",
+    "sc-13",
+    "sc-18",
+    "sc-23",
+    "si-4.10",
+    "si-8",
+    "si-8.2",
+    "si-10",
+    "si-11"
+  ],
+  "scopes": {
+    "amd64": {
+      "met": 31,
+      "required": 34,
+      "evidenced": 34,
+      "criteria": [
+        {
+          "criterion": "IMG-01",
+          "title": "Base image pinned by digest",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-02",
+          "title": "Every build input pinned and verified",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-03",
+          "title": "Hermetic assembly",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-04",
+          "title": "Input refresh is a reviewed change",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-05",
+          "title": "No secrets in the build",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-06",
+          "title": "No package manager",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-07",
+          "title": "Only what the function needs",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-08",
+          "title": "Embedded package inventory",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-09",
+          "title": "No privilege-raising files",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-10",
+          "title": "Software and configuration not writable by the service",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-11",
+          "title": "Non-root, with no privilege transition",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-12",
+          "title": "Runs under an arbitrary UID",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-13",
+          "title": "Works with no capabilities and no new privileges",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-14",
+          "title": "Unprivileged ports",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-15",
+          "title": "Read-only root filesystem",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-16",
+          "title": "Secrets only as read-only files",
+          "status": "deviated",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-17",
+          "title": "Trust material supplied by the operator",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-18",
+          "title": "Fails closed",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-19",
+          "title": "Logs to standard streams, without secrets",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-20",
+          "title": "Lifecycle is declared",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-21",
+          "title": "Bill of materials",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-22",
+          "title": "Signed, with provenance",
+          "status": "met",
+          "checks": 4
+        },
+        {
+          "criterion": "IMG-23",
+          "title": "Identifying labels",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-24",
+          "title": "Immutable tags",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-25",
+          "title": "Vulnerability gate and remediation",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-26",
+          "title": "Exceptions expire",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-27",
+          "title": "No remote administration",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-28",
+          "title": "Malware scan",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-29",
+          "title": "Base kept current",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-30",
+          "title": "Expected behaviour is declared",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-31",
+          "title": "Admitted under the restricted-v2 SCC and the Restricted Pod Security Standard",
+          "status": "deviated",
+          "checks": 0
+        },
+        {
+          "criterion": "IMG-32",
+          "title": "Runs in a user namespace under the restricted-v3 SCC",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-33",
+          "title": "Source is protected and traceable",
+          "status": "deviated",
+          "checks": 0
+        },
+        {
+          "criterion": "IMG-34",
+          "title": "Source and dependencies are scanned before build",
+          "status": "met",
+          "checks": 2
+        }
+      ]
+    },
+    "arm64": {
+      "met": 31,
+      "required": 34,
+      "evidenced": 34,
+      "criteria": [
+        {
+          "criterion": "IMG-01",
+          "title": "Base image pinned by digest",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-02",
+          "title": "Every build input pinned and verified",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-03",
+          "title": "Hermetic assembly",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-04",
+          "title": "Input refresh is a reviewed change",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-05",
+          "title": "No secrets in the build",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-06",
+          "title": "No package manager",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-07",
+          "title": "Only what the function needs",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-08",
+          "title": "Embedded package inventory",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-09",
+          "title": "No privilege-raising files",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-10",
+          "title": "Software and configuration not writable by the service",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-11",
+          "title": "Non-root, with no privilege transition",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-12",
+          "title": "Runs under an arbitrary UID",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-13",
+          "title": "Works with no capabilities and no new privileges",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-14",
+          "title": "Unprivileged ports",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-15",
+          "title": "Read-only root filesystem",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-16",
+          "title": "Secrets only as read-only files",
+          "status": "deviated",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-17",
+          "title": "Trust material supplied by the operator",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-18",
+          "title": "Fails closed",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-19",
+          "title": "Logs to standard streams, without secrets",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-20",
+          "title": "Lifecycle is declared",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-21",
+          "title": "Bill of materials",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-22",
+          "title": "Signed, with provenance",
+          "status": "met",
+          "checks": 4
+        },
+        {
+          "criterion": "IMG-23",
+          "title": "Identifying labels",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-24",
+          "title": "Immutable tags",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-25",
+          "title": "Vulnerability gate and remediation",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-26",
+          "title": "Exceptions expire",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-27",
+          "title": "No remote administration",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-28",
+          "title": "Malware scan",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-29",
+          "title": "Base kept current",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-30",
+          "title": "Expected behaviour is declared",
+          "status": "met",
+          "checks": 3
+        },
+        {
+          "criterion": "IMG-31",
+          "title": "Admitted under the restricted-v2 SCC and the Restricted Pod Security Standard",
+          "status": "deviated",
+          "checks": 0
+        },
+        {
+          "criterion": "IMG-32",
+          "title": "Runs in a user namespace under the restricted-v3 SCC",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-33",
+          "title": "Source is protected and traceable",
+          "status": "deviated",
+          "checks": 0
+        },
+        {
+          "criterion": "IMG-34",
+          "title": "Source and dependencies are scanned before build",
+          "status": "met",
+          "checks": 2
+        }
+      ]
+    },
+    "generic": {
+      "met": 8,
+      "required": 9,
+      "evidenced": 9,
+      "criteria": [
+        {
+          "criterion": "IMG-01",
+          "title": "Base image pinned by digest",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-04",
+          "title": "Input refresh is a reviewed change",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-05",
+          "title": "No secrets in the build",
+          "status": "met",
+          "checks": 2
+        },
+        {
+          "criterion": "IMG-22",
+          "title": "Signed, with provenance",
+          "status": "met",
+          "checks": 4
+        },
+        {
+          "criterion": "IMG-24",
+          "title": "Immutable tags",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-26",
+          "title": "Exceptions expire",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-29",
+          "title": "Base kept current",
+          "status": "met",
+          "checks": 1
+        },
+        {
+          "criterion": "IMG-33",
+          "title": "Source is protected and traceable",
+          "status": "deviated",
+          "checks": 0
+        },
+        {
+          "criterion": "IMG-34",
+          "title": "Source and dependencies are scanned before build",
+          "status": "met",
+          "checks": 2
+        }
+      ]
+    }
+  }
+}
