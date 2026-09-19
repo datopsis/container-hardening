@@ -96,7 +96,7 @@ jobs:
 
   pass:
     needs: fixtures
-    uses: ./.github/workflows/conformance.yml
+    uses: $/.github/workflows/conformance.yml
     with:
       standard-ref: ${{ github.sha }}
       profile: examples/reference-web-server/hardening-profile.json
@@ -108,7 +108,7 @@ jobs:
 
   missing:
     needs: fixtures
-    uses: ./.github/workflows/conformance.yml
+    uses: $/.github/workflows/conformance.yml
     with:
       standard-ref: ${{ github.sha }}
       profile: examples/reference-web-server/hardening-profile.json
@@ -120,7 +120,7 @@ jobs:
 
   malformed:
     needs: fixtures
-    uses: ./.github/workflows/conformance.yml
+    uses: $/.github/workflows/conformance.yml
     with:
       standard-ref: ${{ github.sha }}
       profile: examples/reference-web-server/hardening-profile.json
@@ -132,7 +132,7 @@ jobs:
 
   failed-check:
     needs: fixtures
-    uses: ./.github/workflows/conformance.yml
+    uses: $/.github/workflows/conformance.yml
     with:
       standard-ref: ${{ github.sha }}
       profile: examples/reference-web-server/hardening-profile.json
@@ -144,7 +144,7 @@ jobs:
 
   partial:
     needs: fixtures
-    uses: ./.github/workflows/conformance.yml
+    uses: $/.github/workflows/conformance.yml
     with:
       standard-ref: ${{ github.sha }}
       profile: examples/reference-web-server/hardening-profile.json
@@ -157,7 +157,7 @@ jobs:
   # A full commit, but not the one the workflow runs from.
   wrong-revision:
     needs: fixtures
-    uses: ./.github/workflows/conformance.yml
+    uses: $/.github/workflows/conformance.yml
     with:
       standard-ref: "0000000000000000000000000000000000000000"
       profile: examples/reference-web-server/hardening-profile.json

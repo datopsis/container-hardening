@@ -158,7 +158,7 @@ jobs:
     if: ${{ !cancelled() }}
     permissions:
       contents: read
-    uses: ./.github/workflows/conformance.yml
+    uses: $/.github/workflows/conformance.yml
     with:
       standard-ref: ${{ github.sha }}
       profile: examples/reference-web-server/hardening-profile.json
