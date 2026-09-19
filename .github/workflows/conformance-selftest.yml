@@ -176,6 +176,16 @@ jobs:
       evidence-artifacts: selftest-pass-amd64
       score-artifact: selftest-score-arm64-missing
 
+  # A draft: the same complete evidence, which must claim nothing.
+  draft:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      mode: draft
+      profile: examples/reference-web-server/hardening-profile.json
+      evidence-artifacts: selftest-pass-*
+      score-artifact: selftest-score-draft
+
   # A full commit, but not the one the workflow runs from.
   wrong-revision:
     needs: fixtures
@@ -192,7 +202,7 @@ jobs:
 
   answers:
     name: check every answer
-    needs: [pass, missing, malformed, failed-check, partial, arm64-missing, wrong-revision]
+    needs: [pass, missing, malformed, failed-check, partial, arm64-missing, draft, wrong-revision]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -212,6 +222,7 @@ jobs:
               "failed-check":   ("true",  "true",  "false", None),
               "partial":        ("true",  "false", "false", "short"),
               "arm64-missing":  ("false", None,    "false", None),
+              "draft":          ("true",  "false", "false", None),
               "wrong-revision": ("true",  "true",  "false", None),
           }
           wrong = []

@@ -25,6 +25,7 @@ reinvented per application.
 | [Control model](docs/CONTROL-MODEL.md) | How an image states its controls, and the checker that holds it to them. |
 | [**Adopting**](docs/ADOPTING.md) | What an image repository adds, step by step, to align and show it. |
 | [Reference image](examples/reference-web-server/README.md) | A generic web server built and verified to the standard: the template for new images. |
+| [Which SRGs an image takes](docs/applicability/README.md) | The three every image takes, when a conditional one applies, and the rule-by-rule worksheet. |
 | [Tailoring](docs/TAILORING.md) | How an image records which sources apply to it and where it deviates, with an expiry. |
 | [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 630 rules across four SRGs. |
 | [SRG to 800-53 crosswalk](docs/crosswalk/README.md) | Every rendered rule joined to NIST SP 800-53 Rev 5 through its CCIs. Derived, not hand-authored. |

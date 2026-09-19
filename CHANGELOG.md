@@ -216,6 +216,24 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   finds, and it warns on a decision copied from the reference image word for
   word.
 
+- A draft assessment: the conformance workflow's `mode: draft` reports what
+  adopting would need, and how far the standard has moved since a pinned
+  revision, for an image still researching it. The profile may be incomplete
+  and the component definition absent; it claims nothing and never fails.
+- Rule-by-rule applicability worksheets, generated from the pinned catalogues
+  by `scripts/worksheets.py`, with the rules of other sources that share a CCI
+  suggested for `covered-by`. `check-profile.py` holds a determination to the
+  worksheet it cites. [Which SRGs an image takes](docs/applicability/README.md)
+  gives the rules, including for HTTP applications that are not web servers,
+  with a flowchart.
+- A decisions worksheet for every control the baseline leaves to the image,
+  with origination, rationale, owner, and review, and a warning on every
+  access-control and identification control against a copied "no accounts".
+  Unreviewed decisions block a release. The reference image's decisions moved
+  into one, and await review.
+- Released the reference image 0.2.0, its first multi-architecture index,
+  verified from a clean runner.
+
 ### Fixed
 
 - The scorer counted a `passed` of `"false"` or `0` as met, and skipped a file

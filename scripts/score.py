@@ -19,7 +19,13 @@ It answers three questions separately, because they are different claims:
   release whatever the score.
 
 A revision that does not bind (check-revision.py), or a violation from
-check-profile.py or check-component.py, is not a lower score but a failure.
+check-profile.py, check-component.py, or the decisions worksheet, is not a
+lower score but a failure. A decision not yet reviewed blocks a release.
+
+With --draft, it is a draft assessment for an image still researching the
+standard: the profile may be incomplete, the component definition and
+requirements absent, and the revision may be any; each gap is reported as
+something to do, a moved standard as drift, and nothing is claimed or failed.
 The score itself, and so a successful run, never implies release eligibility;
 see docs/EVIDENCE.md.
 
@@ -128,7 +134,7 @@ def badge(label: str, message: str, colour: str) -> str:
     )
 
 
-COLOURS = {"invalid": ("#6e7781", "lightgrey"), "failing": ("#cf222e", "red"),
+COLOURS = {"invalid": ("#6e7781", "lightgrey"), "failing": ("#cf222e", "red"), "draft": ("#0969da", "blue"),
            "eligible": ("#2da44e", "green"), "not eligible": ("#bf8700", "yellow")}
 
 
@@ -136,35 +142,56 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("evidence", type=Path)
     parser.add_argument("--profile", type=Path, required=True)
-    parser.add_argument("--component", type=Path, required=True)
-    parser.add_argument("--requirements", type=Path, nargs="+", required=True)
+    parser.add_argument("--component", type=Path)
+    parser.add_argument("--requirements", type=Path, nargs="*", default=[])
     parser.add_argument("--requirement-pattern", default=None)
     parser.add_argument("--crosswalk", type=Path, help="the image's map from each criterion to its requirement identifiers")
+    parser.add_argument("--decisions", type=Path, help="the image's decisions worksheet for the controls left to it")
+    parser.add_argument("--draft", action="store_true",
+                        help="a draft assessment: report what adopting would need, claim nothing, and never fail")
     parser.add_argument("--out", type=Path, default=Path("score"))
     parser.add_argument("--today", type=datetime.date.fromisoformat, default=datetime.date.today())
     parser.add_argument("--standard-ref", help="the commit the caller names; required with --workflow-sha")
     parser.add_argument("--workflow-sha", help="the commit the conformance workflow ran from (job.workflow_sha)")
     args = parser.parse_args()
+    if not args.draft and (args.component is None or not args.requirements):
+        parser.error("an audit needs --component and --requirements; a draft may omit them")
 
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     profiles, components, revisions = load("check-profile"), load("check-component"), load("check-revision")
+    sheets = load("worksheets")
     profile = json.loads(args.profile.read_text(encoding="utf-8"))
     head = revisions.git(REPOSITORY, "rev-parse", "HEAD").stdout.strip() or "unknown"
 
+    # In a draft, a revision that does not bind is drift to report, not a failure.
     revision_errors = revisions.check(REPOSITORY, (profile.get("standard") or {}).get("revision"),
-                                      args.standard_ref, args.workflow_sha)
-    profile_violations, _ = profiles.check(profile, json.loads(REGISTER.read_text(encoding="utf-8")), baseline, args.today)
+                                      None if args.draft else args.standard_ref,
+                                      None if args.draft else args.workflow_sha)
+    profile_violations, _ = profiles.check(profile, json.loads(REGISTER.read_text(encoding="utf-8")), baseline, args.today,
+                                           args.profile.resolve().parent)
     active = profiles.active_deviations(profile, args.today)
-    stated = components.stated_requirements(args.requirements, args.requirement_pattern or components.DEFAULT_PATTERN)
-    component = json.loads(args.component.read_text(encoding="utf-8"))
+
+    component_violations: list[str] = []
+    stated = components.stated_requirements(args.requirements, args.requirement_pattern or components.DEFAULT_PATTERN) \
+        if args.requirements else set()
     mapping = json.loads(args.crosswalk.read_text(encoding="utf-8")) if args.crosswalk else None
-    component_violations, _ = components.check(component, baseline, stated, False, active, components.rendered_rules(), mapping)
+    component = json.loads(args.component.read_text(encoding="utf-8")) if args.component and args.component.exists() else None
+    if component is not None:
+        component_violations, _ = components.check(component, baseline, stated, args.draft, active,
+                                                   components.rendered_rules(), mapping)
+    else:
+        component_violations.append("no component definition yet")
     if mapping is not None:
-        component_violations = components.check_crosswalk(mapping, baseline, stated, active) + component_violations
+        component_violations = components.check_crosswalk(mapping, baseline, stated or None, active) + component_violations
     if not stated:
         component_violations.append("no requirement identifiers found; check the requirement pattern")
 
-    evidence = evidence_module.load(args.evidence, profile, baseline)
+    unreviewed: list[str] = []
+    if args.decisions:
+        decision_errors, unreviewed = sheets.check_decisions(json.loads(args.decisions.read_text(encoding="utf-8")), component)
+        component_violations += ["decisions: " + e for e in decision_errors]
+
+    evidence = evidence_module.load(args.evidence, profile, baseline, draft=args.draft)
     # The exception register is judged here, from the profile itself, rather
     # than taken from the image's word for it (IMG-26).
     results = evidence.results + [{
@@ -172,8 +199,7 @@ def main() -> int:
         "check": "every exception is a recorded deviation, none expired or over its limit",
         "passed": not profile_violations,
     }]
-    architectures = [a for a in profile.get("architectures", []) if a in evidence_module.ARCHITECTURES] \
-        if isinstance(profile.get("architectures"), list) else []
+    architectures = evidence.architectures
     deviated = {d["target"] for d in active if d.get("kind") == "criterion"}
     roles = profile.get("roles") if isinstance(profile.get("roles"), list) else None
     scopes = score(baseline, results, deviated, architectures, roles) if evidence.valid else {}
@@ -182,8 +208,16 @@ def main() -> int:
     failing = bool(revision_errors or profile_violations or component_violations or failed_rows)
     stopping = [] if evidence.valid else ["the evidence is invalid"]
     release_blockers = stopping + (["the checks fail"] if failing else []) + blockers(scopes, active)
-    eligible = evidence.valid and not failing and not release_blockers
-    state = "invalid" if not evidence.valid else "failing" if failing else "eligible" if eligible else "not eligible"
+    if unreviewed:
+        release_blockers.append(str(len(unreviewed)) + " decisions not yet reviewed: " + ", ".join(unreviewed[:6])
+                                + (" and more" if len(unreviewed) > 6 else ""))
+    if args.draft:
+        # A draft claims nothing: not conformance, not eligibility, not failure.
+        release_blockers.insert(0, "a draft assessment is not an audit")
+        failing, eligible, state = False, False, "draft"
+    else:
+        eligible = evidence.valid and not failing and not release_blockers
+        state = "invalid" if not evidence.valid else "failing" if failing else "eligible" if eligible else "not eligible"
 
     per_architecture = {s: rows for s, rows in scopes.items() if s != GENERIC}
     evidenced = sum(r["status"] != "no evidence" for rows in per_architecture.values() for r in rows)
@@ -197,12 +231,14 @@ def main() -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "score.json").write_text(json.dumps({
         "schema_version": 2, "standard_revision": head, "scored_on": args.today.isoformat(),
+        "mode": "draft" if args.draft else "audit",
         "source_commit": evidence.source_commit, "state": state,
         "evidence_valid": evidence.valid, "failing": failing, "release_eligible": eligible,
         "coverage": {"evidenced": evidenced, "required": total},
         "release_blockers": release_blockers, "evidence_errors": evidence.errors,
-        "revision_errors": revision_errors, "profile_violations": profile_violations,
-        "component_violations": component_violations, "scopes": summary,
+        "revision_errors" if not args.draft else "drift": revision_errors,
+        "profile_violations": profile_violations, "component_violations": component_violations,
+        "unreviewed_decisions": unreviewed, "scopes": summary,
     }, indent=2) + "\n", encoding="utf-8")
 
     colour, named = COLOURS[state]
@@ -213,7 +249,7 @@ def main() -> int:
         elif state == "failing":
             message = "failing"
         else:
-            message = str(summary[scope]["met"]) + "/" + str(summary[scope]["required"])
+            message = ("draft " if args.draft else "") + str(summary[scope]["met"]) + "/" + str(summary[scope]["required"])
         # Scoped to one architecture, and dated, so a badge never reads as
         # more, or more current, than it is.
         message += " · " + head[:7] + " · " + args.today.isoformat()
@@ -222,18 +258,23 @@ def main() -> int:
             "schemaVersion": 1, "label": label, "message": message, "color": named,
         }) + "\n", encoding="utf-8")
 
+    prefix = "to do" if args.draft else "violation"
     for error in evidence.errors:
         print("  evidence: " + error)
     for problem in revision_errors:
-        print("  revision: " + problem)
+        print(("  drift: " if args.draft else "  revision: ") + problem)
     for violation in profile_violations + component_violations:
-        print("  violation: " + violation)
+        print("  " + prefix + ": " + violation)
     for scope, rows in scopes.items():
         for row in rows:
             if row["status"] != "met":
                 print(f"  {scope:8} {row['criterion']:7} {row['status']:12} {row['title']}")
     for scope in scopes:
-        print(f"hardening {scope}: {summary[scope]['met']}/{summary[scope]['required']}")
+        print(f"hardening {scope}: {'draft ' if args.draft else ''}{summary[scope]['met']}/{summary[scope]['required']}")
+    if args.draft:
+        print("draft assessment against " + head[:12] + "; evidence " + ("valid" if evidence.valid else "invalid")
+              + "; coverage " + str(evidenced) + "/" + str(total) + "; no conformance is claimed")
+        return 0
     print("evidence " + ("valid" if evidence.valid else "invalid") + "; coverage " + str(evidenced) + "/" + str(total)
           + "; " + ("failing" if failing else "passing") + "; release " + ("eligible" if eligible else "not eligible"))
     for blocker in release_blockers:

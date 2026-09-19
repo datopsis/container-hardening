@@ -52,6 +52,7 @@ class Evidence:
     errors: list[str] = field(default_factory=list)
     source_commit: str | None = None
     subjects: dict[str, dict] = field(default_factory=dict)
+    architectures: list[str] = field(default_factory=list)
 
     @property
     def valid(self) -> bool:
@@ -100,16 +101,44 @@ def manifest_problems(profile: dict) -> list[str]:
     return problems
 
 
-def load(directory: Path, profile: dict, baseline: dict) -> Evidence:
-    """Every result in the directory, or the reasons they cannot be trusted."""
+def inferred(directory: Path) -> dict:
+    """For a draft whose profile does not yet say what to expect: what the evidence says it is."""
+    architectures: set[str] = set()
+    evidence: dict[str, str] = {}
+    for path in sorted(directory.rglob("*.json")) if directory.is_dir() else []:
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeDecodeError):
+            continue
+        if not isinstance(document, dict) or document.get("schema") != SCHEMA:
+            continue
+        architecture = (document.get("subject") or {}).get("architecture")
+        if architecture in ARCHITECTURES:
+            architectures.add(architecture)
+        evidence.setdefault(path.name, "generic" if architecture == GENERIC else "architecture")
+    return {"architectures": sorted(architectures) or ["amd64"],
+            "evidence": [{"file": n, "scope": s} for n, s in sorted(evidence.items())]}
+
+
+def load(directory: Path, profile: dict, baseline: dict, draft: bool = False) -> Evidence:
+    """Every result in the directory, or the reasons they cannot be trusted.
+
+    A draft whose profile does not yet declare its architectures and evidence
+    files takes them from the evidence itself, so research can start before
+    the profile is written; everything else is read as strictly as ever.
+    """
     evidence = Evidence()
     errors = evidence.errors
     problems = manifest_problems(profile)
+    if problems and draft:
+        profile = profile | inferred(directory)
+        problems = manifest_problems(profile)
     if problems:
         errors.extend("profile " + p for p in problems)
         return evidence
 
     declared = list(profile["architectures"])
+    evidence.architectures = declared
     expected = {e["file"]: e["scope"] for e in profile["evidence"]}
     criteria = baseline["criteria"]
     qualifiers = {q: profile.get(p) for q, p in QUALIFIERS.items()}

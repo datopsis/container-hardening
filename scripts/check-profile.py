@@ -77,6 +77,27 @@ def text(entry: dict, key: str, where: str, problems: list[str]) -> str:
     return value
 
 
+def worksheet_problems(base: Path, name: str, determined: object, source: str) -> list[str]:
+    """A determination made from an applicability worksheet must follow from it."""
+    candidates = [base / name, Path.cwd() / name]
+    path = next((c for c in candidates if c.is_file()), None)
+    if path is None:
+        return ["the worksheet " + name + " is not found"]
+    spec = importlib.util.spec_from_file_location("worksheets", REPOSITORY / "scripts" / "worksheets.py")
+    sheets = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sheets)
+    sheet = json.loads(path.read_text(encoding="utf-8"))
+    if sheet.get("source") != source:
+        return ["the worksheet " + name + " is for " + str(sheet.get("source"))]
+    errors, counts = sheets.check_applicability(sheet)
+    if errors:
+        return ["the worksheet " + name + " is incomplete: " + str(len(errors)) + " problems, first " + errors[0]]
+    if sheets.applies(counts) != determined:
+        return ["the worksheet decides " + str(counts.get("applies", 0)) + " rules apply, so applies must be "
+                + str(sheets.applies(counts)).lower()]
+    return []
+
+
 def active_deviations(profile: dict, today: datetime.date) -> list[dict]:
     """Deviations in force on the given day, for other checks to honour."""
     found = []
@@ -94,8 +115,9 @@ def check(
     register: dict,
     baseline: dict,
     today: datetime.date,
+    base: Path | None = None,
 ) -> tuple[list[str], list[str]]:
-    """Return (violations, warnings)."""
+    """Return (violations, warnings). BASE is where the profile's relative paths start."""
     violations: list[str] = []
     warnings: list[str] = []
     sources = {s["id"]: s for s in register["sources"]}
@@ -141,6 +163,9 @@ def check(
                 + str(sources[source_id]["sha256"])[:12] + " (" + str(sources[source_id]["release"])
                 + "); review it against the current revision"
             )
+        worksheet = str(entry.get("evidence", ""))
+        if worksheet.endswith(".json") and base is not None:
+            violations.extend(where + ": " + p for p in worksheet_problems(base, worksheet, entry.get("applies"), source_id))
         if entry.get("applies") is True and not sources[source_id]["rendered"]:
             warnings.append(where + ": applies, but the source is not yet rendered, so its rules cannot be traced")
     for missing in sorted(conditional - set(determined)):
@@ -229,7 +254,7 @@ def main() -> int:
     register = json.loads(args.register.read_text(encoding="utf-8"))
     baseline = json.loads(args.baseline.read_text(encoding="utf-8"))
 
-    violations, warnings = check(profile, register, baseline, args.today)
+    violations, warnings = check(profile, register, baseline, args.today, args.profile.resolve().parent)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         commit = os.environ.get("GITHUB_SHA") or subprocess.run(

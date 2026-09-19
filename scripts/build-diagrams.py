@@ -264,6 +264,40 @@ s.box(250, 680, 320, 86, "Monitoring / Response", ["audit / SIEM", "runtime even
 s.tag(590, 728, "PLT-08, PLT-09, PLT-16")
 s.save("control-domains.svg")
 
+# 8. Which SRGs an image takes -------------------------------------------------
+questions = [
+    ("Does it serve or proxy HTTP, an API included?", "Web Server SRG", "worksheet: decide every rule"),
+    ("Does it host an application runtime, offer a", "Application Server SRG", "worksheet: decide every rule"),
+    ("Is it a database management system?", "Database SRG", "not pinned yet: record the gap"),
+    ("Does it do something none of these govern?", "No source identified", "record it; ask for one to be pinned"),
+]
+s = SVG(760, 150 + len(questions) * 96 + 120, "Which SRGs an image takes",
+        "Every image takes the General Purpose Operating System SRG for itself, the Container Platform SRG for its "
+        "platform, and the RHEL 9 STIG for its host. Then, for each question, a yes adds a conditional source: serving "
+        "or proxying HTTP adds the Web Server SRG; hosting an application runtime, a management interface, or user "
+        "accounts adds the Application Server SRG; being a database adds the Database SRG, not yet pinned; doing "
+        "something none of these govern is recorded as a gap. More than one can apply. Each conditional source is "
+        "decided rule by rule in a worksheet, and the determination in the hardening profile follows from it.")
+s.box(40, 20, 680, 92, "Every image", ["General Purpose OS SRG: the image", "Container Platform SRG: the platform",
+                                        "RHEL 9 STIG: the host"], key=True, columns=2)
+y = 150
+for i, (question, source, then) in enumerate(questions):
+    s.arrow(210, y - 38 if i == 0 else y - 22, 210, y)
+    lines = [question] + (["management interface, or user accounts?"] if i == 1 else [])
+    s.box(40, y, 340, 74 if i == 1 else 56, "", key=False)
+    for j, line in enumerate(lines):
+        s.text(210, y + 32 + j * 18, line, 12.5, "600", anchor="middle")
+    height = 74 if i == 1 else 56
+    s.arrow(380, y + height / 2, 450, y + height / 2)
+    s.tag(392, y + height / 2 - 6, "yes")
+    s.box(450, y, 270, height, source, [then])
+    s.tag(222, y + height + 16, "no, or also")
+    y += height + 40
+s.box(40, y, 680, 74, "For each conditional source that may apply",
+      ["generate its worksheet, decide every rule: applies, not-applicable, other-layer, or covered-by",
+       "the profile's determination follows from the worksheet: it applies if any rule applies"], key=True)
+s.save("srg-selection.svg")
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)

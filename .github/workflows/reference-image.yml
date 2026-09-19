@@ -191,6 +191,7 @@ jobs:
       component: examples/reference-web-server/oscal/component-definition.json
       requirements: examples/reference-web-server/requirements.md
       crosswalk: examples/reference-web-server/requirements-crosswalk.json
+      decisions: examples/reference-web-server/decisions.json
       requirement-pattern: '^###\s+(RWS-\d{3})\s*$'
       evidence-artifacts: reference-image-evidence-*
       score-artifact: reference-image-conformance

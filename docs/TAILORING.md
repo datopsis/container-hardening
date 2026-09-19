@@ -59,7 +59,7 @@ determination is indistinguishable from a forgotten one.
 | `release`, `sha256` | The revision the determination was made against |
 | `applies` | `true` or `false` |
 | `basis` | Why, in terms a reviewer can check, such as counts of rules whose subject the image lacks |
-| `evidence` | Where the full reasoning lives, usually the image's own ADR |
+| `evidence` | Where the full reasoning lives: a rule-by-rule [worksheet](applicability/README.md), which `check-profile.py` then holds the determination to, or the image's own ADR |
 | `reviewed_on`, `reviewed_by` | When, and by whom |
 
 The determination is tied to the revision's digest. When DISA publishes a new

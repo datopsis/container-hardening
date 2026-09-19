@@ -3,13 +3,13 @@
 
 Every control in the standard's baseline gets one entry. Where the baseline
 settles a control, the entry takes its origination. Where the baseline leaves
-it research-required, DECISIONS below says what this image does, with the
-reason. An image-owned entry cites the criteria the baseline gives for it and
+it research-required, decisions.json says what this image does, with the
+reason, the owner, and the review. An image-owned entry cites the criteria the baseline gives for it and
 the requirements that state them, as requirements-crosswalk.json maps them,
 which is the verification pointer; a criterion the profile records a
 deviation from is not cited.
 
-DECISIONS are this image's, a static web server's. An image with another
+The decisions are this image's, a static web server's. An image with another
 function decides each of them again; check-component.py warns on one copied
 word for word.
 
@@ -40,35 +40,11 @@ MAP = json.loads((HERE / "requirements-crosswalk.json").read_text(encoding="utf-
 NS = BASELINE["model"]["namespace"]
 SEED = uuid.UUID("6f1c0b52-3d1e-4c6a-9a55-2b6f3f0c7e10")
 
-NO_ACCOUNTS = "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+# The controls the baseline leaves to the image, decided in the decisions
+# worksheet with a rationale, an owner, and a review.
 DECISIONS = {
-    **{c: ("not-applicable", NO_ACCOUNTS) for c in (
-        "ac-2", "ac-2.1", "ac-2.2", "ac-2.3", "ac-2.4", "ac-2.5", "ac-2.11", "ac-2.12",
-        "ac-6.1", "ac-6.2", "ac-6.3", "ac-6.5", "ac-6.9", "ac-7", "ac-8", "ac-10", "ac-12",
-        "ia-2", "ia-2.1", "ia-2.2", "ia-2.5", "ia-2.8", "ia-2.12", "ia-4", "ia-4.4",
-        "ia-5", "ia-5.1", "ia-5.2", "ia-5.6", "ia-6", "ia-8", "ia-8.1", "ia-8.2", "ia-8.4", "ia-11")},
-    "ia-7": ("not-applicable", "The image authenticates to no cryptographic module; it makes no FIPS claim."),
-    "au-10": ("not-applicable", "The image serves anonymous requests; there is no individual whose actions must be undeniable."),
-    "si-4.10": ("not-applicable", "The image does not monitor traffic; that is the platform's (PLT-16)."),
-    "si-8": ("not-applicable", "The image handles no mail."),
-    "si-8.2": ("not-applicable", "The image handles no mail."),
-    "ac-3": ("deployment-configured", "Which content is served, and to whom, is the deployment's mounted content and configuration."),
-    "ac-14": ("deployment-configured", "The image serves its content without identification by design; the deployment decides what content that is."),
-    "ac-17.2": ("deployment-configured", "TLS is enabled by mounting a server block, certificate, and key (IMG-16); the deployment chooses to."),
-    "sc-8": ("deployment-configured", "TLS protects transmission when the deployment mounts it; the image serves plain HTTP on 8080 otherwise."),
-    "sc-8.1": ("deployment-configured", "As SC-8: TLS 1.2 and 1.3, when the deployment mounts it."),
-    "sc-10": ("deployment-configured", "Idle connections close after nginx's keepalive timeout; the deployment may set its own."),
-    "sc-18": ("deployment-configured", "Any script in the served content is the deployment's content, not the image's."),
-    "sc-23": ("deployment-configured", "Session authenticity is TLS, when the deployment mounts it."),
-    "au-3.1": ("deployment-configured", "The deployment may extend nginx's log format with further fields."),
-    "au-2": ("image-owned", "nginx logs every request to standard output and every error to standard error."),
-    "au-3": ("image-owned", "Each access record states the client, time, request, status, size, referrer, and user agent."),
-    "au-12": ("image-owned", "Audit records are generated for every request, with nothing to enable."),
-    "cm-6": ("research-required", "The image ships a reviewed configuration, but no SCAP rule selection yet evidences its settings (IMG-T3)."),
-    "cm-6.1": ("research-required", "As CM-6: automated verification of settings awaits the SCAP profile (IMG-T3)."),
-    "sc-13": ("research-required", "nginx uses OpenSSL as shipped by Red Hat. The standard makes no FIPS claim, and its position on images that protect CUI is open."),
-    "si-10": ("research-required", "nginx rejects malformed requests, but no criterion yet evidences it."),
-    "si-11": ("research-required", "server_tokens is off, so errors do not disclose the version, but no criterion yet evidences error handling."),
+    row["control"]: (row["origination"], row["rationale"])
+    for row in json.loads((HERE / "decisions.json").read_text(encoding="utf-8"))["decisions"]
 }
 LOGGING_CRITERIA = ["IMG-19"]
 
