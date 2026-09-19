@@ -158,9 +158,7 @@ deviations in its profile; each item below closes some of them.
 ## Package 6: publication
 
 - [ ] Decide whether the rendered catalogue and standard are published as a
-  site or consumed as Markdown in the repository. GitHub Pages already serves
-  the reference image's badges, deployed by its workflow; a site would have to
-  deploy alongside them. Both reference points are
+  site or consumed as Markdown in the repository. Both reference points are
   sites; neither is necessary for the content to be useful.
 - [ ] Add link checking and Markdown linting to CI. Register validation and
   weekly source verification are in place.

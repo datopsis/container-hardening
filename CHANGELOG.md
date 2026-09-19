@@ -244,6 +244,11 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   one role's gap.
 - [Releasing an image](docs/RELEASING.md): what a person checks before a
   release and what CI then enforces, with a flowchart.
+- Badges are published by each image, from its own CI, to a `badges` branch in
+  its own repository, with the reusable `badges.yml` workflow, and shown in its
+  README through Shields; ADOPTING.md gives the steps. The reference image
+  publishes its own the same way, and this repository no longer serves badges
+  from GitHub Pages. The `badges` branch is protected from deletion.
 - Proposed [ADR-0007](docs/adr/0007-record-manual-reviews-as-expiring-evidence.md):
   manual reviews as expiring evidence, allowed only where a criterion says so.
 

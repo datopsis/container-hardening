@@ -7,7 +7,7 @@ name: Reference image
 # every runtime property, and the built image gated on vulnerabilities,
 # malware, and stale inputs. The evidence of each architecture is kept
 # separately and judged by the conformance workflow, called the way any image
-# calls it. On main, the badges it writes are published to GitHub Pages.
+# calls it. On main, the badges it writes are published to the badges branch.
 #
 # A tag of the form reference-web-server/vX.Y.Z also releases what was
 # verified, and only if conformance found it release eligible. Nothing is
@@ -196,71 +196,18 @@ jobs:
       evidence-artifacts: reference-image-evidence-*
       score-artifact: reference-image-conformance
 
-  # One badge per architecture and one generic, current with main.
-  pages:
-    name: publish the badges
+  # Published in this repository's badges branch, as any image publishes its
+  # own; the README points at them.
+  badges:
+    name: badges
     needs: conformance
-    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    if: ${{ !cancelled() }}
     permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-    defaults:
-      run:
-        working-directory: .
-    steps:
-      - name: Fetch the score and badges
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          name: reference-image-conformance
-          path: site/reference-web-server
-
-      - name: Write the page
-        env:
-          SHA: ${{ github.sha }}
-          SERVER: ${{ github.server_url }}
-          REPOSITORY: ${{ github.repository }}
-        run: |
-          python3 - <<'PY'
-          import html, json, os
-          from pathlib import Path
-          site = Path("site")
-          score = json.loads((site / "reference-web-server" / "score.json").read_text())
-          source = os.environ["SERVER"] + "/" + os.environ["REPOSITORY"]
-          rows = "".join(
-              '<li><img src="reference-web-server/badge-' + html.escape(scope) + '.svg" alt="hardening '
-              + html.escape(scope) + '"> <code>reference-web-server/shields-' + html.escape(scope) + '.json</code></li>'
-              for scope in score["scopes"])
-          (site / "index.html").write_text(
-              "<!doctype html><meta charset=utf-8><title>Conformance badges</title>"
-              "<style>body{font:15px/1.5 system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem}"
-              "li{margin:.5rem 0;list-style:none}code{font-size:13px}</style>"
-              "<h1>Conformance badges</h1>"
-              "<p>The reference web server, scored by the conformance workflow at <code>" + os.environ["SHA"][:7]
-              + "</code> on " + html.escape(score["scored_on"]) + ": one badge per architecture, and one for the "
-              "criteria that do not depend on architecture. Release eligible: <strong>"
-              + ("yes" if score["release_eligible"] else "no") + "</strong>.</p><ul>" + rows + "</ul>"
-              "<p>Conformance to the standard in <a href=\"" + source + "\">" + html.escape(os.environ["REPOSITORY"])
-              + "</a>, as its <a href=\"" + source + "/blob/main/docs/EVIDENCE.md\">evidence contract</a> defines it. "
-              "Not a compliance score, an authorization, or a STIG result. "
-              "<a href=\"reference-web-server/score.json\">score.json</a></p>\n")
-          PY
-
-      - name: Package the site
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        with:
-          path: site
-
-      - name: Deploy to GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+      contents: write
+    uses: $/.github/workflows/badges.yml
+    with:
+      score-artifact: reference-image-conformance
+      path: reference-web-server
 
   # Each architecture's verified image, pushed untagged by its own digest, and
   # tested again at that digest before anything names it.
