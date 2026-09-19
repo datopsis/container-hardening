@@ -65,15 +65,19 @@ def main() -> int:
         data[len(data) // 2] ^= 0xFF
         (tampered / victim).write_bytes(bytes(data))
         result = build(tampered, "reference-web-server:tampered")
-        record("IMG-02", "a tampered input stops the build", result.returncode != 0 and "FAILED" in result.stdout + result.stderr,
-               (result.stdout + result.stderr)[-200:])
+        output = result.stdout + result.stderr
+        record("IMG-02", "a tampered input stops the build",
+               result.returncode != 0 and victim in output and "FAILED" in output, output[-200:])
 
         missing = Path(scratch) / "missing"
         shutil.copytree(args.bundle, missing)
         (missing / victim).unlink()
         result = build(missing, "reference-web-server:missing")
-        record("IMG-03", "a missing input stops the build rather than being fetched", result.returncode != 0,
-               (result.stdout + result.stderr)[-200:])
+        output = result.stdout + result.stderr
+        # It must fail at the missing file, not for some unrelated reason that
+        # would make this check pass without testing anything.
+        record("IMG-03", "a missing input stops the build rather than being fetched",
+               result.returncode != 0 and victim in output and "No such file" in output, output[-200:])
 
     failed = [r for r in results if not r["passed"]]
     args.evidence.parent.mkdir(parents=True, exist_ok=True)

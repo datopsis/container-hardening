@@ -218,7 +218,13 @@ def runtime_checks(suite: Suite) -> None:
 
 
 def arbitrary_uid(suite: Suite) -> None:
-    name = suite.start(user="123456:0")
+    # Any UID the image was not built for proves the point. This one fits the
+    # 65,536 subordinate UIDs rootless Podman maps by default.
+    try:
+        name = suite.start(user="54321:0")
+    except subprocess.CalledProcessError as error:
+        suite.record("IMG-12", "serves under an arbitrary UID in group 0", False, error.stderr.strip()[-200:])
+        return
     code = suite.http(name, "http://127.0.0.1:8080/")
     suite.record("IMG-12", "serves under an arbitrary UID in group 0", code == 200, str(code))
 
