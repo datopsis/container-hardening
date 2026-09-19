@@ -103,17 +103,9 @@ an omission from it.
 
 ## Package 3: the control mapping
 
-- [ ] Carry the control model across from `datopsis/nginx-ubi`: six origination
-  values, a responsible role that must match, and the rule that only
-  `image-owned` asserts the project satisfies anything. It is already written
-  and enforced there; it needs generalising, not reinventing.
-- [ ] Keep the verification-pointer rule. An `image-owned` control must cite a
-  requirement identifier the adopting product actually states. This is what
-  stops a control asserting an obligation nobody committed to, and it is the
-  part most worth carrying.
-- [ ] Decide where the control spine lives: in this standard, in each image
-  repository, or generated into each from here. This decision shapes every
-  adopting repository and should be an ADR.
+- [ ] Accept or amend [ADR-0004](adr/0004-derive-the-control-baseline-here-validate-components-there.md),
+  which places the control baseline here and each image's component
+  definition in its own repository.
 
 ## Package 4: per-application tailoring
 
@@ -132,6 +124,10 @@ an omission from it.
 - [ ] Reconcile the two repositories' source registers. `nginx-ubi` currently
   records the Container Platform SRG as unresolved at V2R1; the current release
   is **V2R4** and it retrieves normally.
+- [ ] Run `scripts/check-component.py` in each image repository's CI, against a
+  pinned revision of this one. Run against `nginx-ubi` today it reports that
+  375 of 379 controls are absent and that its `cm-6` and `ac-6` entries do not
+  yet cite a criterion.
 - [ ] Close the gaps in the [conformance snapshot](standard/conformance.md).
   The largest are `clickhouse-ubi`'s build (IMG-02, IMG-03) and secrets
   (IMG-16), and the missing release workflows in `seaweedfs-ubi` and
@@ -180,6 +176,14 @@ an omission from it.
   every cited SRG rule reaches the 800-53 control cited beside it, that image
   criteria cite only image rules and platform expectations only platform rules,
   and that every link and anchor resolves.
+- [`docs/CONTROL-MODEL.md`](CONTROL-MODEL.md) carries the nginx-ubi control
+  model across, generalized: six originations, matching roles, and a
+  verification pointer that now names both a standard criterion and a
+  requirement the image states. [`docs/controls/`](controls/README.md) holds the
+  derived baseline for 379 controls: 20 image-owned, 13 deployment-configured,
+  50 host-inherited, 228 organization-inherited, 11 not applicable, and 57
+  left to each image. `scripts/check-component.py` checks an image's OSCAL
+  component definition against it.
 
 Two findings from building it, recorded so they are not rediscovered:
 

@@ -7,8 +7,9 @@ One standard, applied across repositories, tailored per application rather than
 reinvented per application.
 
 > **Status: draft standard.** The requirement catalogues render, the sources
-> are pinned, and the standard is written. The control mapping is outstanding —
-> see [the roadmap](docs/ROADMAP.md). Nothing here is an authorization package, and
+> are pinned, the standard is written, and the control baseline is derived.
+> Per-application tailoring and adoption are outstanding — see
+> [the roadmap](docs/ROADMAP.md). Nothing here is an authorization package, and
 > nothing here claims STIG certification.
 
 ## What is here
@@ -19,6 +20,8 @@ reinvented per application.
 | [Image criteria](docs/standard/criteria.md) | The standard as 30 testable properties, each anchored to an SRG rule. |
 | [Platform expectations](docs/standard/platform.md) | What the platform and host must impose for the image's properties to count. |
 | [NIST SP 800-190](docs/standard/nist-800-190.md) | Every countermeasure of the Application Container Security Guide, and what implements it. |
+| [Control baseline](docs/controls/README.md) | Every High-baseline control: who satisfies it, derived from the standard. |
+| [Control model](docs/CONTROL-MODEL.md) | How an image states its controls, and the checker that holds it to them. |
 | [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 391 rules today. |
 | [SRG to 800-53 crosswalk](docs/crosswalk/README.md) | Every rendered rule joined to NIST SP 800-53 Rev 5 through its CCIs. Derived, not hand-authored. |
 | [Source register](artifacts/sources.json) | Eleven sources pinned by SHA-256, with role, rendering state, and redistribution terms. |
@@ -52,6 +55,7 @@ package, and they are large binary-heavy trees. The repository commits the
 python scripts/build-srg-markdown.py            # regenerate docs/srg/
 python scripts/build-srg-markdown.py --check    # fail if committed output is stale
 python scripts/build-cci-crosswalk.py           # regenerate the 800-53 crosswalk
+python scripts/build-control-baseline.py        # regenerate the control baseline
 ```
 
 One file per rule is deliberate. When DISA publishes a new release the diff
