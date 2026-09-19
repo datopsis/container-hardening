@@ -12,7 +12,7 @@ reference image and changed for its own service:
 
 | Add | Copy from the reference image | You change |
 | --- | --- | --- |
-| A hardening profile | [`hardening-profile.json`](../examples/reference-web-server/hardening-profile.json) | Image name, function, the pinned commit, applicability, deviations |
+| A hardening profile | [`hardening-profile.json`](../examples/reference-web-server/hardening-profile.json) | Image name, function, the pinned commit, architectures, expected evidence, applicability, deviations |
 | Requirement statements | [`requirements.md`](../examples/reference-web-server/requirements.md) | The wording, an identifier prefix, and the checks that verify each |
 | A locked, hermetic build | [`lock.json`](../examples/reference-web-server/lock.json), [`scripts/acquire.py`](../examples/reference-web-server/scripts/acquire.py), [`scripts/build.py`](../examples/reference-web-server/scripts/build.py), [`Containerfile`](../examples/reference-web-server/Containerfile) | The packages and what the image ships |
 | Checks that write evidence | [`tests/`](../examples/reference-web-server/tests/), [`tools.json`](../examples/reference-web-server/tools.json), [`scripts/drift.py`](../examples/reference-web-server/scripts/drift.py) | The runtime probes in `smoke.py` for the service |
@@ -21,10 +21,14 @@ reference image and changed for its own service:
 | CI | [`reference-image.yml`](../.github/workflows/reference-image.yml) and a call to [`conformance.yml`](../.github/workflows/conformance.yml) | The image name and paths |
 
 **It is done when** the conformance workflow passes in the image repository's
-CI and reports a score. The score need not be perfect; every criterion it does
-not count must be a recorded deviation with an expiry, which is what makes the
-image aligned rather than finished. The reference image reports
-`hardening 31/34`, and its three gaps are deviations.
+CI and reports the image **release eligible**: valid evidence, nothing failing,
+and every required criterion on every architecture met or covered by a
+recorded deviation with an expiry. That is what makes the image aligned rather
+than finished. The reference image reports `hardening amd64 31/34` and is
+release eligible, because its three gaps are deviations.
+
+A passing run that is not yet release eligible is progress, not alignment:
+conformance lists what blocks the release.
 
 Nothing here requires the image to meet every criterion on day one. It
 requires every gap to be visible: a criterion the image does not yet meet is a
@@ -53,8 +57,11 @@ and change it for the image:
 | Field | What to put |
 | --- | --- |
 | `image` | The image's name |
+| `schema_version` | `2` |
 | `standard.revision` | The commit from step 1 |
 | `function` | What the image does, in a sentence a reviewer can check |
+| `architectures` | The architectures it is built for: `amd64`, `arm64`, or both |
+| `evidence` | Each evidence file its CI writes, with its scope: `architecture` for a file written once per architecture, `generic` for one written once |
 | `applicability` | A determination for **every** conditional source in the [register](../artifacts/sources.json), pinned to its digest, with its basis |
 | `deviations` | One for each criterion the image does not yet meet, each expiring within 180 days |
 
@@ -76,15 +83,26 @@ standard's criterion and the image's own requirement.
 
 ## 5. Produce evidence in CI
 
-Every check writes a JSON file with a `results` list, each entry naming the
-criterion it establishes:
+Every check writes a JSON file in the shape [Evidence](EVIDENCE.md) defines: a
+header saying which commit, run, architecture, and image it is about, and a
+`results` list in which each check has a stable id and names the criterion it
+establishes:
 
 ```json
-{"results": [{"criterion": "IMG-13", "check": "every process has an empty effective capability set", "passed": true}]}
+{"id": "smoke.no-effective-capabilities", "criterion": "IMG-13",
+ "check": "every process has an empty effective capability set", "passed": true}
 ```
 
 `passed` is `true`, `false`, or `null` for a check that could not run where it
-ran; a `null` never counts as met. Upload the files as one artifact.
+ran, with the reason in `detail`; a `null` never counts as met, and any other
+value makes the evidence invalid. The reference image's
+[`tests/evidence.py`](../examples/reference-web-server/tests/evidence.py)
+writes the header for you.
+
+Build and test each architecture natively, and upload each architecture's
+evidence as its own artifact, such as `evidence-amd64` and `evidence-arm64`.
+Evidence about a built image is per architecture; a passing result on one never
+stands for another.
 
 The reference image's checks can be copied and adapted:
 
@@ -95,7 +113,7 @@ The reference image's checks can be copied and adapted:
 | [`tests/smoke.py`](../examples/reference-web-server/tests/smoke.py) | IMG-06 to IMG-20, IMG-27, IMG-30, IMG-32 | The service's probes, paths, secrets, and failure cases |
 | [`tools.json`](../examples/reference-web-server/tools.json), [`scripts/install_tools.py`](../examples/reference-web-server/scripts/install_tools.py), [`tests/gates.py`](../examples/reference-web-server/tests/gates.py) | IMG-21, IMG-25, IMG-28, IMG-34 | Nothing |
 | [`scripts/drift.py`](../examples/reference-web-server/scripts/drift.py) and a read-only scheduled workflow | IMG-04, IMG-29 | Nothing |
-| The release job in [`reference-image.yml`](../.github/workflows/reference-image.yml) | IMG-21, IMG-22, IMG-24 | The image name |
+| The release job in [`reference-image.yml`](../.github/workflows/reference-image.yml) | IMG-21, IMG-22, IMG-24 | The image name. It builds one architecture |
 
 ## 6. Write the component definition
 
@@ -110,18 +128,27 @@ a database has accounts and a static server does not.
 ```yaml
 jobs:
   conformance:
-    needs: verify            # the job that uploads the evidence
+    needs: verify            # the jobs that upload the evidence
+    if: ${{ !cancelled() }}
     uses: datopsis/container-hardening/.github/workflows/conformance.yml@<commit>
     with:
-      standard-ref: <commit>
+      standard-ref: <the same commit>
       requirements: requirements.md
-      evidence-artifact: evidence
-      # requirement-pattern: only if headings are not like "### RWS-001"
+      evidence-artifacts: evidence-*
+      # requirement-pattern: only if headings are not like "### RWS-001" or "### L1-SUP-001"
+
+  release:
+    needs: conformance
+    if: needs.conformance.outputs.release-eligible == 'true'
 ```
 
-It fails if the profile names a different revision, if the profile or the
-component definition breaks a rule, or if any check failed. Otherwise it
-scores the image, and keeps the score and a badge with the run.
+`standard-ref` must be the full commit in the `uses:` line; the workflow checks
+it against the commit it actually ran from. It fails on invalid evidence, a
+revision that does not bind, a profile or component that breaks a rule, or a
+failed check. Otherwise it scores each architecture and keeps the score and a
+badge per architecture with the run. Its outputs are `evidence-valid`,
+`failing`, `coverage`, `score`, and `release-eligible`; gate a release on the
+last, never on the run succeeding.
 
 ## 8. Keep aligned
 
@@ -131,11 +158,16 @@ scores the image, and keeps the score and a badge with the run.
   source, every determination against the old digest fails until someone
   reviews it again.
 - **The standard moves.** Updating the pinned commit is a pull request, and
-  the checks show what changed for the image.
+  the checks show what changed for the image. The profile's revision need not
+  move with every commit: it stays valid until the criteria, platform
+  expectations, baseline, or register change, and then conformance fails until
+  the image is reassessed.
 
 ## What the score means
 
-`hardening 28/34` means 28 of the 34 required criteria are met with passing
-evidence and no active deviation. It is conformance to this standard. It is not
-a compliance score, an authorization, or a STIG result, and it is not a
-ranking between images.
+`hardening arm64 28/34` means 28 of the 34 required criteria are met on the
+arm64 image with passing evidence and no active deviation. It is conformance to
+this standard, on that architecture, on the day and at the revision the badge
+names. It is not release eligibility, which is a separate answer; it is not a
+compliance score, an authorization, or a STIG result; and it is not a ranking
+between images. See [Evidence](EVIDENCE.md).

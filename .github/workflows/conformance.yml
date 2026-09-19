@@ -1,21 +1,25 @@
 name: Conformance
 
-# Called by an image repository to check itself against a pinned revision of
-# this standard. It checks the hardening profile and the component definition,
-# then scores the evidence the caller's own CI produced, and keeps the score
-# and badge with the run. See docs/ADOPTING.md.
+# Called by an image's CI to judge it against a revision of this standard. It
+# binds the revision, reads the evidence strictly, scores it per architecture,
+# and says separately whether the evidence is valid, how much of it there is,
+# and whether the image is release eligible. See docs/EVIDENCE.md.
 #
-# Call it pinned to a full commit, and pass the same commit as standard-ref:
+# Call it at a full commit, and name the same commit as standard-ref:
 #
 #   uses: datopsis/container-hardening/.github/workflows/conformance.yml@<commit>
 #   with:
 #     standard-ref: <the same commit>
+#
+# The run fails on invalid evidence or a failing check. A score short of
+# release eligibility does not fail it; read the release-eligible output, and
+# gate the release on it.
 
 on:
   workflow_call:
     inputs:
       standard-ref:
-        description: The full commit of container-hardening this image is checked against
+        description: The full commit of container-hardening this image is judged against; the commit in the uses line
         required: true
         type: string
       profile:
@@ -33,14 +37,40 @@ on:
         required: true
         type: string
       requirement-pattern:
-        description: Regular expression capturing one requirement identifier per heading; the default finds headings such as "### RWS-001"
+        description: Regular expression capturing one requirement identifier per heading; the default finds headings such as "### RWS-001" or "### L1-SUP-001"
         required: false
         type: string
         default: '^###\s+([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{3})\s*$'
-      evidence-artifact:
-        description: Name of the artifact holding the caller's evidence JSON files
+      evidence-artifacts:
+        description: Name or glob of the artifacts holding the evidence, such as "evidence-*" for one per architecture; each is kept in its own directory
         required: true
         type: string
+      score-artifact:
+        description: Name of the artifact the score and badges are kept in
+        required: false
+        type: string
+        default: conformance
+      enforce:
+        description: Fail the run on invalid evidence or a failing check; false only to test the workflow itself
+        required: false
+        type: boolean
+        default: true
+    outputs:
+      evidence-valid:
+        description: '"true" when the evidence is well formed and complete'
+        value: ${{ jobs.conformance.outputs.evidence-valid }}
+      failing:
+        description: '"true" when the revision does not bind, the profile or component breaks a rule, or a check failed'
+        value: ${{ jobs.conformance.outputs.failing }}
+      coverage:
+        description: Required criteria with evidence, summed over architectures, such as "68/68"
+        value: ${{ jobs.conformance.outputs.coverage }}
+      release-eligible:
+        description: '"true" only when the evidence is valid, nothing fails, and every criterion on every architecture is met or covered by a non-vulnerability deviation'
+        value: ${{ jobs.conformance.outputs.release-eligible }}
+      score:
+        description: The score per scope, such as "amd64 31/34, arm64 31/34, generic 8/9"
+        value: ${{ jobs.conformance.outputs.score }}
 
 permissions:
   contents: read
@@ -50,6 +80,12 @@ jobs:
     name: conformance
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      evidence-valid: ${{ steps.score.outputs.evidence-valid }}
+      failing: ${{ steps.score.outputs.failing }}
+      coverage: ${{ steps.score.outputs.coverage }}
+      release-eligible: ${{ steps.score.outputs.release-eligible }}
+      score: ${{ steps.score.outputs.score }}
     steps:
       - name: Check out the image repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -57,12 +93,15 @@ jobs:
           persist-credentials: false
           path: image
 
-      - name: Check out the standard at the pinned commit
+      # The standard is checked out at the commit this workflow runs from, not
+      # at whatever the caller says; the scorer then requires the two to agree.
+      - name: Check out the standard this workflow runs from
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          repository: datopsis/container-hardening
-          ref: ${{ inputs.standard-ref }}
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          fetch-depth: 0
           path: standard
 
       - name: Set up Python
@@ -70,58 +109,61 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Fetch the image's evidence
+      # No artifact is not an error here: the scorer reports it as no evidence.
+      - name: Fetch the evidence, one directory per artifact
+        continue-on-error: true
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: ${{ inputs.evidence-artifact }}
+          pattern: ${{ inputs.evidence-artifacts }}
+          merge-multiple: false
           path: evidence
 
-      # The profile must name the revision it is actually checked against.
-      - name: Require the profile to name this revision
-        env:
-          PROFILE: image/${{ inputs.profile }}
-          STANDARD_REF: ${{ inputs.standard-ref }}
-        run: |
-          named=$(python -c "import json,sys; print(json.load(open(sys.argv[1]))['standard']['revision'])" "$PROFILE")
-          if [ "$named" != "$STANDARD_REF" ]; then
-            echo "the profile names $named but is checked against $STANDARD_REF" >&2
-            exit 1
-          fi
-
-      - name: Check the hardening profile
-        env:
-          PROFILE: image/${{ inputs.profile }}
-        run: python standard/scripts/check-profile.py "$PROFILE" --report evidence/profile.json
-
-      - name: Check the component definition
-        env:
-          PROFILE: image/${{ inputs.profile }}
-          COMPONENT: image/${{ inputs.component }}
-          REQUIREMENTS: ${{ inputs.requirements }}
-          PATTERN: ${{ inputs.requirement-pattern }}
-        run: |
-          files=(); for f in $REQUIREMENTS; do files+=("image/$f"); done
-          python standard/scripts/check-component.py "$COMPONENT" --requirements "${files[@]}" \
-            --requirement-pattern "$PATTERN" --profile "$PROFILE"
-
       - name: Score the evidence
-        if: always()
+        id: score
         env:
           PROFILE: image/${{ inputs.profile }}
           COMPONENT: image/${{ inputs.component }}
           REQUIREMENTS: ${{ inputs.requirements }}
           PATTERN: ${{ inputs.requirement-pattern }}
+          STANDARD_REF: ${{ inputs.standard-ref }}
+          WORKFLOW_SHA: ${{ job.workflow_sha }}
         run: |
-          set -o pipefail
           files=(); for f in $REQUIREMENTS; do files+=("image/$f"); done
+          mkdir -p evidence
+          set +e
           python standard/scripts/score.py evidence --profile "$PROFILE" --component "$COMPONENT" \
-            --requirements "${files[@]}" --requirement-pattern "$PATTERN" --out score | tee score.txt
+            --requirements "${files[@]}" --requirement-pattern "$PATTERN" \
+            --standard-ref "$STANDARD_REF" --workflow-sha "$WORKFLOW_SHA" --out score > score.txt 2>&1
+          code=$?
+          set -e
+          cat score.txt
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+          python - score/score.json >> "$GITHUB_OUTPUT" <<'PY'
+          import json, sys
+          s = json.load(open(sys.argv[1]))
+          flag = lambda value: "true" if value else "false"
+          print("evidence-valid=" + flag(s["evidence_valid"]))
+          print("failing=" + flag(s["failing"]))
+          print("release-eligible=" + flag(s["release_eligible"]))
+          print("coverage=" + str(s["coverage"]["evidenced"]) + "/" + str(s["coverage"]["required"]))
+          print("score=" + ", ".join(k + " " + str(v["met"]) + "/" + str(v["required"]) for k, v in s["scopes"].items()))
+          PY
           { echo "## Conformance"; echo; echo '```text'; cat score.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Keep the score and badge
+      - name: Keep the score and badges
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: conformance
+          name: ${{ inputs.score-artifact }}
           path: score/
           if-no-files-found: warn
+
+      - name: Fail on invalid evidence or a failing check
+        if: inputs.enforce
+        env:
+          CODE: ${{ steps.score.outputs.exit }}
+        run: |
+          if [ "$CODE" != 0 ]; then
+            echo "::error::conformance failed: the evidence is invalid, the revision does not bind, or a check failed; see the score step" >&2
+            exit 1
+          fi

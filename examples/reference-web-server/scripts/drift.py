@@ -18,11 +18,14 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import sys
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(HERE / "tests"))
+import evidence  # noqa: E402
 LOCK = json.loads((HERE / "lock.json").read_text(encoding="utf-8"))
 REGISTRY = "https://registry.access.redhat.com/v2/"
 INDEX = "application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json"
@@ -87,13 +90,13 @@ def main() -> int:
     stale = [b for b in bases if b["days_behind"] > LIMIT_DAYS]
     args.report.parent.mkdir(parents=True, exist_ok=True)
     results = [{
-        "criterion": "IMG-29", "check": "no base is more than " + str(LIMIT_DAYS) + " days behind its publisher",
+        "id": "drift.bases-current", "criterion": "IMG-29", "check": "no base is more than " + str(LIMIT_DAYS) + " days behind its publisher",
         "passed": not stale, "detail": ", ".join(b["base"] + " " + str(b["days_behind"]) + " days" for b in bases),
     }]
-    args.report.write_text(json.dumps({
-        "checked_on": today.date().isoformat(), "lock_refreshed_on": LOCK.get("refreshed_on"),
-        "limit_days": LIMIT_DAYS, "bases": bases, "rpms": rpms, "results": results,
-    }, indent=2) + "\n", encoding="utf-8")
+    # A base is judged by its manifest list, which covers every architecture.
+    evidence.write(args.report, evidence.subject("generic"), results,
+                   checked_on=today.date().isoformat(), lock_refreshed_on=LOCK.get("refreshed_on"),
+                   limit_days=LIMIT_DAYS, bases=bases, rpms=rpms)
 
     for base in bases:
         state = "current" if base["days_behind"] == 0 and base["locked"] == base["current"] else \

@@ -27,6 +27,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import evidence
+
 HERE = Path(__file__).resolve().parent.parent
 REPOSITORY = HERE.parent.parent
 LOCK = json.loads((HERE / "lock.json").read_text(encoding="utf-8"))
@@ -34,11 +36,11 @@ TOOLS = json.loads((HERE / "tools.json").read_text(encoding="utf-8"))
 
 
 class Gates:
-    def __init__(self, bin_dir: Path, evidence: Path) -> None:
+    def __init__(self, bin_dir: Path, directory: Path) -> None:
         self.bin = bin_dir
-        self.evidence = evidence
+        self.evidence = directory
         self.results: list[dict] = []
-        evidence.mkdir(parents=True, exist_ok=True)
+        directory.mkdir(parents=True, exist_ok=True)
 
     def tool(self, name: str) -> str:
         return str(self.bin / TOOLS["tools"][name]["binary"])
@@ -46,19 +48,17 @@ class Gates:
     def run(self, *args: str) -> subprocess.CompletedProcess:
         return subprocess.run(list(args), text=True, capture_output=True)
 
-    def record(self, criterion: str, check: str, passed: bool, detail: str = "", report: str | None = None) -> None:
-        entry = {"criterion": criterion, "check": check, "passed": bool(passed), "detail": detail}
+    def record(self, criterion: str, check_id: str, check: str, passed: bool, detail: str = "", report: str | None = None) -> None:
+        entry = {"id": check_id, "criterion": criterion, "check": check, "passed": bool(passed), "detail": detail}
         if report:
             entry["report"] = report
         self.results.append(entry)
         print(("PASS " if passed else "FAIL ") + criterion + "  " + check + ("  (" + detail + ")" if detail and not passed else ""))
 
-    def write(self, name: str) -> int:
+    def write(self, name: str, about: dict) -> int:
         failed = [r for r in self.results if not r["passed"]]
-        (self.evidence / name).write_text(json.dumps({
-            "tools": {n: t["version"] for n, t in TOOLS["tools"].items()} | {"clamav": TOOLS["images"]["clamav"]["reference"]},
-            "passed": len(self.results) - len(failed), "failed": len(failed), "results": self.results,
-        }, indent=2) + "\n", encoding="utf-8")
+        evidence.write(self.evidence / name, about, self.results,
+                       tools={n: t["version"] for n, t in TOOLS["tools"].items()} | {"clamav": TOOLS["images"]["clamav"]["reference"]})
         print(str(len(self.results) - len(failed)) + " passed, " + str(len(failed)) + " failed")
         return 1 if failed else 0
 
@@ -68,16 +68,17 @@ def source(gates: Gates) -> int:
     result = gates.run(gates.tool("gitleaks"), "dir", str(HERE), "--report-format", "json",
                        "--report-path", str(secrets), "--no-banner", "--redact")
     found = json.loads(secrets.read_text()) if secrets.exists() else []
-    gates.record("IMG-34", "no committed secret in the image's source", result.returncode == 0 and not found,
+    gates.record("IMG-34", "gates.source-no-committed-secret", "no committed secret in the image's source", result.returncode == 0 and not found,
                  str(len(found)) + " findings", "gitleaks.json")
 
     report = gates.evidence / "trivy-source.json"
     result = gates.run(gates.tool("trivy"), "fs", "--quiet", "--scanners", "vuln,secret,misconfig",
                        "--file-patterns", "dockerfile:Containerfile", "--severity", "HIGH,CRITICAL",
                        "--exit-code", "1", "--format", "json", "--output", str(report), str(HERE))
-    gates.record("IMG-34", "no High or Critical dependency, secret, or build-definition finding",
+    gates.record("IMG-34", "gates.source-no-high-finding", "no High or Critical dependency, secret, or build-definition finding",
                  result.returncode == 0, result.stderr.strip()[-200:], "trivy-source.json")
-    return gates.write("gates-source.json")
+    # The source is the same whatever the image is built for.
+    return gates.write("gates-source.json", evidence.subject("generic"))
 
 
 def image(gates: Gates, reference: str, bundle: Path) -> int:
@@ -95,7 +96,7 @@ def image(gates: Gates, reference: str, bundle: Path) -> int:
             document = json.loads(sbom.read_text())
             packages = {p.get("name") for p in document.get("packages", [])}
         missing = sorted(r["name"] for r in LOCK["rpms"] if r["name"] not in packages)
-        gates.record("IMG-21", "a bill of materials is generated from the image and covers every locked package",
+        gates.record("IMG-21", "gates.sbom-covers-lock", "a bill of materials is generated from the image and covers every locked package",
                      result.returncode == 0 and not missing, ", ".join(missing) or result.stderr.strip()[-200:],
                      "sbom.spdx.json")
 
@@ -106,13 +107,13 @@ def image(gates: Gates, reference: str, bundle: Path) -> int:
                          "--ignore-unfixed", "--severity", "HIGH,CRITICAL", "--exit-code", "1", "--format", "table")
         # A scan that produced no report has not passed; say why.
         detail = gate.stdout.strip()[-400:] if full.exists() else "no report: " + report.stderr.strip()[-400:]
-        gates.record("IMG-25", "no fixed High or Critical vulnerability (Trivy, every finding recorded)",
+        gates.record("IMG-25", "gates.vulnerabilities-trivy", "no fixed High or Critical vulnerability (Trivy, every finding recorded)",
                      report.returncode == 0 and gate.returncode == 0 and full.exists(), detail, "trivy-image.json")
 
         grype = gates.evidence / "grype.json"
         result = gates.run(gates.tool("grype"), "sbom:" + str(sbom), "--only-fixed", "--fail-on", "high",
                            "--output", "json", "--file", str(grype))
-        gates.record("IMG-25", "no fixed High or Critical vulnerability (Grype, from the bill of materials)",
+        gates.record("IMG-25", "gates.vulnerabilities-grype", "no fixed High or Critical vulnerability (Grype, from the bill of materials)",
                      result.returncode == 0, result.stderr.strip()[-400:], "grype.json")
 
         # The exported filesystem and the verified inputs, as the scanner sees them.
@@ -132,10 +133,10 @@ def image(gates: Gates, reference: str, bundle: Path) -> int:
                            "clamscan --recursive --infected --alert-exceeds-max=yes "
                            "--max-filesize=200M --max-scansize=800M /scan")
         report.write_text(result.stdout + result.stderr)
-        gates.record("IMG-28", "no malware in the image or its inputs, with signatures refreshed this run",
+        gates.record("IMG-28", "gates.no-malware", "no malware in the image or its inputs, with signatures refreshed this run",
                      result.returncode == 0 and "Infected files: 0" in result.stdout,
                      (result.stdout + result.stderr).strip()[-300:], "clamav.txt")
-    return gates.write("gates-image.json")
+    return gates.write("gates-image.json", evidence.image_subject(reference))
 
 
 def main() -> int:

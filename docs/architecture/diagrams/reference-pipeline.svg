@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="612" viewBox="0 0 760 612" role="img" aria-labelledby="t d">
 <title id="t">The reference image's pipeline</title>
-<desc id="d">The reference image's CI, in order: check the profile and component definition, install verified scanners, scan the source, retrieve and verify inputs, show a defective input stops the build, build with networking disabled, verify the running image, generate the bill of materials and run the vulnerability and malware gates, check the base is current, re-verify the latest release, score the evidence, and on a version tag publish, sign, attest, and verify.</desc>
+<desc id="d">The reference image's CI, in order: check the profile and component definition, install verified scanners, scan the source, retrieve and verify inputs, show a defective input stops the build, build with networking disabled, verify the running image, generate the bill of materials and run the vulnerability and malware gates, check the base is current, re-verify the latest release, then validate and score the evidence in the conformance workflow, and on a version tag, only if it is release eligible, publish, sign, attest, and verify.</desc>
 <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
 <rect x="0.5" y="0.5" width="759" height="611" rx="10" fill="#ffffff" stroke="#d0d7de"/>
 <text x="250" y="30" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#57606a" text-anchor="middle">.github/workflows/reference-image.yml</text>
@@ -56,11 +56,11 @@
 <line x1="250" y1="490" x2="250" y2="504" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="504" width="420" height="32" rx="6" fill="#ddf4ff" stroke="#0969da"/>
 <text x="250.0" y="525" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle"></text>
-<text x="250" y="525" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#1f2328" text-anchor="middle">Score the evidence</text>
-<text x="478" y="525" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">hardening 31/34</text>
+<text x="250" y="525" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#1f2328" text-anchor="middle">Conformance: validate the evidence and score it</text>
+<text x="478" y="525" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">hardening amd64 31/34</text>
 <line x1="250" y1="536" x2="250" y2="550" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="550" width="420" height="32" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
 <text x="250.0" y="571" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle"></text>
-<text x="250" y="571" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#1f2328" text-anchor="middle">On a version tag: publish, sign, attest, verify</text>
+<text x="250" y="571" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#1f2328" text-anchor="middle">On a version tag, if release eligible: publish, sign, attest</text>
 <text x="478" y="571" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-21, IMG-22, IMG-24</text>
 </svg>

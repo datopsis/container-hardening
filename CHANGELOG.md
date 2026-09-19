@@ -161,8 +161,41 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   on and where it stops, rather than a generic remark.
 - `check-component.py` finds requirement headings such as `### RWS-001` by
   default; `requirement-pattern` is optional in the conformance workflow.
+- Evidence has a contract, [Evidence](docs/EVIDENCE.md), recorded as
+  ADR-0006. Each file carries a header naming its commit, run, architecture,
+  and image, and each result a stable id. `scripts/evidence.py` reads it
+  strictly: a malformed or missing expected file, a `passed` that is not a
+  Boolean or `null`, a duplicated check, an unknown criterion, or evidence from
+  two images of one architecture makes it invalid, and invalid evidence is not
+  scored.
+- Each required criterion states its scope, per architecture or generic, and
+  the control baseline carries it. The score is kept per architecture, amd64
+  and arm64, and for the generic criteria, with a dated badge for each; a
+  passing result on one architecture never fills a gap on another.
+- Conformance reports three answers separately: `evidence-valid`, the score and
+  `coverage`, and `release-eligible`. An image is release eligible when every
+  criterion on every architecture is met or covered by a deviation, except a
+  vulnerability deviation or a deviation from the vulnerability gate. The
+  reference image's release job gates on it.
+- `scripts/check-revision.py` binds the revision: `standard-ref` must be a full
+  commit and the commit the conformance workflow ran from, and the profile's
+  revision that commit or an ancestor with no normative change since.
+- The reference image is judged by the conformance workflow as any image is,
+  and `conformance-selftest.yml` calls that workflow with missing, malformed,
+  failing, and partial evidence and with a revision that does not bind, and
+  checks each answer.
+- Hardening profiles are schema version 2: they declare `architectures` and the
+  `evidence` files the image's CI writes, and optionally `roles`, `topologies`,
+  and `platforms`. The conformance workflow takes `evidence-artifacts`, a name
+  or pattern, in place of `evidence-artifact`.
 
 ### Fixed
+
+- The scorer counted a `passed` of `"false"` or `0` as met, and skipped a file
+  that did not parse. Both are now errors.
+- The reference image's profile named a revision of the standard from before
+  later changes to the criteria and baseline, and nothing checked it; it now
+  names the current one, and conformance fails when it falls behind.
 
 - The reference image's release job logged in to the registry at a custom
   credentials path, which the provenance action does not read. Release 0.1.0

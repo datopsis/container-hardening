@@ -1,0 +1,212 @@
+name: Conformance self-test
+
+# Calls the conformance workflow the way an image's CI calls it, with evidence
+# that is complete, missing, malformed, failing, or partial, and with a
+# revision that does not bind, and checks each answer. The reference image's
+# own CI is the passing caller with real evidence; this is every way a caller
+# can be wrong. See docs/EVIDENCE.md.
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/conformance.yml"
+      - ".github/workflows/conformance-selftest.yml"
+      - "scripts/**"
+      - "artifacts/**"
+      - "docs/standard/**"
+      - "tests/conformance_fixtures.py"
+      - "examples/reference-web-server/hardening-profile.json"
+      - "examples/reference-web-server/oscal/**"
+      - "examples/reference-web-server/requirements.md"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/conformance.yml"
+      - ".github/workflows/conformance-selftest.yml"
+      - "scripts/**"
+      - "artifacts/**"
+      - "docs/standard/**"
+      - "tests/conformance_fixtures.py"
+      - "examples/reference-web-server/hardening-profile.json"
+      - "examples/reference-web-server/oscal/**"
+      - "examples/reference-web-server/requirements.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: conformance-selftest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fixtures:
+    name: write the evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Write each case
+        run: |
+          for case in pass malformed failed-check partial; do
+            python tests/conformance_fixtures.py "$case" "$RUNNER_TEMP/fixtures/$case"
+          done
+
+      - name: Keep the complete evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: selftest-pass-amd64
+          path: |
+            ${{ runner.temp }}/fixtures/pass/evidence-amd64/
+            ${{ runner.temp }}/fixtures/pass/evidence-generic/
+
+      - name: Keep the malformed evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: selftest-malformed-amd64
+          path: |
+            ${{ runner.temp }}/fixtures/malformed/evidence-amd64/
+            ${{ runner.temp }}/fixtures/malformed/evidence-generic/
+
+      - name: Keep the failing evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: selftest-failed-check-amd64
+          path: |
+            ${{ runner.temp }}/fixtures/failed-check/evidence-amd64/
+            ${{ runner.temp }}/fixtures/failed-check/evidence-generic/
+
+      - name: Keep the partial evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: selftest-partial-amd64
+          path: |
+            ${{ runner.temp }}/fixtures/partial/evidence-amd64/
+            ${{ runner.temp }}/fixtures/partial/evidence-generic/
+
+  pass:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: ${{ github.sha }}
+      profile: examples/reference-web-server/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      enforce: false
+      evidence-artifacts: selftest-pass-*
+      score-artifact: selftest-score-pass
+
+  missing:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: ${{ github.sha }}
+      profile: examples/reference-web-server/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      enforce: false
+      evidence-artifacts: selftest-none-*
+      score-artifact: selftest-score-missing
+
+  malformed:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: ${{ github.sha }}
+      profile: examples/reference-web-server/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      enforce: false
+      evidence-artifacts: selftest-malformed-*
+      score-artifact: selftest-score-malformed
+
+  failed-check:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: ${{ github.sha }}
+      profile: examples/reference-web-server/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      enforce: false
+      evidence-artifacts: selftest-failed-check-*
+      score-artifact: selftest-score-failed-check
+
+  partial:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: ${{ github.sha }}
+      profile: examples/reference-web-server/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      enforce: false
+      evidence-artifacts: selftest-partial-*
+      score-artifact: selftest-score-partial
+
+  # A full commit, but not the one the workflow runs from.
+  wrong-revision:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: "0000000000000000000000000000000000000000"
+      profile: examples/reference-web-server/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      enforce: false
+      evidence-artifacts: selftest-pass-*
+      score-artifact: selftest-score-wrong-revision
+
+  answers:
+    name: check every answer
+    needs: [pass, missing, malformed, failed-check, partial, wrong-revision]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Compare with what each case must answer
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          needs = json.loads(os.environ["RESULTS"])
+          # valid, failing, eligible, and coverage where it is known.
+          expected = {
+              "pass":           ("true",  "false", "true",  None),
+              "missing":        ("false", None,    "false", None),
+              "malformed":      ("false", None,    "false", None),
+              "failed-check":   ("true",  "true",  "false", None),
+              "partial":        ("true",  "false", "false", "short"),
+              "wrong-revision": ("true",  "true",  "false", None),
+          }
+          wrong = []
+          for case, (valid, failing, eligible, coverage) in expected.items():
+              job = needs[case]
+              out = job.get("outputs", {})
+              print(case, job["result"], json.dumps(out))
+              if job["result"] != "success":
+                  wrong.append(case + ": the workflow itself did not complete (" + job["result"] + ")")
+                  continue
+              for name, want in (("evidence-valid", valid), ("failing", failing), ("release-eligible", eligible)):
+                  if want is not None and out.get(name) != want:
+                      wrong.append(case + ": " + name + " is " + repr(out.get(name)) + ", expected " + want)
+              if coverage == "short":
+                  have, of = out.get("coverage", "0/0").split("/")
+                  if not int(have) < int(of):
+                      wrong.append(case + ": coverage " + out.get("coverage", "") + " should be short of complete")
+          if wrong:
+              print("\n".join(wrong))
+              raise SystemExit(1)
+          print("every case answered as it must")
+          PY

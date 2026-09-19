@@ -135,9 +135,15 @@ The [reference web server](../examples/reference-web-server/README.md) is the
 template every image adopts from. It records what it does not yet evidence as
 deviations in its profile; each item below closes some of them.
 
-- [ ] Adopt in each image repository through [ADOPTING.md](ADOPTING.md) and the
-  conformance workflow, and fix whatever the guide turns out not to say.
-  Adoption is under way in `datopsis/seaweedfs-ubi`.
+- [ ] Build the reference image natively for arm64 as well as amd64, and release
+  it as a multi-architecture index: each architecture's candidate digest
+  tested, the index signed and attested, the same digest promoted without a
+  rebuild, and the release verified from a clean environment.
+- [ ] Publish the reference image's badges, one per architecture and one
+  generic, to GitHub Pages.
+- [ ] Add guidance for images with more than one role or topology, and for
+  inputs that are not RPMs: a signed, digest-pinned upstream image, as distinct
+  from a locally recorded tarball digest.
 - [ ] Build the reference image's SCAP profile: the SCAP Security Guide's RHEL 9
   DISA STIG profile, pinned, tailored for an image, with each rule tied to the
   GPOS SRG rule it serves. It is what lets IMG-T3 become required.
@@ -147,16 +153,8 @@ deviations in its profile; each item below closes some of them.
 - [ ] Refuse a world-readable key file at startup without a shell in
   the runtime path (IMG-16). nginx refuses a missing or empty key, not a
   permissive one.
-- [ ] Take into account the per-repository notes in
-  [adoption](adoption/README.md#notes-per-image-repository) when each adopts.
-- [ ] Add a hardening profile to each image repository and run
-  `scripts/check-profile.py` in its CI.
-- [ ] Run `scripts/check-component.py` in each image repository's CI, against a
-  pinned revision of this one.
-- [ ] Close the gaps in the [adoption snapshot](adoption/snapshot-2026-09-18.md),
-  then delete it: each image repository tracks its own from then on.
-- [ ] Decide where each image repository publishes its badge so a README can
-  show it: GitHub Pages, or a Shields endpoint on a stable URL.
+- [ ] Consider a second badge for control coverage: baseline controls present
+  in the component definition, out of all baseline controls.
 
 ## Package 6: publication
 

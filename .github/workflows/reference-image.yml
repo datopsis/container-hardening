@@ -5,11 +5,13 @@ name: Reference image
 # build, assembly with networking disabled, a defective input shown to stop the
 # build, the running image read back against every runtime property, and the
 # built image gated on vulnerabilities, malware, and stale inputs. The evidence
-# is kept with the run, and scored.
+# is kept with the run and judged by the conformance workflow, called the way
+# any image calls it.
 #
 # A tag of the form reference-web-server/vX.Y.Z also releases the image that
-# was verified, not a rebuild of it: signed keylessly, with its bill of
-# materials and SLSA provenance attested, under that version tag only.
+# was verified, not a rebuild of it, and only if conformance found it release
+# eligible: signed keylessly, with its bill of materials and SLSA provenance
+# attested, under that version tag only.
 
 on:
   pull_request:
@@ -75,10 +77,11 @@ jobs:
           if [ "$REF_TYPE" = "tag" ]; then version="${REF_NAME#reference-web-server/v}"; else version="0.0.0-ci"; fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
 
-      # Deviations are the exception register; an expired one fails here (IMG-26).
+      # Deviations are the exception register; an expired one fails here, and
+      # conformance judges it again (IMG-26).
       - name: Check the hardening profile
         working-directory: .
-        run: python scripts/check-profile.py examples/reference-web-server/hardening-profile.json --report examples/reference-web-server/evidence/profile.json
+        run: python scripts/check-profile.py examples/reference-web-server/hardening-profile.json
 
       - name: Check the component definition
         working-directory: .
@@ -126,24 +129,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python tests/release_checks.py --bin "$RUNNER_TEMP/tools" --evidence evidence/release-latest.json
 
-      - name: Score the image
-        if: always()
-        working-directory: .
-        run: |
-          set -o pipefail
-          python scripts/score.py examples/reference-web-server/evidence \
-            --profile examples/reference-web-server/hardening-profile.json \
-            --component examples/reference-web-server/oscal/component-definition.json \
-            --requirements examples/reference-web-server/requirements.md \
-            --requirement-pattern "$REQUIREMENT_PATTERN" \
-            --out examples/reference-web-server/evidence/score | tee "$RUNNER_TEMP/score.txt"
-          { echo "## Reference image"; echo; echo '```text'; cat "$RUNNER_TEMP/score.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-
+      # One artifact per architecture, so no file can overwrite another's.
       - name: Keep the evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: reference-image-evidence
+          name: reference-image-evidence-amd64
           path: examples/reference-web-server/evidence/
           if-no-files-found: warn
 
@@ -160,9 +151,26 @@ jobs:
           path: ${{ runner.temp }}/image.tar
           retention-days: 1
 
+  # Judged exactly as an image repository is judged, from the evidence alone.
+  conformance:
+    name: conformance
+    needs: verify
+    if: ${{ !cancelled() }}
+    permissions:
+      contents: read
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: ${{ github.sha }}
+      profile: examples/reference-web-server/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      requirement-pattern: '^###\s+(RWS-\d{3})\s*$'
+      evidence-artifacts: reference-image-evidence-*
+      score-artifact: reference-image-conformance
+
   release:
     name: release
-    needs: verify
+    needs: [verify, conformance]
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'reference-web-server/v')
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -182,6 +190,17 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.13"
+
+      # A passing score is not permission to release; eligibility is (IMG-25, IMG-26).
+      - name: Require release eligibility
+        env:
+          ELIGIBLE: ${{ needs.conformance.outputs.release-eligible }}
+          SCORE: ${{ needs.conformance.outputs.score }}
+        run: |
+          if [ "$ELIGIBLE" != true ]; then
+            echo "::error::not release eligible ($SCORE); see the conformance job's release blockers" >&2
+            exit 1
+          fi
 
       # Releases are cut only from reviewed commits on the default branch (IMG-33).
       - name: Require the tagged commit to be on main
@@ -234,7 +253,7 @@ jobs:
         run: |
           "$RUNNER_TEMP/tools/cosign" sign --yes "$IMAGE@$DIGEST"
           "$RUNNER_TEMP/tools/cosign" attest --yes --type spdxjson \
-            --predicate "$RUNNER_TEMP/verified/reference-image-evidence/sbom.spdx.json" "$IMAGE@$DIGEST"
+            --predicate "$RUNNER_TEMP/verified/reference-image-evidence-amd64/sbom.spdx.json" "$IMAGE@$DIGEST"
 
       - name: Attest build provenance
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
@@ -263,14 +282,16 @@ jobs:
           mkdir -p evidence
           python3 - "$IMAGE@$DIGEST" "$signature" "$provenance" "$sbom" <<'PY'
           import json, sys
+          sys.path.insert(0, "tests")
+          import evidence
           image, signature, provenance, sbom = sys.argv[1], *sys.argv[2:]
           results = [
-              {"criterion": "IMG-22", "check": "the released digest's keyless signature verifies against the release identity", "passed": signature == "0"},
-              {"criterion": "IMG-22", "check": "the released digest's SLSA provenance verifies", "passed": provenance == "0"},
-              {"criterion": "IMG-21", "check": "the bill of materials is attested to the released digest and retrievable by it", "passed": sbom == "0"},
-              {"criterion": "IMG-24", "check": "the version tag did not exist before the release, and no latest tag is pushed", "passed": True},
+              {"id": "release.signature", "criterion": "IMG-22", "check": "the released digest's keyless signature verifies against the release identity", "passed": signature == "0"},
+              {"id": "release.provenance", "criterion": "IMG-22", "check": "the released digest's SLSA provenance verifies", "passed": provenance == "0"},
+              {"id": "release.sbom-attested", "criterion": "IMG-21", "architecture": "amd64", "check": "the bill of materials is attested to the released digest and retrievable by it", "passed": sbom == "0"},
+              {"id": "release.version-new", "criterion": "IMG-24", "check": "the version tag did not exist before the release, and no latest tag is pushed", "passed": True},
           ]
-          json.dump({"image": image, "results": results}, open("evidence/release.json", "w"), indent=2)
+          evidence.write(evidence.Path("evidence/release.json"), evidence.subject("generic", image=image), results)
           print(json.dumps(results, indent=2))
           PY
           [ "$signature" = 0 ] && [ "$sbom" = 0 ] && [ "$provenance" = 0 ]

@@ -143,15 +143,15 @@ stages = [
     ("Bill of materials; vulnerability and malware gates", "IMG-21, IMG-25, IMG-28", False),
     ("Fail on a base more than 30 days behind", "IMG-29", False),
     ("Re-verify the latest published release", "IMG-21, IMG-22, IMG-24", False),
-    ("Score the evidence", "hardening 31/34", True),
-    ("On a version tag: publish, sign, attest, verify", "IMG-21, IMG-22, IMG-24", False),
+    ("Conformance: validate the evidence and score it", "hardening amd64 31/34", True),
+    ("On a version tag, if release eligible: publish, sign, attest", "IMG-21, IMG-22, IMG-24", False),
 ]
 s = SVG(760, 60 + len(stages) * 46, "The reference image's pipeline",
         "The reference image's CI, in order: check the profile and component definition, install verified scanners, "
         "scan the source, retrieve and verify inputs, show a defective input stops the build, build with networking "
         "disabled, verify the running image, generate the bill of materials and run the vulnerability and malware "
-        "gates, check the base is current, re-verify the latest release, score the evidence, and on a version tag "
-        "publish, sign, attest, and verify.")
+        "gates, check the base is current, re-verify the latest release, then validate and score the evidence in the "
+        "conformance workflow, and on a version tag, only if it is release eligible, publish, sign, attest, and verify.")
 s.text(250, 30, ".github/workflows/reference-image.yml", 13, "600", fill=MUTED, anchor="middle")
 y = 44
 for i, (label, tags, key) in enumerate(stages):
@@ -211,8 +211,8 @@ chain = [
     ("DISA CCI / SRG requirement", "CCI-002233, GPOS SRG V-203696"),
     ("Technical implementation", "Containerfile: USER 1001:0; nginx needs no capability"),
     ("Automated test", "tests/smoke.py reads CapEff and NoNewPrivs from /proc"),
-    ("Evidence artifact", "evidence/smoke.json, kept with every CI run"),
-    ("Continuous compliance result", "scripts/score.py: hardening 31/34 on every change"),
+    ("Evidence artifact", "evidence/smoke.json, per architecture, every CI run"),
+    ("Continuous compliance result", "conformance.yml: hardening amd64 31/34, release eligible"),
 ]
 s = SVG(700, 20 + len(chain) * 62, "Traceability from requirement to evidence",
         "A requirement maps to an 800-53 control, to a DISA CCI or SRG requirement, to a technical implementation, "

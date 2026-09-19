@@ -8,6 +8,10 @@ in its hardening profile, and this script holds it to docs/TAILORING.md:
   determination, applies or does not, with its basis. It is made against the
   source's pinned digest, so a new release makes it stale rather than silently
   carrying it forward.
+- **Evidence.** The architectures the image is built for, and each evidence
+  file its CI writes with that file's scope, which is what the scorer holds
+  the evidence to (docs/EVIDENCE.md). Roles, topologies, and platforms, when
+  the image has more than one of any.
 - **Deviations.** A criterion not met, a control positioned differently from the
   baseline, or a vulnerability not fixed in time. Each has an owner, an
   approver, a reason, what is done instead, and an expiry no further out than
@@ -23,12 +27,16 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import importlib.util
 import json
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 REPOSITORY = Path(__file__).resolve().parent.parent
+SCHEMA_VERSION = 2
 REGISTER = REPOSITORY / "artifacts" / "sources.json"
 BASELINE = REPOSITORY / "artifacts" / "control-baseline.json"
 
@@ -43,6 +51,14 @@ DEVIATION_ID = re.compile(r"^DEV-\d{3}$")
 REVISION = re.compile(r"^[0-9a-f]{40}$")
 DIGEST = re.compile(r"^sha256:[0-9a-f]{64}$")
 ADVISORY = re.compile(r"^(CVE-\d{4}-\d{4,}|GHSA(-[23456789cfghjmpqrvwx]{4}){3})$")
+
+
+def evidence_module():
+    spec = importlib.util.spec_from_file_location("evidence", REPOSITORY / "scripts" / "evidence.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules.setdefault("evidence", module)
+    spec.loader.exec_module(module)
+    return module
 
 
 def date(value, where: str, problems: list[str]) -> datetime.date | None:
@@ -84,13 +100,15 @@ def check(
     warnings: list[str] = []
     sources = {s["id"]: s for s in register["sources"]}
 
-    if profile.get("schema_version") != 1:
-        violations.append("schema_version must be 1")
+    if profile.get("schema_version") != SCHEMA_VERSION:
+        violations.append("schema_version must be " + str(SCHEMA_VERSION) + "; see the changelog for what version 2 adds")
     text(profile, "image", "profile", violations)
     text(profile, "function", "profile", violations)
     revision = (profile.get("standard") or {}).get("revision", "")
     if not REVISION.match(revision or ""):
         violations.append("standard.revision must be the full commit of container-hardening this profile was checked against")
+
+    violations.extend(evidence_module().manifest_problems(profile))
 
     # Applicability.
     conditional = {i for i, s in sources.items() if s["role"] == "conditional"}
@@ -214,10 +232,20 @@ def main() -> int:
     violations, warnings = check(profile, register, baseline, args.today)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
+        commit = os.environ.get("GITHUB_SHA") or subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=args.profile.resolve().parent, text=True, capture_output=True).stdout.strip()
+        run = os.environ.get("GITHUB_RUN_ID")
         args.report.write_text(json.dumps({
+            "schema": "container-hardening/evidence", "schema_version": 1,
+            "subject": {
+                "source_commit": commit, "architecture": "generic",
+                "ci_run": os.environ.get("GITHUB_SERVER_URL", "") + "/" + os.environ.get("GITHUB_REPOSITORY", "")
+                + "/actions/runs/" + run if run else "local",
+            },
             "checked_on": args.today.isoformat(),
             "violations": violations, "warnings": warnings,
             "results": [{
+                "id": "profile.exceptions",
                 "criterion": "IMG-26",
                 "check": "every exception is a recorded deviation, none expired or over its limit",
                 "passed": not violations, "detail": "; ".join(violations),

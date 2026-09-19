@@ -1,10 +1,39 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "image": "reference-web-server",
   "standard": {
-    "revision": "a236dc10189e0c3102f76cc68ea9f73a90bac97f"
+    "revision": "4488a99599cb3c508150952e937e4554d02d23d1"
   },
   "function": "Serves static content with nginx. It has no management interface, no user accounts, and hosts no application runtime.",
+  "architectures": [
+    "amd64"
+  ],
+  "evidence": [
+    {
+      "file": "build.json",
+      "scope": "architecture"
+    },
+    {
+      "file": "smoke.json",
+      "scope": "architecture"
+    },
+    {
+      "file": "gates-image.json",
+      "scope": "architecture"
+    },
+    {
+      "file": "gates-source.json",
+      "scope": "generic"
+    },
+    {
+      "file": "drift.json",
+      "scope": "generic"
+    },
+    {
+      "file": "release-latest.json",
+      "scope": "generic"
+    }
+  ],
   "applicability": [
     {
       "source": "disa-application-server-srg",
