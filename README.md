@@ -62,8 +62,3 @@ silently dropping a rule.
 **A `200` does not mean a release is current.** DISA serves superseded releases
 alongside current ones — `U_GPOS_V2R7_SRG.zip` still resolves while V3R3 is
 current. Only probing adjacent releases establishes currency.
-
-## Related
-
-- [`datopsis/nginx-ubi`](https://github.com/datopsis/nginx-ubi) — the first
-  adopting repository, and the source of the control model carried here.
