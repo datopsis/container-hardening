@@ -133,6 +133,7 @@ s.save("supply-chain.svg")
 
 # 3a. The reference image's pipeline, as it actually runs ----------------------
 stages = [
+    ("On each architecture, natively:", "amd64, arm64", False),
     ("Check the hardening profile and component definition", "IMG-26", False),
     ("Install the pinned, verified scanners", "IMG-02", False),
     ("Scan the source: secrets, dependencies, build definition", "IMG-34", False),
@@ -143,15 +144,16 @@ stages = [
     ("Bill of materials; vulnerability and malware gates", "IMG-21, IMG-25, IMG-28", False),
     ("Fail on a base more than 30 days behind", "IMG-29", False),
     ("Re-verify the latest published release", "IMG-21, IMG-22, IMG-24", False),
-    ("Conformance: validate the evidence and score it", "hardening amd64 31/34", True),
-    ("On a version tag, if release eligible: publish, sign, attest", "IMG-21, IMG-22, IMG-24", False),
+    ("Conformance: validate the evidence and score it", "amd64 and arm64 31/34", True),
+    ("If release eligible: push by digest, test, index, sign, tag", "IMG-21, IMG-22, IMG-24", False),
 ]
 s = SVG(760, 60 + len(stages) * 46, "The reference image's pipeline",
-        "The reference image's CI, in order: check the profile and component definition, install verified scanners, "
+        "The reference image's CI, in order, on each architecture natively: check the profile and component definition, install verified scanners, "
         "scan the source, retrieve and verify inputs, show a defective input stops the build, build with networking "
         "disabled, verify the running image, generate the bill of materials and run the vulnerability and malware "
         "gates, check the base is current, re-verify the latest release, then validate and score the evidence in the "
-        "conformance workflow, and on a version tag, only if it is release eligible, publish, sign, attest, and verify.")
+        "conformance workflow, and on a version tag, only if it is release eligible, push each image by digest and test it "
+        "there, push an index of those digests, sign and attest, add the version tag, and verify from a clean runner.")
 s.text(250, 30, ".github/workflows/reference-image.yml", 13, "600", fill=MUTED, anchor="middle")
 y = 44
 for i, (label, tags, key) in enumerate(stages):

@@ -189,6 +189,21 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   and `platforms`. The conformance workflow takes `evidence-artifacts`, a name
   or pattern, in place of `evidence-artifact`.
 
+- The reference image is built and verified natively for amd64 and arm64. The
+  lock pins each architecture's RPMs, resolved against that architecture's
+  runtime base without emulation, and the tools are pinned per architecture.
+  The malware scan uses ClamAV's multi-architecture image,
+  `clamav/clamav-debian`, pinned by index digest.
+- The reference image's release publishes an index without rebuilding:
+  `scripts/publish.py` pushes each tested image untagged by its own digest,
+  which is then tested again at that digest; pushes an index naming exactly
+  those digests; and, once the index and its images are signed and attested,
+  tags the index's digest with the version. A fresh runner with no registry
+  credentials then verifies the release. The reference README states what the
+  image is not a template for.
+- The reference image's badges, one per architecture and one generic, are
+  published to GitHub Pages from every run on main.
+
 ### Fixed
 
 - The scorer counted a `passed` of `"false"` or `0` as met, and skipped a file

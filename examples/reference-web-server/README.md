@@ -1,19 +1,24 @@
 # Reference web server
 
+![hardening amd64](https://datopsis.github.io/container-hardening/reference-web-server/badge-amd64.svg)
+![hardening arm64](https://datopsis.github.io/container-hardening/reference-web-server/badge-arm64.svg)
+![hardening generic](https://datopsis.github.io/container-hardening/reference-web-server/badge-generic.svg)
+
 A generic, hardened HTTP server image, built to [the standard](../../docs/standard/README.md)
 and verified against [its criteria](../../docs/standard/criteria.md). It is the
 worked example of every file and check an image repository needs, and the
 starting point for a new image: copy this directory, change what the image
 runs, and keep the checks.
 
-It serves static content with nginx 1.26 from Red Hat UBI 9 Micro. It has no
-management interface, no user accounts, and hosts no application runtime.
+It serves static content with nginx 1.26 from Red Hat UBI 9 Micro, built
+natively for amd64 and arm64. It has no management interface, no user
+accounts, and hosts no application runtime.
 
 ## What is here
 
 | File | What it is | Criteria |
 | --- | --- | --- |
-| [`lock.json`](lock.json) | Every input: both bases by manifest-list digest, the nginx 1.26 module stream, eight RPMs by SHA-256 and signing key, and the dependencies deliberately left out, with reasons | IMG-01, IMG-02, IMG-07 |
+| [`lock.json`](lock.json) | Every input: both bases by manifest-list digest, the nginx 1.26 module stream, eight RPMs for each architecture by SHA-256 and signing key, and the dependencies deliberately left out, with reasons | IMG-01, IMG-02, IMG-07 |
 | [`scripts/acquire.py`](scripts/acquire.py) | The only step with network access: retrieves and verifies every input, or with `--refresh` rewrites the lock for review | IMG-02 to IMG-04 |
 | [`Containerfile`](Containerfile) | Assembly from the verified bundle, with networking disabled | IMG-01 to IMG-23 |
 | [`scripts/build.py`](scripts/build.py) | The only supported way to build it | IMG-03, IMG-23 |
@@ -22,12 +27,14 @@ management interface, no user accounts, and hosts no application runtime.
 | [`features.json`](features.json) | The nginx build flags and dynamic modules it declares | IMG-07 |
 | [`hardening-profile.json`](hardening-profile.json) | Its applicability determinations and deviations | IMG-26 |
 | [`tests/build_checks.py`](tests/build_checks.py) | Shows a tampered or missing input stops the build, and reads the build definition | IMG-01 to IMG-05 |
-| [`tools.json`](tools.json), [`scripts/install_tools.py`](scripts/install_tools.py) | The scanners, pinned by archive digest and verified before they are unpacked | IMG-02 |
+| [`tools.json`](tools.json), [`scripts/install_tools.py`](scripts/install_tools.py) | The scanners, pinned by archive digest for each architecture and verified before they are unpacked | IMG-02 |
 | [`tests/gates.py`](tests/gates.py) | Source scans before the build; bill of materials, two vulnerability gates, and a malware scan after it | IMG-21, IMG-25, IMG-28, IMG-34 |
 | [`scripts/drift.py`](scripts/drift.py) | How far the inputs are behind their publishers; fails CI once a base is more than 30 days behind | IMG-04, IMG-29 |
 | [`requirements.md`](requirements.md) | What the image commits to, one requirement per criterion, each naming its checks | the verification pointer |
 | [`scripts/component.py`](scripts/component.py), [`oscal/component-definition.json`](oscal/component-definition.json) | Its OSCAL component definition: every baseline control, and its own decisions for the ones the baseline leaves open | the control model |
 | [`tests/smoke.py`](tests/smoke.py) | Reads every runtime property back from the running image, and records the evidence | IMG-06 to IMG-20, IMG-27, IMG-30, IMG-32 |
+| [`scripts/publish.py`](scripts/publish.py) | Pushes each tested image by digest, the index naming exactly those digests, and then the version tag, without rebuilding or re-encoding | IMG-22, IMG-24 |
+| [`tests/release_checks.py`](tests/release_checks.py) | Verifies a published release as anyone pulling it would: the index, and each architecture's image | IMG-21, IMG-22, IMG-24 |
 | [`tests/evidence.py`](tests/evidence.py) | Writes each check's results with the header the scorer requires: commit, run, architecture, and image | [Evidence](../../docs/EVIDENCE.md) |
 
 ## Building and verifying it
@@ -47,13 +54,27 @@ The gates need Linux, because the scanners are pinned as Linux binaries.
 
 It needs Podman and Python 3. CI does the same on every change to this
 directory, in [`reference-image.yml`](../../.github/workflows/reference-image.yml),
-keeps the evidence files each step writes, and passes them to the
+on a native runner for each architecture, keeps each architecture's evidence
+separately, and passes it to the
 [conformance workflow](../../.github/workflows/conformance.yml), which judges
-this image exactly as it judges any other: `hardening amd64 31/34`, release
-eligible.
+this image exactly as it judges any other: `hardening amd64 31/34`,
+`hardening arm64 31/34`, release eligible. On main, the badges above are
+published from that run.
 
-It is built for amd64 only, and its release path is a single-architecture
-example: it publishes one image, not a multi-architecture index.
+## What it is not a template for
+
+It is one process, one role, and one container, built from RPMs. Copy it for
+that shape. It does not show:
+
+- **An image with more than one role or topology**, such as a server and its
+  workers, or a standalone and a clustered deployment. Such an image needs
+  per-role evidence, and a single container's tests cannot show how its parts
+  secure the traffic between them.
+- **Inputs that are not RPMs**, such as an upstream binary or an upstream image.
+  How those are verified is not how an RPM's signature is.
+- **A release in any other registry**, or of any other architecture.
+
+Its release path does show the pattern for more than one architecture, below.
 
 ## Running it
 
@@ -114,9 +135,20 @@ repository, and refusing a world-readable key file.
 
 Released images are published as `ghcr.io/datopsis/reference-web-server`,
 under version tags only, and only when the conformance workflow finds the
-verified image release eligible. Each is signed keylessly by the release
-workflow, with its bill of materials and SLSA provenance attested. To verify
-one:
+verified images release eligible. From 0.2.0, a version is an index of the
+amd64 and arm64 images, released without rebuilding either:
+
+1. Each architecture's verified image is pushed untagged, by the digest of its
+   own manifest, pulled back, checked to be the image conformance judged, and
+   tested again at that digest.
+2. An index naming exactly those digests is pushed, untagged, by its own digest.
+3. The index and each image are signed keylessly, each image's bill of
+   materials is attested to it, and the index's SLSA provenance is attested.
+4. Only then is the version tag added to the index's digest. A version that
+   already exists is refused.
+5. A fresh runner with no registry credentials verifies the result.
+
+To verify one:
 
 ```sh
 cosign verify ghcr.io/datopsis/reference-web-server:0.1.1 \
@@ -125,6 +157,10 @@ cosign verify ghcr.io/datopsis/reference-web-server:0.1.1 \
 gh attestation verify oci://ghcr.io/datopsis/reference-web-server:0.1.1 --repo datopsis/container-hardening
 ```
 
-CI re-verifies the latest release this way on every run. Version 0.1.0 is
-signed and has an attested bill of materials but no provenance; use 0.1.1 or
-later.
+For an index, verifying the tag verifies the index's own signature. Each
+architecture's image is signed too; verify it the same way at the digest the
+index names for it, which `skopeo inspect --raw` shows, and its bill of
+materials with `cosign verify-attestation --type spdxjson` at that digest. CI
+re-verifies the latest release this way on every run, with
+[`tests/release_checks.py`](tests/release_checks.py). Versions 0.1.0 and 0.1.1
+are amd64 images, not indexes; 0.1.0 has no provenance.

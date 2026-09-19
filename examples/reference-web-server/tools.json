@@ -1,53 +1,104 @@
 {
-  "note": "The tools that judge the image are inputs too, and are pinned the same way (IMG-02). Each archive is verified against this digest before it is unpacked; a publisher's checksum file, fetched from the same place as the archive, is not relied on. Changing a version is a reviewed pull request.",
+  "note": "The tools that judge the image are inputs too, and are pinned the same way (IMG-02). Each archive, one per architecture, is verified against this digest before it is unpacked; a publisher's checksum file, fetched from the same place as the archive, is not relied on. Changing a version is a reviewed pull request.",
   "tools": {
     "syft": {
       "version": "1.52.0",
-      "url": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.tar.gz",
-      "sha256": "caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d",
-      "size": 29289629,
       "binary": "syft",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.tar.gz",
+          "sha256": "caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d",
+          "size": 29289629
+        },
+        "arm64": {
+          "url": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_arm64.tar.gz",
+          "sha256": "c46d5e4c28e12aa4c5becfaa343ef1c7f89045b6b895f2c21d471c62db09c706",
+          "size": 26744986
+        }
+      },
       "purpose": "Bill of materials from the built image (IMG-21)"
     },
     "trivy": {
       "version": "0.74.0",
-      "url": "https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz",
-      "sha256": "2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a",
-      "size": 50419107,
       "binary": "trivy",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz",
+          "sha256": "2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a",
+          "size": 50419107
+        },
+        "arm64": {
+          "url": "https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-ARM64.tar.gz",
+          "sha256": "b94ce1976bbf3c15b514b605ee88be7c6d94a29be2302847ff01cb794d47aad5",
+          "size": 45424969
+        }
+      },
       "purpose": "Vulnerability gate on the image (IMG-25); dependency, secret, and build-definition scan of the source (IMG-34)"
     },
     "grype": {
       "version": "0.119.0",
-      "url": "https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_linux_amd64.tar.gz",
-      "sha256": "3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b",
-      "size": 30482169,
       "binary": "grype",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_linux_amd64.tar.gz",
+          "sha256": "3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b",
+          "size": 30482169
+        },
+        "arm64": {
+          "url": "https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_linux_arm64.tar.gz",
+          "sha256": "29f0ec7c549ddb0e2b6a0ca714851f7399438afc399b80c12808e065edc9a8f8",
+          "size": 27815126
+        }
+      },
       "purpose": "Second, independent vulnerability gate on the bill of materials (IMG-25)"
     },
     "gitleaks": {
       "version": "8.30.1",
-      "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz",
-      "sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
-      "size": 8230402,
       "binary": "gitleaks",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz",
+          "sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+          "size": 8230402
+        },
+        "arm64": {
+          "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_arm64.tar.gz",
+          "sha256": "e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080",
+          "size": 7601421
+        }
+      },
       "purpose": "Committed-secret scan of the source (IMG-34)"
     },
     "cosign": {
       "version": "3.1.3",
-      "url": "https://github.com/sigstore/cosign/releases/download/v3.1.3/cosign-linux-amd64",
-      "sha256": "4629c757b7618056f8ddd7e2625ae9fdd94c0372a65049520bc7d9df9efc7f71",
-      "size": 141178250,
       "binary": "cosign",
       "archive": false,
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/sigstore/cosign/releases/download/v3.1.3/cosign-linux-amd64",
+          "sha256": "4629c757b7618056f8ddd7e2625ae9fdd94c0372a65049520bc7d9df9efc7f71",
+          "size": 141178250
+        },
+        "arm64": {
+          "url": "https://github.com/sigstore/cosign/releases/download/v3.1.3/cosign-linux-arm64",
+          "sha256": "c5d324e091826b0d7a78eb16fef316450b4eb9aaec045611c08ba06f5e73220a",
+          "size": 132747403
+        }
+      },
       "purpose": "Keyless signature and attestations on the released digest, and their verification (IMG-21, IMG-22)"
     }
   },
   "images": {
     "clamav": {
-      "reference": "docker.io/clamav/clamav@sha256:9cb27d7660bdf66e9878c832cb433dd8aa152cfbe16f3c2c0084c80b04ae22b4",
+      "reference": "docker.io/clamav/clamav-debian@sha256:cc16781fe005e49de6a8fc1231b63b265f74b18fc2a6347c670c35716914c3b6",
       "tag": "stable",
-      "purpose": "Malware scan of the inputs and the image, with signatures refreshed in the same run (IMG-28)"
+      "purpose": "Malware scan of the inputs and the image, with signatures refreshed in the same run (IMG-28)",
+      "note": "Pinned by index digest, which covers amd64 and arm64; the Debian-based image is ClamAV's multi-architecture build."
+    },
+    "skopeo": {
+      "reference": "quay.io/skopeo/stable@sha256:47853bb9fb24202af9110531ebd6e43c5f97701254ca290596640290d17942f4",
+      "tag": "v1.20",
+      "purpose": "Pushes each tested image and the index by digest, and promotes the index to its version tag, without re-encoding either (IMG-24)"
     }
   }
 }

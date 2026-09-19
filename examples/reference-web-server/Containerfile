@@ -12,17 +12,20 @@ ARG RUNTIME=registry.access.redhat.com/ubi9/ubi-micro@sha256:7a0454cbd9bd847e8f6
 FROM ${RUNTIME} AS runtime
 
 FROM ${BUILDER} AS assemble
+# Set by the build to the architecture being built; each has its own locked RPMs.
+ARG TARGETARCH
 COPY --from=runtime / /rootfs/
 COPY rootfs/ /overlay/
 RUN --mount=type=bind,from=bundle,target=/bundle,ro \
     set -euo pipefail; \
     lock=/bundle/lock.json; \
-    field() { python3 -c "import json,sys; d=json.load(open('$lock')); print($1)"; }; \
+    arch="${TARGETARCH:?the build must set TARGETARCH}"; \
+    field() { python3 -c "import json,sys; d=json.load(open('$lock')); rpms=d['rpms']['$arch']; print($1)"; }; \
     # The signing key is pinned by digest; a different key is a different trust model.
     echo "$(field "d['signing']['key_file_sha256']")  $(field "d['signing']['key_file']")" | sha256sum --check --quiet; \
     rpmkeys --dbpath /tmp/keys --import "$(field "d['signing']['key_file']")"; \
     allowed="$(field "' '.join(d['signing']['key_ids'])")"; \
-    for entry in $(field "' '.join(r['file']+'|'+r['sha256'] for r in d['rpms'])"); do \
+    for entry in $(field "' '.join(r['file']+'|'+r['sha256'] for r in rpms)"); do \
         file="${entry%%|*}"; digest="${entry##*|}"; \
         echo "$digest  /bundle/$file" | sha256sum --check --quiet; \
         rpmkeys --dbpath /tmp/keys --checksig "/bundle/$file" >/dev/null; \
@@ -31,11 +34,11 @@ RUN --mount=type=bind,from=bundle,target=/bundle,ro \
     done; \
     # Scriptlets would need a shell, useradd, and root; the image needs none.
     rpm --root /rootfs --install --noscripts --nodeps --excludedocs \
-        $(field "' '.join('/bundle/'+r['file'] for r in d['rpms'])"); \
+        $(field "' '.join('/bundle/'+r['file'] for r in rpms)"); \
     # The inventory is written from what was installed, and must cover the lock (IMG-08).
     install -d -m 0755 /rootfs/usr/share/reference-web-server; \
     rpm --root /rootfs -qa --qf '%{NEVRA}\t%{SHA256HEADER}\n' | LC_ALL=C sort > /rootfs/usr/share/reference-web-server/rpm-manifest.tsv; \
-    for nevra in $(field "' '.join(r['nevra'] for r in d['rpms'])"); do \
+    for nevra in $(field "' '.join(r['nevra'] for r in rpms)"); do \
         grep -q "^${nevra}	" /rootfs/usr/share/reference-web-server/rpm-manifest.tsv || { echo "not installed: $nevra" >&2; exit 1; }; \
     done; \
     chmod 0444 /rootfs/usr/share/reference-web-server/rpm-manifest.tsv; \

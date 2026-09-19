@@ -2,12 +2,16 @@
 """Retrieve and verify every input the reference image is built from.
 
 This is the only step that touches the network (IMG-03). It pulls the base
-images by manifest-list digest, downloads the locked RPMs, and verifies each
-against the lock by size and SHA-256 (IMG-02). Signatures are verified during
-assembly, against a pinned key, because the key comes from the pinned builder.
+images by manifest-list digest, downloads the RPMs locked for this machine's
+architecture, and verifies each against the lock by size and SHA-256 (IMG-02).
+Signatures are verified during assembly, against a pinned key, because the key
+comes from the pinned builder.
 
-A refresh re-resolves everything and rewrites the lock. It never runs in the
-build; its output is a change to lock.json, reviewed like any other (IMG-04).
+A refresh re-resolves everything, for every architecture, and rewrites the
+lock. Each architecture's set is resolved against that architecture's runtime
+base, so it needs no emulation: nothing of another architecture is run. It
+never runs in the build; its output is a change to lock.json, reviewed like
+any other (IMG-04).
 
 Usage:
     python scripts/acquire.py BUNDLE_DIR             # fetch and verify
@@ -30,6 +34,10 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent.parent
 LOCK = HERE / "lock.json"
 REGISTRY = "registry.access.redhat.com"
+# The architectures the image is built for, and RPM's name for each.
+ARCHITECTURES = {"amd64": "x86_64", "arm64": "aarch64"}
+sys.path.insert(0, str(HERE / "tests"))
+import evidence  # noqa: E402
 INDEX_TYPES = "application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json"
 
 
@@ -66,26 +74,30 @@ def enable(lock: dict, options: str = "") -> str:
     return ("dnf -q -y " + options + "module enable " + streams + " >/dev/null && ") if streams else ""
 
 
-def export_runtime(lock: dict, work: Path) -> None:
-    container = run("podman", "create", reference(lock["bases"]["runtime"]), capture=True).strip()
+def export_runtime(lock: dict, work: Path, architecture: str) -> None:
+    # Creating a container runs nothing, so another architecture's base needs
+    # no emulation to be exported.
+    container = run("podman", "create", "--platform", "linux/" + architecture,
+                    reference(lock["bases"]["runtime"]), capture=True).strip()
     try:
         run("podman", "export", "--output", str(work / "runtime.tar"), container)
     finally:
         run("podman", "rm", "--force", container, capture=True)
 
 
-def fetch(lock: dict, bundle: Path) -> int:
+def fetch(lock: dict, bundle: Path, architecture: str) -> int:
     for base in lock["bases"].values():
-        run("podman", "pull", "--quiet", reference(base), capture=True)
+        run("podman", "pull", "--quiet", "--platform", "linux/" + architecture, reference(base), capture=True)
     bundle.mkdir(parents=True, exist_ok=True)
+    packages = lock["rpms"][architecture]
     with tempfile.TemporaryDirectory() as scratch:
         work = Path(scratch)
         (work / "rpms").mkdir()
-        nevras = " ".join(p["nevra"] for p in lock["rpms"])
+        nevras = " ".join(p["nevra"] for p in packages)
         # A package from a module stream is hidden until its stream is enabled.
         in_builder(lock, work, enable(lock) + "dnf -q download --destdir=/work/rpms " + nevras)
         problems = []
-        for package in lock["rpms"]:
+        for package in packages:
             path = work / "rpms" / package["file"]
             if not path.is_file():
                 problems.append(package["file"] + ": not retrieved")
@@ -98,7 +110,8 @@ def fetch(lock: dict, bundle: Path) -> int:
             print("\n".join(problems), file=sys.stderr)
             return 1
     shutil.copy2(LOCK, bundle / "lock.json")
-    print("verified " + str(len(lock["rpms"])) + " RPMs and " + str(len(lock["bases"])) + " bases into " + str(bundle))
+    print("verified " + str(len(packages)) + " " + architecture + " RPMs and " + str(len(lock["bases"]))
+          + " bases into " + str(bundle))
     return 0
 
 
@@ -106,14 +119,41 @@ def refresh(lock: dict) -> int:
     for base in lock["bases"].values():
         base["digest"] = manifest_list_digest(base["repository"], base["tag"])
         run("podman", "pull", "--quiet", reference(base), capture=True)
+    resolved, keys, key_sha256 = {}, set(), set()
+    for architecture, rpm_arch in ARCHITECTURES.items():
+        rpms = resolve(lock, architecture, rpm_arch, keys, key_sha256)
+        if rpms is None:
+            return 1
+        resolved[architecture] = rpms
+    # Pulling another architecture's base replaced the native one locally.
+    for base in lock["bases"].values():
+        run("podman", "pull", "--quiet", reference(base), capture=True)
+    if len(key_sha256) != 1:
+        print("the builder's signing key differs between runs: " + ", ".join(sorted(key_sha256)), file=sys.stderr)
+        return 1
+    lock["rpms"] = resolved
+    lock["signing"] = {
+        "key_file": "/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release",
+        "key_file_sha256": key_sha256.pop(),
+        "key_ids": sorted(keys),
+    }
+    lock["refreshed_on"] = datetime.now(timezone.utc).date().isoformat()
+    LOCK.write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8", newline="\n")
+    print("rewrote lock.json: review the diff before committing it")
+    return 0
+
+
+def resolve(lock: dict, architecture: str, rpm_arch: str, keys: set, key_sha256: set) -> list[dict] | None:
+    """One architecture's install set, resolved against its own runtime base."""
     with tempfile.TemporaryDirectory() as scratch:
         work = Path(scratch)
         (work / "rpms").mkdir()
-        export_runtime(lock, work)
+        export_runtime(lock, work, architecture)
+        options = "--forcearch=" + rpm_arch + " --installroot=/r --releasever=9 --setopt=reposdir=/etc/yum.repos.d "
         in_builder(lock, work, (
             "mkdir /r && tar -xf /work/runtime.tar -C /r && "
-            + enable(lock, "--installroot=/r --releasever=9 --setopt=reposdir=/etc/yum.repos.d ") +
-            "dnf -q -y --installroot=/r --releasever=9 --setopt=reposdir=/etc/yum.repos.d "
+            + enable(lock, options) +
+            "dnf -q -y " + options +
             "--setopt=install_weak_deps=False --nodocs --downloadonly --downloaddir=/work/rpms install "
             + " ".join(lock["install"]) + " && "
             "sha256sum /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release > /work/key.sha256 && "
@@ -121,7 +161,7 @@ def refresh(lock: dict) -> int:
             "rpm -qp --nosignature --qf '%{NAME}\\t%{NEVRA}\\t%{RSAHEADER:pgpsig}\\n' \"$f\"; done > /work/rpms.tsv"
         ))
         wanted = set(lock["install"]) | set(lock["dependencies"])
-        rpms, keys = [], set()
+        rpms = []
         for line in (work / "rpms.tsv").read_text().splitlines():
             filename, name, nevra, signature = line.split("\t")
             if name not in wanted:
@@ -132,18 +172,10 @@ def refresh(lock: dict) -> int:
             rpms.append({"name": name, "nevra": nevra, "file": path.name, "size": path.stat().st_size, "sha256": sha256(path), "key_id": key})
         missing = wanted - {r["name"] for r in rpms}
         if missing:
-            print("resolved set lacks " + ", ".join(sorted(missing)), file=sys.stderr)
-            return 1
-        lock["rpms"] = sorted(rpms, key=lambda r: r["name"])
-        lock["signing"] = {
-            "key_file": "/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release",
-            "key_file_sha256": (work / "key.sha256").read_text().split()[0],
-            "key_ids": sorted(keys),
-        }
-    lock["refreshed_on"] = datetime.now(timezone.utc).date().isoformat()
-    LOCK.write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8", newline="\n")
-    print("rewrote lock.json: review the diff before committing it")
-    return 0
+            print(architecture + ": resolved set lacks " + ", ".join(sorted(missing)), file=sys.stderr)
+            return None
+        key_sha256.add((work / "key.sha256").read_text().split()[0])
+        return sorted(rpms, key=lambda r: r["name"])
 
 
 def main() -> int:
@@ -156,7 +188,7 @@ def main() -> int:
         return refresh(lock)
     if not args.bundle:
         parser.error("a bundle directory is required")
-    return fetch(lock, args.bundle.resolve())
+    return fetch(lock, args.bundle.resolve(), evidence.host_architecture())
 
 
 if __name__ == "__main__":

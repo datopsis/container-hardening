@@ -31,6 +31,7 @@ REGISTRY = "https://registry.access.redhat.com/v2/"
 INDEX = "application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json"
 MANIFEST = "application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.image.manifest.v2+json"
 LIMIT_DAYS = 30
+RPM_ARCHITECTURES = {"amd64": "x86_64", "arm64": "aarch64"}
 
 
 def get(path: str, accept: str) -> tuple[bytes, dict]:
@@ -56,25 +57,30 @@ def base_drift(name: str, base: dict, today: datetime) -> dict:
 
 
 def rpm_drift() -> list[dict]:
+    """Each architecture's locked RPMs against the newest its repositories offer."""
     builder = "registry.access.redhat.com/" + LOCK["bases"]["builder"]["repository"] + "@" + LOCK["bases"]["builder"]["digest"]
-    names = " ".join(r["name"] for r in LOCK["rpms"])
-    # The locked module streams must be enabled, or their newer builds are hidden.
-    enable = ""
-    if LOCK.get("modules"):
-        enable = "dnf -q -y module enable " + " ".join(LOCK["modules"]) + " >/dev/null && "
-    query = "dnf -q repoquery --latest-limit 1 --arch x86_64,noarch --qf '%{name} %{epoch}:%{version}-%{release}.%{arch}' "
-    result = subprocess.run(["podman", "run", "--rm", builder, "bash", "-c", enable + query + names],
-                            text=True, capture_output=True, check=True)
-    latest = {}
-    for line in result.stdout.splitlines():
-        name, evra = line.split(" ", 1)
-        latest[name] = evra
     report = []
-    for rpm in LOCK["rpms"]:
-        locked = rpm["nevra"][len(rpm["name"]) + 1:]
-        locked = locked if ":" in locked else "0:" + locked
-        report.append({"name": rpm["name"], "locked": locked, "latest": latest.get(rpm["name"]),
-                       "newer_available": latest.get(rpm["name"]) not in (None, locked)})
+    for architecture, packages in LOCK["rpms"].items():
+        rpm_arch = RPM_ARCHITECTURES[architecture]
+        names = " ".join(r["name"] for r in packages)
+        # The locked module streams must be enabled, or their newer builds are hidden.
+        enable = ""
+        if LOCK.get("modules"):
+            enable = "dnf -q -y --forcearch=" + rpm_arch + " module enable " + " ".join(LOCK["modules"]) + " >/dev/null && "
+        query = ("dnf -q --forcearch=" + rpm_arch + " repoquery --latest-limit 1 --arch " + rpm_arch + ",noarch "
+                 "--qf '%{name} %{epoch}:%{version}-%{release}.%{arch}' ")
+        result = subprocess.run(["podman", "run", "--rm", builder, "bash", "-c", enable + query + names],
+                                text=True, capture_output=True, check=True)
+        latest = {}
+        for line in result.stdout.splitlines():
+            name, evra = line.split(" ", 1)
+            latest[name] = evra
+        for rpm in packages:
+            locked = rpm["nevra"][len(rpm["name"]) + 1:]
+            locked = locked if ":" in locked else "0:" + locked
+            report.append({"architecture": architecture, "name": rpm["name"], "locked": locked,
+                           "latest": latest.get(rpm["name"]),
+                           "newer_available": latest.get(rpm["name"]) not in (None, locked)})
     return report
 
 
@@ -104,7 +110,8 @@ def main() -> int:
         print("base " + base["base"] + ": " + state)
     newer = [r for r in rpms if r["newer_available"]]
     print(str(len(newer)) + " of " + str(len(rpms)) + " locked RPMs have a newer build" +
-          ("".join("\n  " + r["name"] + " " + r["locked"] + " -> " + str(r["latest"]) for r in newer)))
+          ("".join("\n  " + r["architecture"] + " " + r["name"] + " " + r["locked"] + " -> " + str(r["latest"])
+                   for r in newer)))
     if stale:
         print("a base is more than " + str(LIMIT_DAYS) + " days behind; refresh the lock with scripts/acquire.py --refresh")
     return 1 if args.enforce and stale else 0

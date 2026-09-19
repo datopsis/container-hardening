@@ -65,7 +65,7 @@ def main() -> int:
     record("IMG-04", "build.drift-automation-read-only", "drift automation holds only read permission and changes nothing",
            permissions == [("contents", "read")] and not writes, str(permissions))
 
-    victim = LOCK["rpms"][0]["file"]
+    victim = LOCK["rpms"][evidence.host_architecture()][0]["file"]
     with tempfile.TemporaryDirectory() as scratch:
         tampered = Path(scratch) / "tampered"
         shutil.copytree(args.bundle, tampered)

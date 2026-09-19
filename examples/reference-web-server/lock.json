@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "note": "Every input the reference image is built from. Written by scripts/acquire.py --refresh and changed only by a reviewed pull request. modules lists the module streams enabled to resolve them; install lists the packages asked for; dependencies lists the ones their function needs; omitted lists what the package metadata requires but the image deliberately leaves out, and why.",
+  "note": "Every input the reference image is built from. Written by scripts/acquire.py --refresh and changed only by a reviewed pull request. modules lists the module streams enabled to resolve them; install lists the packages asked for; dependencies lists the ones their function needs; rpms lists, for each architecture, the exact files resolved against that architecture's runtime base; omitted lists what the package metadata requires but the image deliberately leaves out, and why.",
   "bases": {
     "builder": {
       "repository": "ubi9/ubi",
@@ -35,72 +35,140 @@
     "findutils, grep, sed, alternatives, audit-libs, libcap-ng, libsemanage, libsigsegv, bzip2-libs": "Pulled in only by shadow-utils and the scriptlets.",
     "pcre": "nginx 1.26 links PCRE2, which the runtime base already provides. dnf resolves pcre only because grep, itself omitted, requires it."
   },
-  "rpms": [
-    {
-      "name": "crypto-policies",
-      "nevra": "crypto-policies-20260224-1.gitea0f072.el9_8.noarch",
-      "file": "crypto-policies-20260224-1.gitea0f072.el9_8.noarch.rpm",
-      "size": 98707,
-      "sha256": "a9ad86b8df75a7c9c29c6f6dd4b8f78cfa1f42b492eff0d11b82c457d37a7f9f",
-      "key_id": "199e2f91fd431d51"
-    },
-    {
-      "name": "libxcrypt",
-      "nevra": "libxcrypt-4.4.18-3.el9.x86_64",
-      "file": "libxcrypt-4.4.18-3.el9.x86_64.rpm",
-      "size": 122599,
-      "sha256": "a50bb26a28ee7e6379c86b5b91285299b71569fa87ea968d800a56090b7a179d",
-      "key_id": "199e2f91fd431d51"
-    },
-    {
-      "name": "nginx-core",
-      "nevra": "nginx-core-2:1.26.3-9.module+el9.8.0+24845+a897661e.4.x86_64",
-      "file": "nginx-core-1.26.3-9.module+el9.8.0+24845+a897661e.4.x86_64.rpm",
-      "size": 690969,
-      "sha256": "f6c2fcdd69f65cc182f2b803d7655a484ef63121d98b7c07c434d5d54e0d6fa7",
-      "key_id": "199e2f91fd431d51"
-    },
-    {
-      "name": "nginx-filesystem",
-      "nevra": "nginx-filesystem-2:1.26.3-9.module+el9.8.0+24845+a897661e.4.noarch",
-      "file": "nginx-filesystem-1.26.3-9.module+el9.8.0+24845+a897661e.4.noarch.rpm",
-      "size": 16881,
-      "sha256": "9a97e040cf28f25034658ce8fefa79c0c9454b4605e2a539afcf60277f1c327b",
-      "key_id": "199e2f91fd431d51"
-    },
-    {
-      "name": "openssl-fips-provider",
-      "nevra": "openssl-fips-provider-3.0.7-11.el9_8.x86_64",
-      "file": "openssl-fips-provider-3.0.7-11.el9_8.x86_64.rpm",
-      "size": 14256,
-      "sha256": "c00860e9c5a1d90488aa2eb65fe41f62926b38c6b3669d331a8b97e4a60223ac",
-      "key_id": "199e2f91fd431d51"
-    },
-    {
-      "name": "openssl-fips-provider-so",
-      "nevra": "openssl-fips-provider-so-3.0.7-11.el9_8.x86_64",
-      "file": "openssl-fips-provider-so-3.0.7-11.el9_8.x86_64.rpm",
-      "size": 595008,
-      "sha256": "60d36ad3a67d6b00e67bb0a19c0902fbb2ecdd873cf7f280a3039d04a092790c",
-      "key_id": "199e2f91fd431d51"
-    },
-    {
-      "name": "openssl-libs",
-      "nevra": "openssl-libs-1:3.5.8-1.el9_8.x86_64",
-      "file": "openssl-libs-3.5.8-1.el9_8.x86_64.rpm",
-      "size": 2430624,
-      "sha256": "3abe1f190415d91d4dc51db74cf2ad7e06b1e5ca5f63dac978fe58d8fd14e493",
-      "key_id": "199e2f91fd431d51"
-    },
-    {
-      "name": "zlib",
-      "nevra": "zlib-1.2.11-40.el9.x86_64",
-      "file": "zlib-1.2.11-40.el9.x86_64.rpm",
-      "size": 95708,
-      "sha256": "baf95ffbf40ee014135f16fe33e343faf7ff1ca06509fd97cd988e6afeabf670",
-      "key_id": "199e2f91fd431d51"
-    }
-  ],
+  "rpms": {
+    "amd64": [
+      {
+        "name": "crypto-policies",
+        "nevra": "crypto-policies-20260224-1.gitea0f072.el9_8.noarch",
+        "file": "crypto-policies-20260224-1.gitea0f072.el9_8.noarch.rpm",
+        "size": 98707,
+        "sha256": "a9ad86b8df75a7c9c29c6f6dd4b8f78cfa1f42b492eff0d11b82c457d37a7f9f",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "libxcrypt",
+        "nevra": "libxcrypt-4.4.18-3.el9.x86_64",
+        "file": "libxcrypt-4.4.18-3.el9.x86_64.rpm",
+        "size": 122599,
+        "sha256": "a50bb26a28ee7e6379c86b5b91285299b71569fa87ea968d800a56090b7a179d",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "nginx-core",
+        "nevra": "nginx-core-2:1.26.3-9.module+el9.8.0+24845+a897661e.4.x86_64",
+        "file": "nginx-core-1.26.3-9.module+el9.8.0+24845+a897661e.4.x86_64.rpm",
+        "size": 690969,
+        "sha256": "f6c2fcdd69f65cc182f2b803d7655a484ef63121d98b7c07c434d5d54e0d6fa7",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "nginx-filesystem",
+        "nevra": "nginx-filesystem-2:1.26.3-9.module+el9.8.0+24845+a897661e.4.noarch",
+        "file": "nginx-filesystem-1.26.3-9.module+el9.8.0+24845+a897661e.4.noarch.rpm",
+        "size": 16881,
+        "sha256": "9a97e040cf28f25034658ce8fefa79c0c9454b4605e2a539afcf60277f1c327b",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "openssl-fips-provider",
+        "nevra": "openssl-fips-provider-3.0.7-11.el9_8.x86_64",
+        "file": "openssl-fips-provider-3.0.7-11.el9_8.x86_64.rpm",
+        "size": 14256,
+        "sha256": "c00860e9c5a1d90488aa2eb65fe41f62926b38c6b3669d331a8b97e4a60223ac",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "openssl-fips-provider-so",
+        "nevra": "openssl-fips-provider-so-3.0.7-11.el9_8.x86_64",
+        "file": "openssl-fips-provider-so-3.0.7-11.el9_8.x86_64.rpm",
+        "size": 595008,
+        "sha256": "60d36ad3a67d6b00e67bb0a19c0902fbb2ecdd873cf7f280a3039d04a092790c",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "openssl-libs",
+        "nevra": "openssl-libs-1:3.5.8-1.el9_8.x86_64",
+        "file": "openssl-libs-3.5.8-1.el9_8.x86_64.rpm",
+        "size": 2430624,
+        "sha256": "3abe1f190415d91d4dc51db74cf2ad7e06b1e5ca5f63dac978fe58d8fd14e493",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "zlib",
+        "nevra": "zlib-1.2.11-40.el9.x86_64",
+        "file": "zlib-1.2.11-40.el9.x86_64.rpm",
+        "size": 95708,
+        "sha256": "baf95ffbf40ee014135f16fe33e343faf7ff1ca06509fd97cd988e6afeabf670",
+        "key_id": "199e2f91fd431d51"
+      }
+    ],
+    "arm64": [
+      {
+        "name": "crypto-policies",
+        "nevra": "crypto-policies-20260224-1.gitea0f072.el9_8.noarch",
+        "file": "crypto-policies-20260224-1.gitea0f072.el9_8.noarch.rpm",
+        "size": 98707,
+        "sha256": "a9ad86b8df75a7c9c29c6f6dd4b8f78cfa1f42b492eff0d11b82c457d37a7f9f",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "libxcrypt",
+        "nevra": "libxcrypt-4.4.18-3.el9.aarch64",
+        "file": "libxcrypt-4.4.18-3.el9.aarch64.rpm",
+        "size": 127655,
+        "sha256": "f05030123425a5033bcca3f260313cafc199bc7bca57e9fb13c335bd087c35a7",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "nginx-core",
+        "nevra": "nginx-core-2:1.26.3-9.module+el9.8.0+24845+a897661e.4.aarch64",
+        "file": "nginx-core-1.26.3-9.module+el9.8.0+24845+a897661e.4.aarch64.rpm",
+        "size": 687878,
+        "sha256": "fffa69ba76961e497553c8c709b297d1164bbee676dc22786c0647faa1237028",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "nginx-filesystem",
+        "nevra": "nginx-filesystem-2:1.26.3-9.module+el9.8.0+24845+a897661e.4.noarch",
+        "file": "nginx-filesystem-1.26.3-9.module+el9.8.0+24845+a897661e.4.noarch.rpm",
+        "size": 16881,
+        "sha256": "9a97e040cf28f25034658ce8fefa79c0c9454b4605e2a539afcf60277f1c327b",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "openssl-fips-provider",
+        "nevra": "openssl-fips-provider-3.0.7-11.el9_8.aarch64",
+        "file": "openssl-fips-provider-3.0.7-11.el9_8.aarch64.rpm",
+        "size": 14220,
+        "sha256": "158193d2f965db318148ec76e9347b530ac1f5379d849012c0a04d3c50cda478",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "openssl-fips-provider-so",
+        "nevra": "openssl-fips-provider-so-3.0.7-11.el9_8.aarch64",
+        "file": "openssl-fips-provider-so-3.0.7-11.el9_8.aarch64.rpm",
+        "size": 529340,
+        "sha256": "22374a51f8a529dcfcf3b3ebbb2095103e0e811a28953535e5a62e26d1233301",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "openssl-libs",
+        "nevra": "openssl-libs-1:3.5.8-1.el9_8.aarch64",
+        "file": "openssl-libs-3.5.8-1.el9_8.aarch64.rpm",
+        "size": 2294194,
+        "sha256": "23134af6ea097b94d8261367db01f91604ef3b508654caf4f7399e5c142abcc8",
+        "key_id": "199e2f91fd431d51"
+      },
+      {
+        "name": "zlib",
+        "nevra": "zlib-1.2.11-40.el9.aarch64",
+        "file": "zlib-1.2.11-40.el9.aarch64.rpm",
+        "size": 94454,
+        "sha256": "2e7f193e67235130c10f5579c2d2ec92e22e4098b6d12fb2855d93b1540c60f7",
+        "key_id": "199e2f91fd431d51"
+      }
+    ]
+  },
   "signing": {
     "key_file": "/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release",
     "key_file_sha256": "0db3dc1b6228f29d60f37c5ad91d9f4cd3547895e8ebedb242469b1c0a0cdf08",

@@ -95,7 +95,8 @@ def image(gates: Gates, reference: str, bundle: Path) -> int:
         if result.returncode == 0 and sbom.exists():
             document = json.loads(sbom.read_text())
             packages = {p.get("name") for p in document.get("packages", [])}
-        missing = sorted(r["name"] for r in LOCK["rpms"] if r["name"] not in packages)
+        architecture = evidence.image_subject(reference)["architecture"]
+        missing = sorted(r["name"] for r in LOCK["rpms"][architecture] if r["name"] not in packages)
         gates.record("IMG-21", "gates.sbom-covers-lock", "a bill of materials is generated from the image and covers every locked package",
                      result.returncode == 0 and not missing, ", ".join(missing) or result.stderr.strip()[-200:],
                      "sbom.spdx.json")

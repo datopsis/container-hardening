@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Install the pinned scanning tools, verifying each before it is unpacked.
 
-Every archive in tools.json is downloaded, checked against its recorded size
-and SHA-256, and only then extracted. A mismatch stops the install with the
+Every archive in tools.json for this machine's architecture is downloaded,
+checked against its recorded size and SHA-256, and only then extracted. A mismatch stops the install with the
 tool named; nothing half-verified reaches the bin directory.
 
 Usage:
@@ -22,19 +22,23 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent
 TOOLS = json.loads((HERE / "tools.json").read_text(encoding="utf-8"))
+sys.path.insert(0, str(HERE / "tests"))
+import evidence  # noqa: E402
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("bin", type=Path, help="directory to install the tools into")
+    parser.add_argument("--architecture", default=evidence.host_architecture(), choices=("amd64", "arm64"))
     args = parser.parse_args()
     args.bin.mkdir(parents=True, exist_ok=True)
 
     for name, tool in TOOLS["tools"].items():
-        with urllib.request.urlopen(tool["url"], timeout=300) as response:
+        pinned = tool["platforms"][args.architecture]
+        with urllib.request.urlopen(pinned["url"], timeout=300) as response:
             payload = response.read()
         digest = hashlib.sha256(payload).hexdigest()
-        if len(payload) != tool["size"] or digest != tool["sha256"]:
+        if len(payload) != pinned["size"] or digest != pinned["sha256"]:
             print(name + ": does not match tools.json (" + digest + ", " + str(len(payload)) + " bytes)", file=sys.stderr)
             return 1
         target = args.bin / tool["binary"]
@@ -44,7 +48,7 @@ def main() -> int:
         else:
             target.write_bytes(payload)
         target.chmod(0o755)
-        print("verified and installed " + name + " " + tool["version"])
+        print("verified and installed " + name + " " + tool["version"] + " for " + args.architecture)
     return 0
 
 

@@ -113,7 +113,24 @@ The reference image's checks can be copied and adapted:
 | [`tests/smoke.py`](../examples/reference-web-server/tests/smoke.py) | IMG-06 to IMG-20, IMG-27, IMG-30, IMG-32 | The service's probes, paths, secrets, and failure cases |
 | [`tools.json`](../examples/reference-web-server/tools.json), [`scripts/install_tools.py`](../examples/reference-web-server/scripts/install_tools.py), [`tests/gates.py`](../examples/reference-web-server/tests/gates.py) | IMG-21, IMG-25, IMG-28, IMG-34 | Nothing |
 | [`scripts/drift.py`](../examples/reference-web-server/scripts/drift.py) and a read-only scheduled workflow | IMG-04, IMG-29 | Nothing |
-| The release job in [`reference-image.yml`](../.github/workflows/reference-image.yml) | IMG-21, IMG-22, IMG-24 | The image name. It builds one architecture |
+| The candidate, release, and published jobs in [`reference-image.yml`](../.github/workflows/reference-image.yml), with [`scripts/publish.py`](../examples/reference-web-server/scripts/publish.py) | IMG-21, IMG-22, IMG-24 | The image name and registry |
+
+### Releasing more than one architecture
+
+The reference image's release is the pattern: build and test each
+architecture natively, then publish what was tested without rebuilding it.
+
+1. **Push each verified image by its own digest, untagged**, and confirm the
+   registry serves that exact manifest.
+2. **Test it again at that digest**, and check it is the image conformance
+   judged: its image ID equals the `image_id` in that architecture's evidence.
+3. **Push an index naming exactly those digests**, and only the index, so the
+   images it names are not copied again and cannot change digest.
+4. **Sign the index and every image it names, and attest** each image's bill of
+   materials to it and the index's provenance to the index.
+5. **Promote by tagging the index's digest**, refusing a version that exists.
+6. **Verify from a clean environment**, with no registry credentials, as a
+   consumer would.
 
 ## 6. Write the component definition
 

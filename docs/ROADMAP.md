@@ -135,12 +135,8 @@ The [reference web server](../examples/reference-web-server/README.md) is the
 template every image adopts from. It records what it does not yet evidence as
 deviations in its profile; each item below closes some of them.
 
-- [ ] Build the reference image natively for arm64 as well as amd64, and release
-  it as a multi-architecture index: each architecture's candidate digest
-  tested, the index signed and attested, the same digest promoted without a
-  rebuild, and the release verified from a clean environment.
-- [ ] Publish the reference image's badges, one per architecture and one
-  generic, to GitHub Pages.
+- [ ] Release the reference image as its first multi-architecture index,
+  0.2.0, and confirm the published verification passes.
 - [ ] Add guidance for images with more than one role or topology, and for
   inputs that are not RPMs: a signed, digest-pinned upstream image, as distinct
   from a locally recorded tarball digest.
@@ -159,7 +155,9 @@ deviations in its profile; each item below closes some of them.
 ## Package 6: publication
 
 - [ ] Decide whether the rendered catalogue and standard are published as a
-  site or consumed as Markdown in the repository. Both reference points are
+  site or consumed as Markdown in the repository. GitHub Pages already serves
+  the reference image's badges, deployed by its workflow; a site would have to
+  deploy alongside them. Both reference points are
   sites; neither is necessary for the content to be useful.
 - [ ] Add link checking and Markdown linting to CI. Register validation and
   weekly source verification are in place.
