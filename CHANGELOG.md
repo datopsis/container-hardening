@@ -91,6 +91,21 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   checks it; `check-component.py --profile` honours active deviations.
   Proposed [ADR-0005](docs/adr/0005-tailor-by-profile-deviations-expire.md).
 
+- Integrated the guidance recorded in `CONVERSATION.md`. Eighteen more sources
+  are pinned, among them NIST IR 8176, SP 800-53A, the DISA Kubernetes and
+  OpenShift STIGs, the DISA Container Image Creation and Deployment Guide, the
+  NSA/CISA Kubernetes Hardening Guide, SSDF, SP 800-161, SLSA 1.2, in-toto, the
+  OCI specifications, FIPS 140-3, and SP 800-207 and 207A; the NIST catalogue
+  and baseline are now pinned at a tag instead of a moving branch.
+  `docs/architecture/` holds the reference architecture, with its six
+  diagrams as SVG. Every criterion and expectation now states its
+  implementation, verification, expected result, and evidence, and
+  `docs/assessment/` holds the SP 800-53A procedures for every baseline
+  control, generated from the pinned catalogue. Added IMG-31 and IMG-32
+  (restricted-v2 and restricted-v3 SCCs), IMG-33 (protected source), IMG-34
+  (source and dependency scanning), PLT-18 (workload identity), and target
+  IMG-T4 (SLSA Build Level 3).
+
 ### Fixed
 
 - Corrected the process guide's register entry. Its title is *Container

@@ -31,6 +31,8 @@ ROLES = {
     "cross-reference",
     "crosswalk",
     "not-applicable",
+    "specification",
+    "assessment",
 }
 REQUIRED = (
     "id", "publisher", "title", "release", "retrieved_on", "url", "sha256",

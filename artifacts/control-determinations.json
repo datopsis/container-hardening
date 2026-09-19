@@ -674,6 +674,14 @@
       "reason": "Policy and procedures are written and maintained by the organization for the system. The standard is an input to them, not a substitute."
     },
     {
+      "control": "ia-2",
+      "origination": "research-required",
+      "handoff": [
+        "PLT-18"
+      ],
+      "reason": "The platform identifies and authenticates workloads acting on a user's behalf (PLT-18). Whether the image identifies and authenticates users of its own depends on its function: a database does, a static file server does not."
+    },
+    {
       "control": "ia-2.1",
       "origination": "research-required",
       "handoff": [

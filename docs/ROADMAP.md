@@ -90,8 +90,16 @@ standard, not an omission from it.
   so the diff shows exactly which rules changed; that diff should be the review
   artifact, with an explicit record of what changed and what it means for each
   adopting repository.
-- [ ] Obtain a CIS benchmark via an account holder and record its digest. It
-  can be cited by identifier but never rendered; its terms forbid reproduction.
+- [ ] Obtain the CIS Kubernetes and OpenShift benchmarks via an account holder
+  and record their digests. They can be cited by identifier but never rendered;
+  their terms are non-commercial and ShareAlike.
+- [ ] Render the DISA Kubernetes STIG V2R6 and OpenShift STIG V2R6, pinned but
+  not yet converted, and add them to the crosswalk. They instantiate the
+  Container Platform SRG for each product, so platform expectations can then
+  cite product rules as well.
+- [ ] Map NIST IR 8176, the DISA Container Image Creation and Deployment Guide,
+  and the NSA/CISA Kubernetes Hardening Guide countermeasure by countermeasure,
+  as SP 800-190 is, with a test that fails on any unmapped item.
 
 ## Package 2: the hardening standard
 
@@ -100,9 +108,13 @@ standard, not an omission from it.
   It is built first as the reference image's SCAP tailoring, starting from the
   SCAP Security Guide's RHEL 9 DISA STIG profile with host-only rules removed.
 
+- [ ] Decide how an image whose own function protects CUI meets FIPS 140-3: the
+  standard makes no FIPS claim for images, and a platform secret store must use
+  a validated module, but an image that encrypts data itself needs a position.
+
 ## Package 3: the control mapping
 
-- [ ] Review the 124 determinations in
+- [ ] Review the 125 determinations in
   [`artifacts/control-determinations.json`](../artifacts/control-determinations.json).
   They are judgement calls, each with its reason, and have not yet had a
   second reader. Start with the nine that make a control `image-owned` by
@@ -114,11 +126,11 @@ standard, not an omission from it.
 - [ ] Accept or amend [ADR-0005](adr/0005-tailor-by-profile-deviations-expire.md),
   the hardening profile and its expiry limits of 180 days for a criterion or
   control and 90 for a vulnerability.
-- [ ] Pin a conditional source for the database images. `postgresql-ubi` and
-  `clickhouse-ubi` have no function-specific source in the register; the DISA
-  Database SRG is the likely candidate, and each would then record a
-  determination for it. `seaweedfs-ubi` and `lakekeeper-ubi` likewise need
-  their function's source identified.
+- [ ] Pin a conditional source for each image function the register does not
+  yet cover. Databases have none; the DISA Database SRG is the likely
+  candidate. Object storage and API or catalog services likewise need their
+  function's source identified. Each image would then record a determination
+  for it.
 
 ## Package 5: adoption
 

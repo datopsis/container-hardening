@@ -65,6 +65,8 @@ from, and that is the one a reviewer needs to reproduce the output.
 | `conditional` | Applies only to images of a particular function |
 | `cross-reference` | Cited by identifier only |
 | `crosswalk` | Joins other sources; produces no rules of its own |
+| `specification` | A technical specification the criteria act on, such as OCI or SLSA |
+| `assessment` | How a control is assessed; the source of assessment procedures |
 | `not-applicable` | Assessed and ruled out, with the basis recorded |
 
 A `not-applicable` determination is a claim in its own right. It must record

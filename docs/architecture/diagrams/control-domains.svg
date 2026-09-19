@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="790" viewBox="0 0 820 790" role="img" aria-labelledby="t d">
+<title id="t">Ten container security control domains</title>
+<desc id="d">Container security divides into ten domains. Source, Build, and Image feed Registry and Admission, which feed Runtime. Runtime divides into Kernel, Network, and Identity, which feed Monitoring and Response.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="819" height="789" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<rect x="300" y="16" width="220" height="36" rx="6" fill="#ddf4ff" stroke="#0969da"/>
+<text x="410.0" y="37" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Container security</text>
+<path d="M410,52 L410,70 L150,70 L150,86" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="86" width="220" height="120" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="150.0" y="107" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Source</text>
+<text x="54.0" y="128" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">review</text>
+<text x="54.0" y="146" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">dependencies</text>
+<text x="54.0" y="164" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">secrets</text>
+<text x="150" y="224" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="middle">IMG-33, IMG-34</text>
+<path d="M410,52 L410,70 L410,70 L410,86" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="300" y="86" width="220" height="120" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="410.0" y="107" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Build</text>
+<text x="314.0" y="128" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">isolated</text>
+<text x="314.0" y="146" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">reproducible</text>
+<text x="314.0" y="164" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">provenance</text>
+<text x="314.0" y="182" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">SBOM</text>
+<text x="410" y="224" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="middle">IMG-02, 03, 21, 22</text>
+<path d="M410,52 L410,70 L670,70 L670,86" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="560" y="86" width="220" height="120" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="670.0" y="107" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Image</text>
+<text x="574.0" y="128" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">minimal</text>
+<text x="574.0" y="146" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">non-root</text>
+<text x="574.0" y="164" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">scanned</text>
+<text x="574.0" y="182" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">signed</text>
+<text x="670" y="224" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="middle">IMG-06 to IMG-32</text>
+<path d="M150,230 L150,250 L260,250 L260,264" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<path d="M410,230 L410,250 L300,250 L300,264" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<path d="M410,250 L520,250 L520,264" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<path d="M670,230 L670,250 L560,250 L560,264" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="150" y="264" width="220" height="100" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="260.0" y="285" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Registry</text>
+<text x="164.0" y="306" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">immutable</text>
+<text x="164.0" y="324" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">RBAC</text>
+<text x="164.0" y="342" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">scanning</text>
+<text x="260" y="382" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="middle">PLT-08, PLT-12, IMG-24</text>
+<rect x="450" y="264" width="220" height="100" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="560.0" y="285" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Admission</text>
+<text x="464.0" y="306" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">signature</text>
+<text x="464.0" y="324" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">provenance</text>
+<text x="464.0" y="342" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">policy</text>
+<text x="560" y="382" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="middle">PLT-01, PLT-02</text>
+<path d="M260,388 L260,404 L410,404 L410,420" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<path d="M560,388 L560,404 L410,404 L410,420" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="300" y="420" width="220" height="40" rx="6" fill="#ddf4ff" stroke="#0969da"/>
+<text x="410.0" y="441" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Runtime</text>
+<path d="M410,460 L410,478 L150,478 L150,494" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="494" width="220" height="130" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="150.0" y="515" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Kernel</text>
+<text x="54.0" y="536" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">namespaces</text>
+<text x="54.0" y="554" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">cgroups</text>
+<text x="54.0" y="572" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">seccomp</text>
+<text x="54.0" y="590" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">SELinux</text>
+<text x="54.0" y="608" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">capabilities</text>
+<text x="150" y="642" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="middle">PLT-07, IMG-13</text>
+<path d="M410,460 L410,478 L410,478 L410,494" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="300" y="494" width="220" height="130" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="410.0" y="515" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Network</text>
+<text x="314.0" y="536" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">policies</text>
+<text x="314.0" y="554" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">mTLS</text>
+<text x="314.0" y="572" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">isolation</text>
+<text x="410" y="642" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="middle">PLT-10, PLT-18</text>
+<path d="M410,460 L410,478 L670,478 L670,494" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="560" y="494" width="220" height="130" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="670.0" y="515" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Identity</text>
+<text x="574.0" y="536" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">RBAC</text>
+<text x="574.0" y="554" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">workload identity</text>
+<text x="574.0" y="572" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">secrets</text>
+<text x="670" y="642" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="middle">PLT-06, 13, 18</text>
+<path d="M150,648 L150,664 L410,664 L410,680" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<path d="M410,648 L410,664 L410,664 L410,680" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<path d="M670,648 L670,664 L410,664 L410,680" fill="none" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="250" y="680" width="320" height="86" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="410.0" y="701" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Monitoring / Response</text>
+<text x="264.0" y="722" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">audit / SIEM</text>
+<text x="264.0" y="740" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">runtime events</text>
+<text x="414.0" y="722" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">CVE reassessment</text>
+<text x="414.0" y="740" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">incident response</text>
+<text x="590" y="728" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-08, PLT-09, PLT-16</text>
+</svg>
