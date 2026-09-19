@@ -172,13 +172,17 @@
       "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Web_Server_V3R3_SRG.zip",
       "sha256": "7345e31a61c162ee4ca0253e3f44b729c18bb45b3a17cb364e5d08422412b409",
       "size": 1220358,
-      "xccdf": null,
-      "rendered": null,
+      "xccdf": {
+        "file": "U_Web_Server_V3R3_Manual-xccdf.xml",
+        "sha256": "634ff396f651314aed1864ef1af5e617a314218cb7a3dfa7214213329ec1ac86",
+        "rules": 102
+      },
+      "rendered": "docs/srg/web-server-srg/README.md",
       "status": "pinned",
       "role": "conditional",
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "Applies only to an image whose function is serving or proxying HTTP, such as datopsis/nginx-ubi. Confirmed current on 2026-09-18: V3R4, V3R5 and V4R1 are not published. Pinned but not yet rendered."
+      "notes": "Applies to an image whose function is serving or proxying HTTP. It is the function-specific source for web servers and reverse proxies, and is selected per image by an applicability determination in that image's hardening profile. Confirmed current on 2026-09-18: V3R4, V3R5 and V4R1 are not published."
     },
     {
       "id": "disa-application-server-srg",
@@ -190,13 +194,17 @@
       "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Application_Server_V4R5_SRG.zip",
       "sha256": "ea33d7f18f950e86c9e0cc63835cf8802d319804ac143b2020b1fbac13ff2643",
       "size": 1253893,
-      "xccdf": null,
-      "rendered": null,
+      "xccdf": {
+        "file": "U_Application_Server_SRG_V4R5_Manual-xccdf.xml",
+        "sha256": "45b6bf02f361ed9378a690ebbe2ab1c332c69d1b12abb2a815c66f5a1a7d0d4c",
+        "rules": 137
+      },
+      "rendered": "docs/srg/application-server-srg/README.md",
       "status": "pinned",
       "role": "conditional",
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "137 rules, of which 27 presuppose a management interface or hosted applications and 18 refer to accounts. Applies only to an image that actually hosts an application runtime. It was assessed not applicable to datopsis/nginx-ubi for exactly that reason, which is the worked example of a per-application applicability determination. Pinned but not yet rendered."
+      "notes": "Applies to an image that hosts an application runtime and manages the applications deployed into it. Much of it presupposes a management interface, hosted applications, and user accounts, so an image with none of those can be determined not applicable against this revision, citing the rendered rules that presuppose them."
     },
     {
       "id": "cis-benchmark",

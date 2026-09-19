@@ -48,7 +48,8 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   targets, each anchored to a GPOS SRG rule and its 800-53 control; 11 platform
   expectations anchored to the Container Platform SRG; a comparison with the
   DISA Container Hardening Process Guide; and a dated conformance snapshot of
-  the five image repositories. `tests/test_standard.py` checks every citation
+  the image repositories, since moved out of the standard to
+  `docs/adoption/`. `tests/test_standard.py` checks every citation
   against the crosswalk.
 - Recorded [ADR-0003](docs/adr/0003-secrets-reach-an-image-only-as-read-only-files.md):
   secrets reach an image only as read-only files.
@@ -63,7 +64,7 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   HST-04. It also tightened IMG-13 (default seccomp and SELinux) and IMG-25
   (every layer scanned).
 
-- Carried the nginx-ubi control model across as `docs/CONTROL-MODEL.md`, and
+- Wrote the control model, `docs/CONTROL-MODEL.md`, and
   derived a control baseline for all 370 High-baseline controls and 9 more the
   standard reaches. Most originations follow from the criteria's anchors
   through the crosswalk; `artifacts/control-determinations.json` overrides the
@@ -72,6 +73,17 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   definition against the baseline and the verification-pointer rule. Recorded
   [ADR-0004](docs/adr/0004-derive-the-control-baseline-here-validate-components-there.md).
 - Added HST-05, clock synchronization, which the time-stamp controls needed.
+
+- Rendered the DISA Web Server SRG V3R3 (102 rules) and Application Server SRG
+  V4R5 (137 rules), and added them to the crosswalk. The crosswalk now reports
+  what DISA maps a CCI to when it gives no Revision 5 reference: three Web
+  Server SRG rules cite CCIs mapped only to Revision 4 controls that Revision 5
+  withdraws. `check-component.py` now refuses a cross-reference naming a rule
+  that is not in the rendered catalogue.
+- Detached the standard from specific image repositories. Nothing in the
+  standard, the control model, or the ADRs now depends on or names one. The
+  conformance snapshot moved to `docs/adoption/` as an adoption record, with a
+  plan for a conformance score and badge.
 
 ### Fixed
 

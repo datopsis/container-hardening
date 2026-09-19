@@ -13,6 +13,7 @@ the rules in docs/CONTROL-MODEL.md:
 - a control's origination matches the baseline, except where the baseline
   leaves it `research-required` for the image to decide
 - every control in the baseline is present, unless --allow-incomplete
+- a cross-reference to a rendered SRG names a rule that exists in it
 
 It never edits the component definition.
 
@@ -31,8 +32,9 @@ from pathlib import Path
 
 REPOSITORY = Path(__file__).resolve().parent.parent
 BASELINE = REPOSITORY / "artifacts" / "control-baseline.json"
+CROSSWALK = REPOSITORY / "artifacts" / "crosswalk.json"
 
-# The heading shape nginx-ubi's requirement tree uses: "### L1-IMG-001".
+# Requirement headings of the form "### L1-IMG-001"; override per repository.
 DEFAULT_PATTERN = r"^###\s+(L[123]-[A-Z]{3}-\d{3})\s*$"
 METHODS = {"examine", "test", "interview"}
 CROSS_REFERENCE = re.compile(r"^[a-z0-9][a-z0-9-]*:\S+$")
@@ -67,6 +69,7 @@ def check(
     baseline: dict,
     requirements: set[str] | None,
     allow_incomplete: bool = False,
+    rules: dict[str, set[str]] | None = None,
 ) -> tuple[list[str], list[str]]:
     """Return (violations, warnings)."""
     namespace = baseline["model"]["namespace"]
@@ -133,6 +136,10 @@ def check(
         for reference in props(entry, "cross-reference", namespace):
             if not CROSS_REFERENCE.match(reference):
                 violations.append(where + ": cross-reference " + repr(reference) + " must be <source-id>:<reference>")
+                continue
+            source, _, rule = reference.partition(":")
+            if rules and source in rules and rule not in rules[source]:
+                violations.append(where + ": cross-reference " + reference + " names no rule in the rendered " + source)
 
         if control not in expected:
             warnings.append(where + ": not in the baseline; nothing to check it against")
@@ -155,6 +162,12 @@ def check(
     return violations, warnings
 
 
+def rendered_rules(path: Path = CROSSWALK) -> dict[str, set[str]]:
+    """Group IDs of every rendered catalogue, keyed by register source id."""
+    crosswalk = json.loads(path.read_text(encoding="utf-8"))
+    return {c["source"]: {r["group_id"] for r in c["rules"]} for c in crosswalk["catalogues"]}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("component", type=Path, help="the OSCAL component definition to check")
@@ -171,7 +184,7 @@ def main() -> int:
         print("no requirement identifiers found; check --requirement-pattern", file=sys.stderr)
         return 2
 
-    violations, warnings = check(component, baseline, requirements, args.allow_incomplete)
+    violations, warnings = check(component, baseline, requirements, args.allow_incomplete, rendered_rules())
     for warning in warnings:
         print("warning: " + warning)
     for violation in violations:

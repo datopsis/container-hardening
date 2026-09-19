@@ -10,13 +10,13 @@ decision-makers: Joey
 
 Each Datopsis image has to say, for every NIST SP 800-53 control in the High
 baseline, whether it satisfies the control, hands it to someone else, or does
-not apply. The model for saying so was written and enforced in `nginx-ubi`: six
-origination values, a responsible role, and a verification pointer on anything
-the image claims. After that model was written, `nginx-ubi` had determined 4 of
-the 370 controls.
+not apply. The model for saying so has six origination values, a
+responsible role, and a verification pointer on anything the image claims.
+Writing the model is quick; applying it is not. An image that authors its own
+determinations one control at a time makes a handful and stops.
 
-There are five images today. Hand-authoring 370 determinations in each is
-roughly 1,850 decisions. Most of them would be identical across images, since
+Hand-authoring 370 determinations per image is roughly 1,850 decisions across
+five images. Most of them would be identical across images, since
 personnel security is organizational for all of them, and would drift apart the
 moment anyone edited one. The question is where the determinations live.
 
@@ -33,7 +33,7 @@ moment anyone edited one. The question is where the determinations live.
 
 ## Considered Options
 
-* **Each image authors its own** — the status quo in `nginx-ubi`
+* **Each image authors its own** — every repository writes all 370
 * **This repository authors every image's component definition** — central
   ownership of every claim
 * **Generate complete component definitions here, copy into each image** —
@@ -54,7 +54,7 @@ repository holds its own OSCAL component definition and runs
 `scripts/check-component.py` from a pinned revision of this repository against
 it.
 
-*Each image authors its own* is what produced 4 of 370. It keeps every claim
+*Each image authors its own* makes a handful and stops. It keeps every claim
 next to its evidence, which is right, and leaves every image to rediscover the
 same 300 answers, which is not.
 

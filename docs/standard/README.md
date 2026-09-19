@@ -148,9 +148,10 @@ interface; a way to log into it is a way to change it that bypasses every
 property above. NIST SP 800-190 says remote administration tools "should never
 be enabled within containers", and this standard agrees without exception.
 
-The shell is the obvious next thing to remove, and none of the current images
-has removed it. It is a [target](criteria.md#targets), not a requirement: no
-runtime path may depend on it, so that removing it later breaks nothing.
+The shell is the obvious next thing to remove, and it is harder than it looks:
+UBI Micro ships one, and entrypoints and healthchecks tend to lean on it. It is
+a [target](criteria.md#targets), not a requirement: no runtime path may depend
+on it, so that removing it later breaks nothing.
 
 ### Nothing that raises privilege
 
@@ -313,8 +314,8 @@ tags. Others are about what is claimed:
   An image assessed against the GPOS SRG has been assessed against the GPOS SRG,
   and says exactly that.
 - **No FIPS validation claim.** Using a FIPS-capable library inside an image does
-  not create a validated cryptographic boundary. None of the current images
-  claims one, and the standard does not let an image imply one.
+  not create a validated cryptographic boundary, and the standard does not let
+  an image imply one.
 - **No authorization.** This produces a standard and a mapping. An authorization
   is a decision an authorizing official makes about a system, and an image is
   not a system.

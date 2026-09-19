@@ -151,7 +151,7 @@
         "PLT-01",
         "PLT-10"
       ],
-      "reason": "Cryptographic protection of remote sessions. The platform protects registry transport and traffic leaving it (PLT-01, PLT-10), but an image that terminates TLS itself, as nginx-ubi does, implements part of this. Which applies depends on the image."
+      "reason": "Cryptographic protection of remote sessions. The platform protects registry transport and traffic leaving it (PLT-01, PLT-10), but an image that terminates TLS itself, as a web server or reverse proxy usually does, implements part of this. Which applies depends on the image."
     },
     {
       "control": "ac-17.3",

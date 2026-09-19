@@ -375,8 +375,8 @@ date. An expired exception fails the build.
 
 ## Targets
 
-Directions no current Datopsis image meets. Each becomes required by amending
-this document, when at least one image has shown it can be done.
+Directions the standard sets but does not yet require. Each becomes required by
+amending this document, once an image has shown it can be done.
 
 ### IMG-T1 No shell
 
@@ -397,7 +397,7 @@ Two builds of the same commit and lock produce the same image digest, using
 
 An OpenSCAP scan of the image against an agreed, GPOS-derived rule selection,
 published with each release. It is a target rather than a requirement because
-the rule selection does not exist yet, and two images currently scan against
-different ones.
+no agreed rule selection exists yet; scanning each image against its own
+selection would make results incomparable.
 
 - **Anchors:** [V-203780](../srg/general-purpose-operating-system-srg/rules/V-203780.md) → [CM-6](../crosswalk/controls/cm-6.md)
