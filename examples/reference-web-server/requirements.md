@@ -14,17 +14,21 @@ Both bases, the UBI 9 builder and the UBI 9 Micro runtime, are named by manifest
 
 ### RWS-002
 
-Every RPM is verified against lock.json by size and SHA-256 when retrieved, and again by SHA-256, signing key, and signer during assembly.
+Every RPM and signing key is fetched from the location lock.json records and verified by size and SHA-256 as it arrives, and the bundle holds exactly the lock. During assembly each is verified again: the Red Hat release key by SHA-256 and full fingerprint, each RPM by SHA-256, signature, signer, and the source package it was built from.
 
 - Criterion: IMG-02
 - Verified by `tests/build_checks.py`: a tampered input stops the build
+- Verified by `tests/build_checks.py`: an input the lock does not name stops the build
+- Verified by `tests/build_checks.py`: a signing key other than the pinned one stops the build
 
 ### RWS-003
 
-Assembly runs with networking disabled and pulls refused, from a bundle retrieved beforehand; a missing input stops it.
+Retrieval fetches only what lock.json names, from where it says, over HTTPS from the hosts it allows, and resolves nothing; each base pulled is the architecture being built. Assembly runs with networking disabled and pulls refused, from that bundle; a missing input stops it.
 
 - Criterion: IMG-03
 - Verified by `tests/build_checks.py`: the build definition runs no retrieval tool or package manager
+- Verified by `tests/build_checks.py`: retrieval runs no package manager or resolver
+- Verified by `tests/build_checks.py`: each base pulled is the architecture being built
 - Verified by `tests/build_checks.py`: a missing input stops the build rather than being fetched
 
 ### RWS-004
@@ -36,10 +40,12 @@ Only a reviewed pull request changes lock.json; the drift job reports and holds 
 
 ### RWS-005
 
-No credential is a build argument, environment variable, layer, or label.
+No credential is a build argument, environment variable, layer, or label, and nothing of how the inputs were acquired, such as a repository host, a signing key, or the bundle, reaches the image's history, labels, bill of materials, or provenance.
 
 - Criterion: IMG-05
 - Verified by `tests/build_checks.py`: no credential-shaped build argument or environment variable
+- Verified by `tests/gates.py image`: no credential or acquisition material in history, labels, or the bill of materials
+- Verified by `tests/release_checks.py`: no credential or acquisition material in the release's provenance
 
 ### RWS-006
 
@@ -269,3 +275,15 @@ The source is scanned for secrets, and for dependency and build-definition findi
 - Criterion: IMG-34
 - Verified by `tests/gates.py source`: no committed secret in the image's source
 - Verified by `tests/gates.py source`: no High or Critical dependency, secret, or build-definition finding
+
+### RWS-035
+
+The workflows that build and release this image pin every action to a full commit, default to read-only permissions, grant writes only to the jobs that publish, persist no checkout credentials, release only from a version tag on main, and are audited in CI.
+
+- Criterion: IMG-35
+- Verified by `tests/pipeline_checks.py`: every action is pinned to a full commit, or is this repository's own
+- Verified by `tests/pipeline_checks.py`: every workflow's default permissions are read-only
+- Verified by `tests/pipeline_checks.py`: only the jobs that must write hold write permissions, and only those they need
+- Verified by `tests/pipeline_checks.py`: no checkout persists its credentials
+- Verified by `tests/pipeline_checks.py`: a release starts only from a version tag, on a commit on the default branch
+- Verified by `tests/pipeline_checks.py`: CI audits every workflow for security findings

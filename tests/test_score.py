@@ -323,6 +323,36 @@ class ScoreTests(unittest.TestCase):
         self.assertEqual(status(scopes(complete(), {"IMG-13"})["amd64"], "IMG-13"), "deviated")
 
 
+class ArchitectureScopedDeviationTests(unittest.TestCase):
+    def test_a_deviation_scoped_to_one_architecture_excuses_it_there_alone(self) -> None:
+        files = complete()
+        files["evidence-amd64/runtime.json"]["results"] = [
+            r for r in files["evidence-amd64/runtime.json"]["results"] if r["criterion"] != "IMG-13"]
+        files["evidence-arm64/runtime.json"]["results"] = [
+            r for r in files["evidence-arm64/runtime.json"]["results"] if r["criterion"] != "IMG-13"]
+        loaded = load(files)
+        results = loaded.results + [result("IMG-26") | {"architecture": "generic"}]
+        rows = score.score(BASELINE, results, {"IMG-13": {"arm64"}}, PROFILE["architectures"])
+        self.assertEqual(status(rows["arm64"], "IMG-13"), "deviated")
+        self.assertEqual(status(rows["amd64"], "IMG-13"), "no evidence")
+
+    def test_the_profile_refuses_a_scope_it_does_not_declare_or_a_generic_criterion(self) -> None:
+        profiles = module("check-profile")
+        profile = json.loads((REPOSITORY / "examples" / "reference-web-server" / "hardening-profile.json").read_text(encoding="utf-8"))
+        register = json.loads((REPOSITORY / "artifacts" / "sources.json").read_text(encoding="utf-8"))
+        today = __import__("datetime").date(2026, 9, 20)
+        scoped = copy.deepcopy(profile)
+        scoped["deviations"][0]["architectures"] = ["arm64"]
+        self.assertEqual(profiles.check(scoped, register, BASELINE, today)[0], [])
+        scoped["deviations"][0]["architectures"] = ["s390x"]
+        self.assertTrue(any("architectures must name" in v for v in profiles.check(scoped, register, BASELINE, today)[0]))
+        generic = next(d for d in scoped["deviations"] if REQUIRED[d["target"]]["scope"] == "generic")
+        generic["architectures"] = ["arm64"]
+        scoped["deviations"][0].pop("architectures")
+        self.assertTrue(any("cannot be excused on one architecture" in v
+                            for v in profiles.check(scoped, register, BASELINE, today)[0]))
+
+
 class EligibilityTests(unittest.TestCase):
     def test_a_criterion_deviation_does_not_block_a_release(self) -> None:
         deviations = [{"id": "DEV-001", "kind": "criterion", "target": "IMG-31"}]

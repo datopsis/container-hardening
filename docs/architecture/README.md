@@ -210,7 +210,7 @@ container-security reference architecture than implementing SP 800-190 alone.
 | Domain | Owner | Criteria and expectations |
 | --- | --- | --- |
 | Source | Image | IMG-33, IMG-34 |
-| Build | Image | IMG-01 to IMG-05, IMG-21, IMG-22, IMG-29 |
+| Build | Image | IMG-01 to IMG-05, IMG-21, IMG-22, IMG-29, IMG-35 |
 | Image | Image | IMG-06 to IMG-20, IMG-23 to IMG-28, IMG-30 to IMG-32 |
 | Registry | Platform | PLT-08, PLT-12 |
 | Admission | Platform | PLT-01, PLT-02, PLT-03, PLT-05 |

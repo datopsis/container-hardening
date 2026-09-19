@@ -21,16 +21,28 @@ RUN --mount=type=bind,from=bundle,target=/bundle,ro \
     lock=/bundle/lock.json; \
     arch="${TARGETARCH:?the build must set TARGETARCH}"; \
     field() { python3 -c "import json,sys; d=json.load(open('$lock')); rpms=d['rpms']['$arch']; print($1)"; }; \
-    # The signing key is pinned by digest; a different key is a different trust model.
-    echo "$(field "d['signing']['key_file_sha256']")  $(field "d['signing']['key_file']")" | sha256sum --check --quiet; \
-    rpmkeys --dbpath /tmp/keys --import "$(field "d['signing']['key_file']")"; \
+    # The bundle holds exactly what the lock names for this architecture: nothing missing, nothing extra.
+    expected="$(field "' '.join(sorted(['lock.json'] + [k['file'] for k in d['signing']['keys']] + [r['file'] for r in rpms]))")"; \
+    present="$(ls -A /bundle | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"; \
+    if [ "$present" != "$(echo $expected | tr ' ' '\n' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')" ]; then \
+        echo "the bundle is not exactly the lock: has [$present], expected [$expected]" >&2; exit 1; fi; \
+    # Each signing key came from its publisher, and must be the pinned key: by digest, and by full fingerprint.
+    for entry in $(field "' '.join(k['file']+'|'+k['sha256']+'|'+k['fingerprint'] for k in d['signing']['keys'])"); do \
+        file="${entry%%|*}"; rest="${entry#*|}"; digest="${rest%%|*}"; fingerprint="${rest#*|}"; \
+        echo "$digest  /bundle/$file" | sha256sum --check --quiet; \
+        found="$(gpg --with-colons --show-keys "/bundle/$file" 2>/dev/null | awk -F: '$1=="fpr"{print $10}')"; \
+        [ "$found" = "$fingerprint" ] || { echo "$file has fingerprint [$found], not $fingerprint" >&2; exit 1; }; \
+        rpmkeys --dbpath /tmp/keys --import "/bundle/$file"; \
+    done; \
     allowed="$(field "' '.join(d['signing']['key_ids'])")"; \
-    for entry in $(field "' '.join(r['file']+'|'+r['sha256'] for r in rpms)"); do \
-        file="${entry%%|*}"; digest="${entry##*|}"; \
+    for entry in $(field "' '.join(r['file']+'|'+r['sha256']+'|'+r['source_rpm'] for r in rpms)"); do \
+        file="${entry%%|*}"; rest="${entry#*|}"; digest="${rest%%|*}"; source="${rest#*|}"; \
         echo "$digest  /bundle/$file" | sha256sum --check --quiet; \
         rpmkeys --dbpath /tmp/keys --checksig "/bundle/$file" >/dev/null; \
         signer="$(rpm -qp --nosignature --qf '%{RSAHEADER:pgpsig}' "/bundle/$file")"; \
         case " $allowed " in *" ${signer##*Key ID }"*) ;; *) echo "unexpected signer for $file: $signer" >&2; exit 1;; esac; \
+        built="$(rpm -qp --nosignature --qf '%{SOURCERPM}' "/bundle/$file")"; \
+        [ "$built" = "$source" ] || { echo "$file was built from $built, the lock says $source" >&2; exit 1; }; \
     done; \
     # Scriptlets would need a shell, useradd, and root; the image needs none.
     rpm --root /rootfs --install --noscripts --nodeps --excludedocs \

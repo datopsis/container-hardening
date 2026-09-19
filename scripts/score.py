@@ -105,6 +105,9 @@ def score(baseline: dict, results: list[dict], deviated: set[str], architectures
     """
     required = {c: m for c, m in baseline["criteria"].items() if m["level"] == "required"}
     combos = combinations({"role": roles or [], "topology": topologies or []})
+    # A deviation scoped to some architectures excuses the criterion on those alone.
+    if not isinstance(deviated, dict):
+        deviated = {c: None for c in deviated}
     scopes: dict[str, list[dict]] = {}
     for scope in [*architectures, GENERIC]:
         rows = []
@@ -114,7 +117,7 @@ def score(baseline: dict, results: list[dict], deviated: set[str], architectures
                 continue
             checks = [r for r in results if r["criterion"] == criterion
                       and (not per_architecture or r["architecture"] == scope)]
-            if criterion in deviated:
+            if criterion in deviated and (deviated[criterion] is None or scope in deviated[criterion]):
                 found, uncovered = "deviated", []
             else:
                 statuses, uncovered = [], set()
@@ -260,7 +263,8 @@ def main() -> int:
         "requirements": list(((mapping or {}).get("criteria") or {}).get("IMG-26") or []),
     }]
     architectures = evidence.architectures
-    deviated = {d["target"] for d in active if d.get("kind") == "criterion"}
+    deviated = {d["target"]: (set(d["architectures"]) if d.get("architectures") else None)
+                for d in active if d.get("kind") == "criterion"}
     roles = profile.get("roles") if isinstance(profile.get("roles"), list) else None
     topologies = profile.get("topologies") if isinstance(profile.get("topologies"), list) else None
     criteria_map = mapping.get("criteria") if isinstance(mapping, dict) and isinstance(mapping.get("criteria"), dict) else None

@@ -3,7 +3,10 @@
 
 The hermetic build is only a control if a defective input stops it. This
 builds from a copy of a verified bundle with one RPM tampered with, then with
-one missing, and requires each build to fail (IMG-02, IMG-03). It also reads
+one missing, then with an extra input, then with another key in place of the
+pinned one, and requires each build to fail (IMG-02, IMG-03). It checks that
+retrieval runs no package manager, and that each base pulled is the
+architecture being built (IMG-03). It also reads
 the Containerfile for anything that would fetch during assembly or carry a
 credential into image history (IMG-03, IMG-05).
 
@@ -14,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import shutil
@@ -65,7 +69,25 @@ def main() -> int:
     record("IMG-04", "build.drift-automation-read-only", "drift automation holds only read permission and changes nothing",
            permissions == [("contents", "read")] and not writes, str(permissions))
 
-    victim = LOCK["rpms"][evidence.host_architecture()][0]["file"]
+    # Retrieval fetches what the lock names and resolves nothing (IMG-03): the
+    # functions that retrieve run no package manager.
+    source = ast.parse((HERE / "scripts" / "acquire.py").read_text(encoding="utf-8"))
+    retrieval = [n for n in source.body if isinstance(n, ast.FunctionDef) and n.name in ("fetch", "download")]
+    resolvers = sorted({s.value for f in retrieval for s in ast.walk(f)
+                        if isinstance(s, ast.Constant) and isinstance(s.value, str)
+                        and re.search(r"\b(dnf|microdnf|yum|rpm|repoquery|pip|npm)\b", s.value)})
+    record("IMG-03", "build.retrieval-resolves-nothing", "retrieval runs no package manager or resolver",
+           len(retrieval) == 2 and not resolvers, ", ".join(resolvers))
+    architecture = evidence.host_architecture()
+    bases = {name: subprocess.run(["podman", "image", "inspect", "--format", "{{.Architecture}}",
+                                   "registry.access.redhat.com/" + b["repository"] + "@" + b["digest"]],
+                                  text=True, capture_output=True).stdout.strip()
+             for name, b in LOCK["bases"].items()}
+    record("IMG-03", "build.bases-native", "each base pulled is the architecture being built",
+           all(a == architecture for a in bases.values()), str(bases))
+
+    victim = LOCK["rpms"][architecture][0]["file"]
+    key = LOCK["signing"]["keys"][0]["file"]
     with tempfile.TemporaryDirectory() as scratch:
         tampered = Path(scratch) / "tampered"
         shutil.copytree(args.bundle, tampered)
@@ -85,7 +107,24 @@ def main() -> int:
         # It must fail at the missing file, not for some unrelated reason that
         # would make this check pass without testing anything.
         record("IMG-03", "build.missing-input-refused", "a missing input stops the build rather than being fetched",
-               result.returncode != 0 and victim in output and "No such file" in output, output[-200:])
+               result.returncode != 0 and victim in output and "not exactly the lock" in output, output[-200:])
+
+        extra = Path(scratch) / "extra"
+        shutil.copytree(args.bundle, extra)
+        (extra / "unlocked.rpm").write_bytes(b"not in the lock")
+        result = build(extra, "reference-web-server:extra")
+        output = result.stdout + result.stderr
+        record("IMG-02", "build.extra-input-refused", "an input the lock does not name stops the build",
+               result.returncode != 0 and "unlocked.rpm" in output and "not exactly the lock" in output, output[-200:])
+
+        # Another key under the pinned key's name: the build must not trust it.
+        substituted = Path(scratch) / "substituted"
+        shutil.copytree(args.bundle, substituted)
+        (substituted / key).write_text("-----BEGIN PGP PUBLIC KEY BLOCK-----\n\nnot the pinned key\n-----END PGP PUBLIC KEY BLOCK-----\n")
+        result = build(substituted, "reference-web-server:substituted")
+        output = result.stdout + result.stderr
+        record("IMG-02", "build.other-key-refused", "a signing key other than the pinned one stops the build",
+               result.returncode != 0 and key in output and "FAILED" in output, output[-200:])
 
     failed = [r for r in results if not r["passed"]]
     # The bundle holds this machine's architecture's inputs, and the builds

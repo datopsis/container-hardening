@@ -41,6 +41,10 @@
     {
       "file": "release-latest.json",
       "scope": "generic"
+    },
+    {
+      "file": "pipeline.json",
+      "scope": "generic"
     }
   ],
   "applicability": [

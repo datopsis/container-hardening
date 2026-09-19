@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -42,8 +43,15 @@ def main() -> int:
     created = datetime.fromtimestamp(int(git("log", "-1", "--format=%ct")), timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     lock_sha256 = hashlib.sha256(LOCK.read_bytes()).hexdigest()
 
+    # Towards a reproducible build (IMG-T2): timestamps come from the commit,
+    # where this Podman can set them. It does not yet show two builds agree.
+    epoch = git("log", "-1", "--format=%ct")
+    options = subprocess.run(["podman", "build", "--help"], text=True, capture_output=True).stdout
+    reproducible = ["--source-date-epoch", epoch, "--rewrite-timestamp"] if "--rewrite-timestamp" in options else []
+
     command = [
         "podman", "build",
+        *reproducible,
         "--format", "docker",
         "--network", "none",
         "--pull=never",
@@ -57,7 +65,7 @@ def main() -> int:
         "--tag", args.tag,
         str(HERE),
     ]
-    return subprocess.run(command).returncode
+    return subprocess.run(command, env=os.environ | {"SOURCE_DATE_EPOCH": epoch}).returncode
 
 
 if __name__ == "__main__":

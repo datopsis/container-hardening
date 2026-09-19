@@ -249,6 +249,22 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   README through Shields; ADOPTING.md gives the steps. The reference image
   publishes its own the same way, and this repository no longer serves badges
   from GitHub Pages. The `badges` branch is protected from deletion.
+- Proposed [ADR-0008](docs/adr/0008-retrieve-by-locked-location-and-hold-the-pipeline-to-the-standard.md),
+  from a comparison with an image that had gone further on its build. IMG-02
+  records each input's location and source package, pins signing keys by full
+  fingerprint from their publisher, and requires the bundle to be exactly the
+  lock; IMG-03 confines retrieval to fetching what the lock names, with
+  resolution left to the reviewed refresh; IMG-05 scans the bill of materials
+  and provenance as well; IMG-26 lets an exception name the architectures it
+  concerns, which the scorer honours; and IMG-35, new, requires the pipeline
+  to be pinned and least-privileged. The required criteria are now 35.
+- The reference image follows: it fetches by locked URL from named hosts over
+  HTTPS without a package manager, admits its bundle only when complete and
+  refuses one that exists, verifies the Red Hat release key by full fingerprint
+  and each package's source package, checks each base's architecture, scans
+  history, labels, the bill of materials, and the release's provenance for
+  acquisition material, and reads its own workflows. ADOPTING.md adds how to
+  fetch inputs and how to operate them.
 - Proposed [ADR-0007](docs/adr/0007-record-manual-reviews-as-expiring-evidence.md):
   manual reviews as expiring evidence, allowed only where a criterion says so.
 

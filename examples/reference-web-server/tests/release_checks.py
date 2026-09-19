@@ -30,6 +30,7 @@ import subprocess
 from pathlib import Path
 
 import evidence
+import gates
 
 HERE = Path(__file__).resolve().parent.parent
 IMAGE = "ghcr.io/datopsis/reference-web-server"
@@ -92,9 +93,13 @@ def main() -> int:
     result = signed(top)
     record("IMG-22", "release.latest-signature", "the release's keyless signature verifies against the release workflow",
            result.returncode == 0, result.stderr.strip()[-200:])
-    provenance = run("gh", "attestation", "verify", "oci://" + top, "--repo", REPOSITORY)
+    provenance = run("gh", "attestation", "verify", "oci://" + top, "--repo", REPOSITORY, "--format", "json")
     record("IMG-22", "release.latest-provenance", "the release's SLSA provenance verifies", provenance.returncode == 0,
-           (provenance.stdout + provenance.stderr).strip()[-200:])
+           provenance.stderr.strip()[-200:])
+    # The provenance ships with the image; it may carry no acquisition material or credential (IMG-05).
+    found = gates.leftovers({"provenance": provenance.stdout}) if provenance.returncode == 0 else ["provenance not read"]
+    record("IMG-05", "release.provenance-clean", "no credential or acquisition material in the release's provenance",
+           not found, "; ".join(found))
 
     children = {}
     if manifest.get("mediaType") in INDEXES:

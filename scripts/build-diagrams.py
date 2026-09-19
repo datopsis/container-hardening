@@ -235,7 +235,7 @@ s = SVG(820, 790, "Ten container security control domains",
         "which feed Runtime. Runtime divides into Kernel, Network, and Identity, which feed Monitoring and Response.")
 s.box(300, 16, 220, 36, "Container security", key=True)
 cols = [(40, "Source", ["review", "dependencies", "secrets"], "IMG-33, IMG-34"),
-        (300, "Build", ["isolated", "reproducible", "provenance", "SBOM"], "IMG-02, 03, 21, 22"),
+        (300, "Build", ["isolated", "reproducible", "provenance", "SBOM"], "IMG-02, 03, 21, 22, 35"),
         (560, "Image", ["minimal", "non-root", "scanned", "signed"], "IMG-06 to IMG-32")]
 for x, title, lines, tags in cols:
     s.path(f"M410,52 L410,70 L{x + 110},70 L{x + 110},86")

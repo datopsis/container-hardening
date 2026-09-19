@@ -124,8 +124,13 @@ jobs:
         if: env.GENERIC == 'true'
         run: python tests/gates.py source --bin "$RUNNER_TEMP/tools" --evidence evidence
 
-      # The only step with network access to inputs. It verifies every one
-      # against this architecture's lock before the build ever sees it.
+      # The pipeline is an input too (IMG-35): its pins, permissions, and credentials.
+      - name: Read the pipeline that builds and releases the image
+        if: env.GENERIC == 'true'
+        run: python tests/pipeline_checks.py --evidence evidence/pipeline.json
+
+      # The only step with network access to inputs. It fetches exactly what
+      # this architecture's lock names, and verifies it, before the build sees it.
       - name: Retrieve and verify inputs
         run: python scripts/acquire.py "$RUNNER_TEMP/bundle"
 

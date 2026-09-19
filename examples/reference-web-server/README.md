@@ -18,17 +18,18 @@ accounts, and hosts no application runtime.
 
 | File | What it is | Criteria |
 | --- | --- | --- |
-| [`lock.json`](lock.json) | Every input: both bases by manifest-list digest, the nginx 1.26 module stream, eight RPMs for each architecture by SHA-256 and signing key, and the dependencies deliberately left out, with reasons | IMG-01, IMG-02, IMG-07 |
-| [`scripts/acquire.py`](scripts/acquire.py) | The only step with network access: retrieves and verifies every input, or with `--refresh` rewrites the lock for review | IMG-02 to IMG-04 |
+| [`lock.json`](lock.json) | Every input: both bases by manifest-list digest, the nginx 1.26 module stream, eight RPMs for each architecture by location, SHA-256, signer, and source package, the Red Hat release key by location, SHA-256, and full fingerprint, and the dependencies deliberately left out, with reasons | IMG-01, IMG-02, IMG-07 |
+| [`scripts/acquire.py`](scripts/acquire.py) | The only step with network access: fetches exactly what the lock names, from where it says, over HTTPS from named hosts, resolving nothing, and admits the bundle only when all of it verifies; or with `--refresh`, the one step that resolves, rewrites the lock for review | IMG-02 to IMG-04 |
 | [`Containerfile`](Containerfile) | Assembly from the verified bundle, with networking disabled | IMG-01 to IMG-23 |
 | [`scripts/build.py`](scripts/build.py) | The only supported way to build it | IMG-03, IMG-23 |
 | [`rootfs/`](rootfs/) | The configuration and content the image ships | IMG-10, IMG-14, IMG-15, IMG-19 |
 | [`behaviour.json`](behaviour.json) | What it does when it runs: processes, listeners, writable paths, outbound destinations, mounts | IMG-30 |
 | [`features.json`](features.json) | The nginx build flags and dynamic modules it declares | IMG-07 |
 | [`hardening-profile.json`](hardening-profile.json) | Its applicability determinations and deviations | IMG-26 |
-| [`tests/build_checks.py`](tests/build_checks.py) | Shows a tampered or missing input stops the build, and reads the build definition | IMG-01 to IMG-05 |
+| [`tests/build_checks.py`](tests/build_checks.py) | Shows a tampered, missing, or extra input, or another key, stops the build; reads the build definition and the retrieval; checks each base is the architecture built | IMG-01 to IMG-05 |
+| [`tests/pipeline_checks.py`](tests/pipeline_checks.py) | Reads the workflows that build and release the image: pins, permissions, credentials, and the release trigger | IMG-35 |
 | [`tools.json`](tools.json), [`scripts/install_tools.py`](scripts/install_tools.py) | The scanners, pinned by archive digest for each architecture and verified before they are unpacked | IMG-02 |
-| [`tests/gates.py`](tests/gates.py) | Source scans before the build; bill of materials, two vulnerability gates, and a malware scan after it | IMG-21, IMG-25, IMG-28, IMG-34 |
+| [`tests/gates.py`](tests/gates.py) | Source scans before the build; bill of materials, a scan of history, labels, and the bill of materials for acquisition material, two vulnerability gates, and a malware scan after it | IMG-05, IMG-21, IMG-25, IMG-28, IMG-34 |
 | [`scripts/drift.py`](scripts/drift.py) | How far the inputs are behind their publishers; fails CI once a base is more than 30 days behind | IMG-04, IMG-29 |
 | [`decisions.json`](decisions.json) | Its decision, rationale, owner, and review for each control the baseline leaves to the image | the control model |
 | [`requirements.md`](requirements.md) | What the image commits to, one requirement per criterion, each naming its checks | the verification pointer |
@@ -58,8 +59,8 @@ directory, in [`reference-image.yml`](../../.github/workflows/reference-image.ym
 on a native runner for each architecture, keeps each architecture's evidence
 separately, and passes it to the
 [conformance workflow](../../.github/workflows/conformance.yml), which judges
-this image exactly as it judges any other: `hardening amd64 31/34`,
-`hardening arm64 31/34`. On main, that run publishes the badges above to this
+this image exactly as it judges any other: `hardening amd64 32/35`,
+`hardening arm64 32/35`. On main, that run publishes the badges above to this
 repository's `badges` branch, exactly as an adopting image publishes its own;
 see [Show the badges](../../docs/ADOPTING.md#8-show-the-badges).
 
