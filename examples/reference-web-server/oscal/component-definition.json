@@ -66,7 +66,7 @@
                   }
                 ],
                 "description": "AC-2 Account Management.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image has no account of its own to manage: it ships no authentication configuration, no account store, and no management interface, and answers every request anonymously. The identity it runs as is the platform's: a numeric, non-root UID in group 0 (IMG-11), and any arbitrary UID the platform assigns (IMG-12). Account management for that identity is the platform's and the organization's, which the control baseline records as organization-inherited elsewhere."
               },
               {
                 "uuid": "74baaa25-30ec-5c23-bf38-3ece2455c28c",
@@ -79,7 +79,7 @@
                   }
                 ],
                 "description": "AC-2(1) Automated System Account Management.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no account store to manage by automated means; see AC-2. The image adds none."
               },
               {
                 "uuid": "b5bda117-2d2f-5c70-a9df-42608591f7d8",
@@ -92,7 +92,7 @@
                   }
                 ],
                 "description": "AC-2(2) Automated Temporary and Emergency Account Management.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There are no temporary or emergency accounts: the image issues no credentials of any kind; see AC-2."
               },
               {
                 "uuid": "e82a0ec2-4d5f-56b0-8e28-b2a69713d27e",
@@ -105,7 +105,7 @@
                   }
                 ],
                 "description": "AC-2(3) Disable Accounts.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no account to disable; see AC-2. The runtime identity is created and removed with the container, by the platform."
               },
               {
                 "uuid": "7dbdc593-2561-51c2-9bd8-04de0dc42b05",
@@ -118,7 +118,7 @@
                   }
                 ],
                 "description": "AC-2(4) Automated Audit Actions.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "No account is created, modified, or removed in the image, so there is no such action to log; see AC-2. What the image does log is every request (AU-2)."
               },
               {
                 "uuid": "407ef5bd-1048-5006-85b1-08a0486e7930",
@@ -131,7 +131,7 @@
                   }
                 ],
                 "description": "AC-2(5) Inactivity Logout.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image holds no logon session to end on inactivity; HTTP requests are stateless and anonymous; see AC-2."
               },
               {
                 "uuid": "9e8fe01d-8f6b-5d70-8e68-eb81e2a7c22f",
@@ -144,7 +144,7 @@
                   }
                 ],
                 "description": "AC-2(11) Usage Conditions.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image enforces no per-account usage conditions because it has no accounts; see AC-2. What may be requested, and from where, is the deployment's network policy (PLT-10)."
               },
               {
                 "uuid": "22c295f2-26af-594b-8e3f-05ef0b264d16",
@@ -157,7 +157,7 @@
                   }
                 ],
                 "description": "AC-2(12) Account Monitoring for Atypical Usage.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no account whose usage could be atypical; see AC-2. Request-level monitoring is the platform's (PLT-16)."
               },
               {
                 "uuid": "3d270051-06d1-5228-b747-126caff1dc49",
@@ -193,7 +193,7 @@
                   }
                 ],
                 "description": "AC-3 Access Enforcement.",
-                "remarks": "Which content is served, and to whom, is the deployment's mounted content and configuration."
+                "remarks": "The image enforces what nginx enforces: it serves only files under the document root it ships, resolving each request with try_files and answering 404 otherwise, and it reads nothing outside that root. Which content exists, and who may reach it, is decided by what the deployment mounts and by its network policy (PLT-10); the image adds no access-control rules of its own."
               },
               {
                 "uuid": "52d9249b-2f66-502a-827c-c43b06728f6b",
@@ -303,7 +303,7 @@
                   }
                 ],
                 "description": "AC-6(1) Authorize Access to Security Functions.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image separates no security functions by account because it has no accounts; see AC-2. It runs with every Linux capability dropped and no_new_privileges set, verified at runtime (IMG-13), so no process holds privilege to authorize."
               },
               {
                 "uuid": "1bf27bdb-70cd-5ca7-ad2d-7585ca75f4b7",
@@ -316,7 +316,7 @@
                   }
                 ],
                 "description": "AC-6(2) Non-privileged Access for Nonsecurity Functions.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "Every process in the image runs as the same unprivileged, non-root identity; there is no privileged account to use for anything, security-related or not (IMG-11, IMG-13)."
               },
               {
                 "uuid": "8e737866-5f9b-50c1-8324-879e145adbc6",
@@ -329,7 +329,7 @@
                   }
                 ],
                 "description": "AC-6(3) Network Access to Privileged Commands.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image exposes no privileged command, locally or over the network: it has no shell service, no administration endpoint, and no remote-administration daemon (IMG-27)."
               },
               {
                 "uuid": "1a8fe01f-43a7-5120-84cf-d168c11192c8",
@@ -342,7 +342,7 @@
                   }
                 ],
                 "description": "AC-6(5) Privileged Accounts.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no privileged account to restrict: the image runs non-root with no capabilities, and carries neither su nor sudo, which the smoke suite verifies (IMG-09, IMG-11, IMG-13)."
               },
               {
                 "uuid": "f648f092-081e-5ae9-b5a3-a3dfeec9efa7",
@@ -446,7 +446,7 @@
                   }
                 ],
                 "description": "AC-6(9) Log Use of Privileged Functions.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "No privileged function executes in the image, so there is none to log; see AC-6(5). Every request it does serve is logged (AU-2, AU-12)."
               },
               {
                 "uuid": "3ef6bbf2-703c-562e-9d8d-d7e9661e471c",
@@ -492,7 +492,7 @@
                   }
                 ],
                 "description": "AC-7 Unsuccessful Logon Attempts.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no logon to attempt, successfully or otherwise; the image authenticates nobody; see AC-2."
               },
               {
                 "uuid": "c2c0bb6f-e27a-5295-bda8-c6fed86cc4f0",
@@ -505,7 +505,7 @@
                   }
                 ],
                 "description": "AC-8 System Use Notification.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image displays no system-use notification because it has no logon and no interactive session; see AC-2. Any banner in served content is the deployment's content."
               },
               {
                 "uuid": "787d7fe3-eadc-5794-93cc-09b96a3de05e",
@@ -518,7 +518,7 @@
                   }
                 ],
                 "description": "AC-10 Concurrent Session Control.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image controls no concurrent sessions by account, having none; see AC-2. Concurrent connections are bounded by worker_connections in the shipped configuration and by the deployment's resource limits (PLT-05)."
               },
               {
                 "uuid": "f0614f30-af08-5058-b52d-e4963b331afc",
@@ -557,7 +557,7 @@
                   }
                 ],
                 "description": "AC-12 Session Termination.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no user session to terminate; each HTTP request is answered and closed, and idle connections end at nginx's keepalive timeout (SC-10); see AC-2."
               },
               {
                 "uuid": "45700024-3e71-58f4-a16b-acceb0c49b78",
@@ -575,7 +575,7 @@
                   }
                 ],
                 "description": "AC-14 Permitted Actions Without Identification or Authentication.",
-                "remarks": "The image serves its content without identification by design; the deployment decides what content that is."
+                "remarks": "The image serves its content without identification or authentication by design, which is what this control requires be documented and deliberate: it is a public, read-only HTTP server. Which content may be reached without authentication is the deployment's, through what it mounts and its network policy (PLT-10)."
               },
               {
                 "uuid": "8221aa04-33d8-58f8-b08a-6be7e788de22",
@@ -629,7 +629,7 @@
                   }
                 ],
                 "description": "AC-17(2) Protection of Confidentiality and Integrity Using Encryption.",
-                "remarks": "TLS is enabled by mounting a server block, certificate, and key (IMG-16); the deployment chooses to."
+                "remarks": "The image can protect remote access with TLS 1.2 or 1.3 when the deployment mounts a server block, certificate, and key read-only into /etc/nginx (IMG-16, IMG-17); the smoke suite proves it serves HTTPS that way. Whether remote access is encrypted in a given deployment is that deployment's decision, with the platform's (PLT-10)."
               },
               {
                 "uuid": "68641fba-e862-500b-8ade-57ef05a823ee",
@@ -1005,7 +1005,7 @@
                   }
                 ],
                 "description": "AU-2 Event Logging.",
-                "remarks": "nginx logs every request to standard output and every error to standard error."
+                "remarks": "nginx logs every request to standard output in its combined format, and every error to standard error at notice level, as the shipped nginx.conf sets. The image writes no log file, and the smoke suite reads a served request back out of the container's standard output (IMG-19)."
               },
               {
                 "uuid": "2ad51f15-c7bc-5ff5-be99-dee870958200",
@@ -1038,7 +1038,7 @@
                   }
                 ],
                 "description": "AU-3 Content of Audit Records.",
-                "remarks": "Each access record states the client, time, request, status, size, referrer, and user agent."
+                "remarks": "Each access record carries the client address, the time, the request line, the status, the bytes sent, the referrer, and the user agent, which is nginx's combined format, the shipped default. Error records carry the time, severity, message, client, and request (IMG-19)."
               },
               {
                 "uuid": "6dbb5744-f647-5866-a2c5-9e8241f64eba",
@@ -1056,7 +1056,7 @@
                   }
                 ],
                 "description": "AU-3(1) Additional Audit Information.",
-                "remarks": "The deployment may extend nginx's log format with further fields."
+                "remarks": "The image logs the combined format and adds nothing further. A deployment that needs more fields, such as a request identifier or upstream timing, mounts a server block setting its own log_format (IMG-16); the image neither prevents nor performs that."
               },
               {
                 "uuid": "67f53ee7-993d-5eb6-a538-0c10f1cbf564",
@@ -1375,7 +1375,7 @@
                   }
                 ],
                 "description": "AU-10 Non-repudiation.",
-                "remarks": "The image serves anonymous requests; there is no individual whose actions must be undeniable."
+                "remarks": "The image serves anonymous requests and binds no action to an individual, so there is no actor whose denial the image could refute. Non-repudiation of what the image itself produces is met at release instead: every published image is signed keylessly and carries attested provenance (IMG-22)."
               },
               {
                 "uuid": "4b38c7d9-e3ad-5527-8c0c-5b9f6cdac948",
@@ -1426,7 +1426,7 @@
                   }
                 ],
                 "description": "AU-12 Audit Record Generation.",
-                "remarks": "Audit records are generated for every request, with nothing to enable."
+                "remarks": "Audit records are generated for every request and every error as the image runs, with nothing to enable and no way to disable it short of changing the configuration: logging is compiled into the shipped nginx.conf, and the smoke suite verifies records appear on the standard streams (IMG-19)."
               },
               {
                 "uuid": "bbb4106e-027e-5edb-8c78-d54ece920b30",
@@ -2150,7 +2150,7 @@
                   }
                 ],
                 "description": "CM-6 Configuration Settings.",
-                "remarks": "The image ships a reviewed configuration, but no SCAP rule selection yet evidences its settings (IMG-T3)."
+                "remarks": "The image ships one reviewed configuration file, owned by root and not writable by the runtime identity (IMG-10), with settings chosen for this standard: logs to the standard streams, server_tokens off, every writable path under the declared tmpfs, and listeners above 1024. What is not yet true is automated verification of those settings against a published benchmark; that waits on the SCAP profile (IMG-T3), which is why this control stays open."
               },
               {
                 "uuid": "37161dfc-b752-5b60-8eba-260b8b1a37ac",
@@ -2168,7 +2168,7 @@
                   }
                 ],
                 "description": "CM-6(1) Automated Management, Application, and Verification.",
-                "remarks": "As CM-6: automated verification of settings awaits the SCAP profile (IMG-T3)."
+                "remarks": "As CM-6: the settings are fixed in the image and verified by the smoke suite in the properties they produce, but not yet by an automated check against a benchmark. The SCAP profile (IMG-T3) is the work that would close it."
               },
               {
                 "uuid": "10ee726d-e79e-50be-81de-9d9041fa06c3",
@@ -3370,7 +3370,7 @@
                   }
                 ],
                 "description": "IA-2 Identification and Authentication (Organizational Users).",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image identifies and authenticates no user: it has no logon, no session, and no credential store, and serves every request anonymously; see AC-2. Identifying the people who administer the platform is the platform's and the organization's."
               },
               {
                 "uuid": "bbdc0b16-20da-5211-80ae-ff4858065277",
@@ -3383,7 +3383,7 @@
                   }
                 ],
                 "description": "IA-2(1) Multi-factor Authentication to Privileged Accounts.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no privileged account, and so no multi-factor authentication for one; see IA-2 and AC-6(5)."
               },
               {
                 "uuid": "6b2272a2-a4a5-525d-a281-37664edcacea",
@@ -3396,7 +3396,7 @@
                   }
                 ],
                 "description": "IA-2(2) Multi-factor Authentication to Non-privileged Accounts.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no non-privileged account to authenticate, with one factor or several: the image serves every request anonymously and holds no credential store; see IA-2."
               },
               {
                 "uuid": "87795b99-d345-55f4-9bb8-59f7bb425a9f",
@@ -3409,7 +3409,7 @@
                   }
                 ],
                 "description": "IA-2(5) Individual Authentication with Group Authentication.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image uses no group authenticator, having no authentication at all; see IA-2."
               },
               {
                 "uuid": "88031910-72f3-5a17-b181-730ecd90d8f4",
@@ -3422,7 +3422,7 @@
                   }
                 ],
                 "description": "IA-2(8) Access to Accounts \u2014 Replay Resistant.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no authentication exchange that could be replayed; see IA-2. Replay protection for the traffic itself comes from TLS when the deployment mounts it (SC-8, SC-23)."
               },
               {
                 "uuid": "f257d40a-2ec2-5087-9572-e895343ec356",
@@ -3435,7 +3435,7 @@
                   }
                 ],
                 "description": "IA-2(12) Acceptance of PIV Credentials.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image accepts no credentials at all, PIV included: it has no authentication path for a client to present one to; see IA-2."
               },
               {
                 "uuid": "f331b22e-0018-555a-8251-575db7965104",
@@ -3466,7 +3466,7 @@
                   }
                 ],
                 "description": "IA-4 Identifier Management.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image manages no identifiers: it issues none, and the identity it runs as is assigned by the platform (IMG-11, IMG-12); see IA-2."
               },
               {
                 "uuid": "aa94c14a-ee61-57e7-9f0d-52acc65ce371",
@@ -3479,7 +3479,7 @@
                   }
                 ],
                 "description": "IA-4(4) Identify User Status.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no identifier to mark as belonging to a contractor or a foreign national, because the image manages none; see IA-4."
               },
               {
                 "uuid": "a060a611-2de1-56f8-b9f3-00c8fa650265",
@@ -3492,7 +3492,7 @@
                   }
                 ],
                 "description": "IA-5 Authenticator Management.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image manages no authenticators. It holds no password, key, or token of its own; the only secret it may be given is a TLS private key, which arrives as a read-only mounted file and is never written, logged, or placed in arguments or environment (IMG-16, ADR-0003)."
               },
               {
                 "uuid": "45be3715-35d5-5068-879d-1ccd73f2c2cd",
@@ -3505,7 +3505,7 @@
                   }
                 ],
                 "description": "IA-5(1) Password-based Authentication.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "No password authenticates anything in the image: it stores none, prompts for none, and has no account a password could belong to; see IA-5."
               },
               {
                 "uuid": "b0ef5169-f5d6-5947-b955-efb543efcffd",
@@ -3518,7 +3518,7 @@
                   }
                 ],
                 "description": "IA-5(2) Public Key-based Authentication.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image performs no public-key authentication of users. It does verify publisher signatures on its own inputs at build time, against a key pinned by full fingerprint (IMG-02), which is a different control (SI-7, CM-14)."
               },
               {
                 "uuid": "3c62fa59-40d8-533f-bf0b-5410b76a24c3",
@@ -3531,7 +3531,7 @@
                   }
                 ],
                 "description": "IA-5(6) Protection of Authenticators.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image protects the one authenticator it may be given, a TLS private key, as ADR-0003 requires: read-only, readable only by the container's user or a group it belongs to, never in arguments, environment, or logs. The smoke suite proves the key does not appear in any of them (IMG-16)."
               },
               {
                 "uuid": "bddcd0c1-ba44-55a3-a0fc-5758e47db39d",
@@ -3544,7 +3544,7 @@
                   }
                 ],
                 "description": "IA-6 Authentication Feedback.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image gives no authentication feedback because it authenticates nobody; see IA-2. It also discloses no version in its responses, since server_tokens is off (SI-11)."
               },
               {
                 "uuid": "a47f48ec-d4c2-514b-a54c-9b7304c6304b",
@@ -3557,7 +3557,7 @@
                   }
                 ],
                 "description": "IA-7 Cryptographic Module Authentication.",
-                "remarks": "The image authenticates to no cryptographic module; it makes no FIPS claim."
+                "remarks": "The image authenticates to no cryptographic module. It uses OpenSSL as Red Hat ships it, for TLS when a deployment mounts key material, and makes no FIPS claim; how this standard treats images that protect CUI is open (SC-13)."
               },
               {
                 "uuid": "45157eac-ad2a-5945-938d-303dff2300a2",
@@ -3570,7 +3570,7 @@
                   }
                 ],
                 "description": "IA-8 Identification and Authentication (Non-organizational Users).",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image identifies and authenticates no non-organizational user, serving every request anonymously; see IA-2."
               },
               {
                 "uuid": "5555faa2-81b8-560c-96dc-261be12b110a",
@@ -3583,7 +3583,7 @@
                   }
                 ],
                 "description": "IA-8(1) Acceptance of PIV Credentials from Other Agencies.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image accepts no PIV credentials from other agencies, accepting no credentials at all; see IA-8."
               },
               {
                 "uuid": "6162e3fe-8bd3-5442-88e5-c47a49c480c1",
@@ -3596,7 +3596,7 @@
                   }
                 ],
                 "description": "IA-8(2) Acceptance of External Authenticators.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image accepts no external authenticators, such as a federated or third-party credential, because it authenticates nobody; see IA-8."
               },
               {
                 "uuid": "283e7833-4bed-5947-bc75-f55431207c3a",
@@ -3609,7 +3609,7 @@
                   }
                 ],
                 "description": "IA-8(4) Use of Defined Profiles.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "The image conforms to no identity profile because it performs no identification; see IA-8."
               },
               {
                 "uuid": "a386d15e-bb0d-56bb-b02c-d023a85567aa",
@@ -3622,7 +3622,7 @@
                   }
                 ],
                 "description": "IA-11 Re-authentication.",
-                "remarks": "The image has no user accounts, logon, sessions, or authenticators: it serves static content to anonymous clients."
+                "remarks": "There is no session to re-authenticate; each request is anonymous and independent; see IA-2."
               },
               {
                 "uuid": "9117f70d-ff9d-5628-bc0a-b08f8564630a",
@@ -6069,7 +6069,7 @@
                   }
                 ],
                 "description": "SC-8 Transmission Confidentiality and Integrity.",
-                "remarks": "TLS protects transmission when the deployment mounts it; the image serves plain HTTP on 8080 otherwise."
+                "remarks": "The image serves plain HTTP on 8080 as shipped, and TLS 1.2 or 1.3 on 8443 when the deployment mounts a server block, certificate, and key (IMG-16), which the smoke suite proves works. Whether transmission is protected in a given deployment therefore depends on that deployment, and on the platform's requirement that service traffic be encrypted (PLT-10, PLT-18)."
               },
               {
                 "uuid": "b4f77aad-10a4-5aac-b492-841794bb6367",
@@ -6087,7 +6087,7 @@
                   }
                 ],
                 "description": "SC-8(1) Cryptographic Protection.",
-                "remarks": "As SC-8: TLS 1.2 and 1.3, when the deployment mounts it."
+                "remarks": "The cryptography, when a deployment enables TLS, is OpenSSL as Red Hat ships it, restricted to TLS 1.2 and 1.3 by the server block the deployment mounts; the image ships no cipher policy of its own and makes no FIPS claim (SC-13, IA-7)."
               },
               {
                 "uuid": "6c5766ec-317e-57e4-8baf-657024a342e5",
@@ -6105,7 +6105,7 @@
                   }
                 ],
                 "description": "SC-10 Network Disconnect.",
-                "remarks": "Idle connections close after nginx's keepalive timeout; the deployment may set its own."
+                "remarks": "The shipped configuration sets no keepalive_timeout, so nginx's default applies and idle connections close without intervention; a deployment that needs a specific period sets it in a mounted server block (IMG-16). Disconnecting a session on organizational policy is the deployment's and the platform's."
               },
               {
                 "uuid": "9b06c4ba-d98b-5e7b-93aa-16e15ea3a8d8",
@@ -6159,7 +6159,7 @@
                   }
                 ],
                 "description": "SC-13 Cryptographic Protection.",
-                "remarks": "nginx uses OpenSSL as shipped by Red Hat. The standard makes no FIPS claim, and its position on images that protect CUI is open."
+                "remarks": "TLS, when a deployment enables it, uses OpenSSL as Red Hat ships it in UBI 9, pinned in the lock by digest and signature (IMG-02). The image makes no FIPS 140-3 claim: this standard has not yet decided what it requires of images that protect CUI, which is why this control stays open rather than being answered here."
               },
               {
                 "uuid": "8b86dd55-5e6a-5a1f-b3ec-415622604028",
@@ -6208,7 +6208,7 @@
                   }
                 ],
                 "description": "SC-18 Mobile Code.",
-                "remarks": "Any script in the served content is the deployment's content, not the image's."
+                "remarks": "The image ships one static HTML page and executes no mobile code: it has no scripting module, no CGI, and no application runtime, and the dynamic modules it carries are declared and verified (IMG-07). Any script in content a deployment mounts is that deployment's, to authorize under its own policy."
               },
               {
                 "uuid": "c05be866-2199-5c66-88de-85e07a1957be",
@@ -6280,7 +6280,7 @@
                   }
                 ],
                 "description": "SC-23 Session Authenticity.",
-                "remarks": "Session authenticity is TLS, when the deployment mounts it."
+                "remarks": "Session authenticity, for a protocol that keeps no session, is the authenticity of the connection: TLS when the deployment mounts it (SC-8), and the platform's mutual authentication between services (PLT-18). The image adds no session identifier, cookie, or token of its own."
               },
               {
                 "uuid": "a14a8027-48f2-5576-9414-51c7a63ab80e",
@@ -6628,7 +6628,7 @@
                   }
                 ],
                 "description": "SI-4(10) Visibility of Encrypted Communications.",
-                "remarks": "The image does not monitor traffic; that is the platform's (PLT-16)."
+                "remarks": "The image neither inspects nor monitors traffic, encrypted or otherwise; it answers requests. Making encrypted communications visible to monitoring is the platform's (PLT-16, PLT-10), which is where this standard places it."
               },
               {
                 "uuid": "77aec2e3-db23-5ed4-90fe-7570e4360a06",
@@ -6890,7 +6890,7 @@
                   }
                 ],
                 "description": "SI-8 Spam Protection.",
-                "remarks": "The image handles no mail."
+                "remarks": "The image handles no electronic mail: it has no mail transfer agent, no mail client, and no mailbox, and its only listeners are the declared HTTP ports (IMG-30)."
               },
               {
                 "uuid": "15308b29-c842-5a6e-b582-4857ea8f3742",
@@ -6903,7 +6903,7 @@
                   }
                 ],
                 "description": "SI-8(2) Automatic Updates.",
-                "remarks": "The image handles no mail."
+                "remarks": "There are no spam-protection mechanisms to update, since the image handles no mail; see SI-8. The image's own inputs are kept current by a reviewed refresh (IMG-04, IMG-29)."
               },
               {
                 "uuid": "ed457f0b-56bd-5fc5-ba22-009e705abaa3",
@@ -6921,7 +6921,7 @@
                   }
                 ],
                 "description": "SI-10 Information Input Validation.",
-                "remarks": "nginx rejects malformed requests, but no criterion yet evidences it."
+                "remarks": "nginx parses and rejects malformed requests, answering 400 rather than passing them on, and the image passes no input to an interpreter or application runtime because it hosts none. What is missing is a criterion and a check that prove the rejection, rather than relying on nginx's behaviour, which is why this control stays open."
               },
               {
                 "uuid": "b97906c8-6a73-5fc8-9d36-273ad843158d",
@@ -6939,7 +6939,7 @@
                   }
                 ],
                 "description": "SI-11 Error Handling.",
-                "remarks": "server_tokens is off, so errors do not disclose the version, but no criterion yet evidences error handling."
+                "remarks": "The shipped configuration sets server_tokens off, so error responses carry neither the version nor build details, and errors go to standard error rather than to a client. What is missing is a criterion that requires error output be free of internal detail, and a check for it, which is why this control stays open."
               },
               {
                 "uuid": "6f0a92d4-d83b-5823-b0a7-5ebf8d0f3628",
