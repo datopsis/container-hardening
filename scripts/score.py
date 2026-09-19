@@ -28,7 +28,7 @@ endpoint file.
 
 Usage:
     python scripts/score.py EVIDENCE_DIR --profile PROFILE --component COMPONENT \\
-        --requirements FILE... [--requirement-pattern REGEX] [--out DIR] \\
+        --requirements FILE... [--requirement-pattern REGEX] [--crosswalk FILE] [--out DIR] \\
         [--standard-ref SHA --workflow-sha SHA]
 """
 
@@ -73,9 +73,15 @@ def status(checks: list[dict], deviated: bool) -> str:
     return "met"
 
 
-def score(baseline: dict, results: list[dict], deviated: set[str], architectures: list[str]) -> dict[str, list[dict]]:
-    """Rows per scope: each architecture, then generic."""
+def score(baseline: dict, results: list[dict], deviated: set[str], architectures: list[str],
+          roles: list[str] | None = None) -> dict[str, list[dict]]:
+    """Rows per scope: each architecture, then generic.
+
+    With roles, a per-architecture criterion is met on an architecture only if
+    it is met for every role; the worst role's status is the criterion's.
+    """
     required = {c: m for c, m in baseline["criteria"].items() if m["level"] == "required"}
+    order = ["failed", "no evidence", "skipped", "met"]
     scopes: dict[str, list[dict]] = {}
     for scope in [*architectures, GENERIC]:
         rows = []
@@ -85,8 +91,10 @@ def score(baseline: dict, results: list[dict], deviated: set[str], architectures
                 continue
             checks = [r for r in results if r["criterion"] == criterion
                       and (not per_architecture or r["architecture"] == scope)]
-            rows.append({"criterion": criterion, "title": meta["title"], "status": status(checks, criterion in deviated),
-                         "checks": len(checks)})
+            found = status(checks, criterion in deviated)
+            if per_architecture and roles and found != "deviated":
+                found = min((status([c for c in checks if c.get("role") == role], False) for role in roles), key=order.index)
+            rows.append({"criterion": criterion, "title": meta["title"], "status": found, "checks": len(checks)})
         scopes[scope] = rows
     return scopes
 
@@ -131,6 +139,7 @@ def main() -> int:
     parser.add_argument("--component", type=Path, required=True)
     parser.add_argument("--requirements", type=Path, nargs="+", required=True)
     parser.add_argument("--requirement-pattern", default=None)
+    parser.add_argument("--crosswalk", type=Path, help="the image's map from each criterion to its requirement identifiers")
     parser.add_argument("--out", type=Path, default=Path("score"))
     parser.add_argument("--today", type=datetime.date.fromisoformat, default=datetime.date.today())
     parser.add_argument("--standard-ref", help="the commit the caller names; required with --workflow-sha")
@@ -147,9 +156,11 @@ def main() -> int:
     profile_violations, _ = profiles.check(profile, json.loads(REGISTER.read_text(encoding="utf-8")), baseline, args.today)
     active = profiles.active_deviations(profile, args.today)
     stated = components.stated_requirements(args.requirements, args.requirement_pattern or components.DEFAULT_PATTERN)
-    component_violations, _ = components.check(
-        json.loads(args.component.read_text(encoding="utf-8")), baseline, stated, False, active, components.rendered_rules()
-    )
+    component = json.loads(args.component.read_text(encoding="utf-8"))
+    mapping = json.loads(args.crosswalk.read_text(encoding="utf-8")) if args.crosswalk else None
+    component_violations, _ = components.check(component, baseline, stated, False, active, components.rendered_rules(), mapping)
+    if mapping is not None:
+        component_violations = components.check_crosswalk(mapping, baseline, stated, active) + component_violations
     if not stated:
         component_violations.append("no requirement identifiers found; check the requirement pattern")
 
@@ -164,7 +175,8 @@ def main() -> int:
     architectures = [a for a in profile.get("architectures", []) if a in evidence_module.ARCHITECTURES] \
         if isinstance(profile.get("architectures"), list) else []
     deviated = {d["target"] for d in active if d.get("kind") == "criterion"}
-    scopes = score(baseline, results, deviated, architectures) if evidence.valid else {}
+    roles = profile.get("roles") if isinstance(profile.get("roles"), list) else None
+    scopes = score(baseline, results, deviated, architectures, roles) if evidence.valid else {}
 
     failed_rows = [s + " " + r["criterion"] for s, rows in scopes.items() for r in rows if r["status"] == "failed"]
     failing = bool(revision_errors or profile_violations or component_violations or failed_rows)

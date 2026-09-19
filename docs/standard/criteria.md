@@ -102,9 +102,19 @@ before use. Where the publisher signs the input, the signature is verified
 against a pinned key or identity as well. A checksum fetched from the same
 origin as the artifact is not verification.
 
+These are three different claims, and a lock keeps them apart. A digest
+recorded in the lock shows the input has not changed since it was reviewed; it
+does not show who published it. A publisher's signature, verified against a
+pinned key or identity, shows who published it. A checksum published beside
+the artifact, such as an `.md5` or `.sha256` file, shows neither, and is
+recorded, if at all, as metadata, never as the input's integrity control.
+
 - **Implementation:** A committed lock records every input's size and SHA-256,
   and the signing key or identity where one exists; an install step verifies
-  each before use and compares the installed set with the lock.
+  each before use and compares the installed set with the lock. An upstream
+  image is pinned by digest, its signature verified against the publisher's
+  pinned identity at that digest, and only then are files extracted from it,
+  each recorded in the lock by SHA-256.
 - **Verification:** A mismatched digest, a missing input, and an unsigned or
   wrongly
   signed package each fail the build; after installation, the installed package

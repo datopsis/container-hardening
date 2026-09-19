@@ -41,6 +41,11 @@ on:
         required: false
         type: string
         default: '^###\s+([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{3})\s*$'
+      crosswalk:
+        description: Path to the image's map from each criterion to its requirement identifiers; checked when given
+        required: false
+        type: string
+        default: ""
       evidence-artifacts:
         description: Name or glob of the artifacts holding the evidence, such as "evidence-*" for one per architecture; each is kept in its own directory
         required: true
@@ -125,14 +130,16 @@ jobs:
           COMPONENT: image/${{ inputs.component }}
           REQUIREMENTS: ${{ inputs.requirements }}
           PATTERN: ${{ inputs.requirement-pattern }}
+          CROSSWALK: ${{ inputs.crosswalk }}
           STANDARD_REF: ${{ inputs.standard-ref }}
           WORKFLOW_SHA: ${{ job.workflow_sha }}
         run: |
           files=(); for f in $REQUIREMENTS; do files+=("image/$f"); done
+          crosswalk=(); if [ -n "$CROSSWALK" ]; then crosswalk=(--crosswalk "image/$CROSSWALK"); fi
           mkdir -p evidence
           set +e
           python standard/scripts/score.py evidence --profile "$PROFILE" --component "$COMPONENT" \
-            --requirements "${files[@]}" --requirement-pattern "$PATTERN" \
+            --requirements "${files[@]}" --requirement-pattern "$PATTERN" "${crosswalk[@]}" \
             --standard-ref "$STANDARD_REF" --workflow-sha "$WORKFLOW_SHA" --out score > score.txt 2>&1
           code=$?
           set -e

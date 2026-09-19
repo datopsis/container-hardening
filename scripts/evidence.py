@@ -8,8 +8,9 @@ that is missing is an error, and any error makes the whole evidence invalid.
 Invalid evidence is not scored lower; it is not scored.
 
 The hardening profile says what to expect: the architectures the image is
-built for, and each evidence file with its scope. A file with scope
-`architecture` is expected once for each architecture; a `generic` file once.
+built for, its roles if it has more than one, and each evidence file with its
+scope. A file with scope `architecture` is expected once for each
+architecture, and for each role; a `generic` file once.
 Other JSON files, such as scanner reports, are ignored, unless they carry a
 `results` list, which is what evidence looks like without its header.
 
@@ -34,8 +35,9 @@ SCHEMA_VERSION = 1
 ARCHITECTURES = ("amd64", "arm64")
 GENERIC = "generic"
 SCOPES = ("architecture", "generic")
-# Declared by the profile when the image has more than one of each; required
-# on every result's subject when declared, refused when not.
+# Declared by the profile when the image has more than one of each. Evidence
+# about a built image names one of each declared; evidence about the source or
+# process, in a generic file, names none.
 QUALIFIERS = {"role": "roles", "topology": "topologies", "platform": "platforms"}
 
 COMMIT = re.compile(r"^[0-9a-f]{40}$")
@@ -179,7 +181,9 @@ def load(directory: Path, profile: dict, baseline: dict) -> Evidence:
             value = subject.get(qualifier)
             if allowed is None and value is not None:
                 errors.append(where + ": subject." + qualifier + " is set, but the profile declares no " + QUALIFIERS[qualifier])
-            elif allowed is not None and value not in allowed:
+            elif allowed is not None and scope == "generic" and value is not None:
+                errors.append(where + ": a generic file is about the source or process, and names no " + qualifier)
+            elif allowed is not None and scope == "architecture" and value not in allowed:
                 errors.append(where + ": subject." + qualifier + " must be one of " + ", ".join(allowed))
         found.setdefault((path.name, architecture, *(subject.get(q) for q in QUALIFIERS)), []).append(where)
         evidence.subjects[where] = subject
@@ -236,10 +240,12 @@ def load(directory: Path, profile: dict, baseline: dict) -> Evidence:
                 **{q: subject.get(q) for q in QUALIFIERS if subject.get(q) is not None},
             })
 
+    roles = qualifiers["role"] or [None]
     for name, scope in expected.items():
-        for architecture in declared if scope == "architecture" else [GENERIC]:
-            if not any(k[0] == name and k[1] == architecture for k in found):
-                errors.append(name + " (" + architecture + "): expected, and missing")
+        wanted = [(a, r) for a in declared for r in roles] if scope == "architecture" else [(GENERIC, None)]
+        for architecture, role in wanted:
+            if not any(k[0] == name and k[1] == architecture and (role is None or k[2] == role) for k in found):
+                errors.append(name + " (" + architecture + (", " + role if role else "") + "): expected, and missing")
     for key, copies in found.items():
         if len(copies) > 1:
             errors.append(key[0] + " (" + ", ".join(k for k in key[1:] if k) + "): found more than once, at "

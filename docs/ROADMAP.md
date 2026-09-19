@@ -137,9 +137,6 @@ deviations in its profile; each item below closes some of them.
 
 - [ ] Release the reference image as its first multi-architecture index,
   0.2.0, and confirm the published verification passes.
-- [ ] Add guidance for images with more than one role or topology, and for
-  inputs that are not RPMs: a signed, digest-pinned upstream image, as distinct
-  from a locally recorded tarball digest.
 - [ ] Build the reference image's SCAP profile: the SCAP Security Guide's RHEL 9
   DISA STIG profile, pinned, tailored for an image, with each rule tied to the
   GPOS SRG rule it serves. It is what lets IMG-T3 become required.

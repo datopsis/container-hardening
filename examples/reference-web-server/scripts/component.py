@@ -5,15 +5,20 @@ Every control in the standard's baseline gets one entry. Where the baseline
 settles a control, the entry takes its origination. Where the baseline leaves
 it research-required, DECISIONS below says what this image does, with the
 reason. An image-owned entry cites the criteria the baseline gives for it and
-the requirements in requirements.md that state them, which is the
-verification pointer; a criterion the profile records a deviation from is
-not cited.
+the requirements that state them, as requirements-crosswalk.json maps them,
+which is the verification pointer; a criterion the profile records a
+deviation from is not cited.
+
+DECISIONS are this image's, a static web server's. An image with another
+function decides each of them again; check-component.py warns on one copied
+word for word.
 
 The output is checked by scripts/check-component.py in the repository root.
 
 Usage:
     python scripts/component.py            # write oscal/component-definition.json
-    python scripts/component.py --check    # fail if it is stale
+    python scripts/component.py --check    # fail if it is stale, or the crosswalk
+                                           # disagrees with requirements.md
 """
 
 from __future__ import annotations
@@ -31,6 +36,7 @@ ROOT = HERE.parent.parent
 BASELINE = json.loads((ROOT / "artifacts" / "control-baseline.json").read_text(encoding="utf-8"))
 PROFILE = json.loads((HERE / "hardening-profile.json").read_text(encoding="utf-8"))
 OUTPUT = HERE / "oscal" / "component-definition.json"
+MAP = json.loads((HERE / "requirements-crosswalk.json").read_text(encoding="utf-8"))
 NS = BASELINE["model"]["namespace"]
 SEED = uuid.UUID("6f1c0b52-3d1e-4c6a-9a55-2b6f3f0c7e10")
 
@@ -68,6 +74,12 @@ LOGGING_CRITERIA = ["IMG-19"]
 
 
 def requirements() -> dict[str, list[str]]:
+    """The crosswalk: which requirements state each criterion."""
+    return MAP["criteria"]
+
+
+def stated_in_prose() -> dict[str, list[str]]:
+    """The same map, as requirements.md states it, to keep the two in step."""
     by_criterion: dict[str, list[str]] = {}
     text = (HERE / "requirements.md").read_text(encoding="utf-8")
     for identifier, criterion in re.findall(r"^### (RWS-\d{3})\n.*?^- Criterion: (IMG-\d+)$", text, re.M | re.S):
@@ -145,6 +157,10 @@ def main() -> int:
     args = parser.parse_args()
     body = build()
     if args.check:
+        prose = stated_in_prose()
+        if {c: sorted(r) for c, r in prose.items()} != {c: sorted(r) for c, r in requirements().items()}:
+            print("requirements-crosswalk.json and requirements.md map criteria to requirements differently", file=sys.stderr)
+            return 1
         if not OUTPUT.exists() or OUTPUT.read_text(encoding="utf-8") != body:
             print("the component definition is stale: python scripts/component.py", file=sys.stderr)
             return 1
