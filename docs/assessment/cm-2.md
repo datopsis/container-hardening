@@ -65,7 +65,7 @@ The Test method is answered by the image's own verification of each criterion th
 | Criterion | Verification | Evidence |
 | --- | --- | --- |
 | [IMG-01](../standard/criteria.md#img-01-base-image-pinned-by-digest) | Every `FROM` carries `@sha256:`; each equals the lock's recorded digest; the build resolves the base from local storage without pulling ([IMG-03](../standard/criteria.md#img-03-hermetic-assembly)). | The lock file; the build log showing the base resolved from local storage. |
-| [IMG-02](../standard/criteria.md#img-02-every-build-input-pinned-and-verified) | A mismatched digest, a missing input, and an unsigned or wrongly signed package each fail the build; after installation, the installed package set matches the lock. | The lock; the negative-test results; the installed-versus-locked comparison from the build log. |
+| [IMG-02](../standard/criteria.md#img-02-every-build-input-pinned-and-verified) | A mismatched digest, a missing input, an extra input, a key with another fingerprint, and an unsigned or wrongly signed package each fail the build; after installation, the installed package set matches the lock. | The lock; the negative-test results; the installed-versus-locked comparison from the build log. |
 | [IMG-23](../standard/criteria.md#img-23-identifying-labels) | Each label is present and the revision matches the release commit. | The image configuration. |
 
 ---
