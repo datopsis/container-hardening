@@ -2,7 +2,29 @@
 
 What an image repository adds, in order, to align with this standard and show
 that it does. The [reference web server](../examples/reference-web-server/README.md)
-has done every step; each step below points at its copy.
+in this repository has done every step; each step below points at its copy,
+and the fastest route is to copy that directory and change it.
+
+## In short
+
+An adopting image repository ends up with these, each copied from the
+reference image and changed for its own service:
+
+| Add | Copy from the reference image | You change |
+| --- | --- | --- |
+| A hardening profile | [`hardening-profile.json`](../examples/reference-web-server/hardening-profile.json) | Image name, function, the pinned commit, applicability, deviations |
+| Requirement statements | [`requirements.md`](../examples/reference-web-server/requirements.md) | The wording, an identifier prefix, and the checks that verify each |
+| A locked, hermetic build | [`lock.json`](../examples/reference-web-server/lock.json), [`scripts/acquire.py`](../examples/reference-web-server/scripts/acquire.py), [`scripts/build.py`](../examples/reference-web-server/scripts/build.py), [`Containerfile`](../examples/reference-web-server/Containerfile) | The packages and what the image ships |
+| Checks that write evidence | [`tests/`](../examples/reference-web-server/tests/), [`tools.json`](../examples/reference-web-server/tools.json), [`scripts/drift.py`](../examples/reference-web-server/scripts/drift.py) | The runtime probes in `smoke.py` for the service |
+| A behaviour declaration | [`behaviour.json`](../examples/reference-web-server/behaviour.json) | Processes, listeners, writable paths, outbound destinations |
+| A component definition | [`scripts/component.py`](../examples/reference-web-server/scripts/component.py) | Decisions for the controls the baseline leaves to the image |
+| CI | [`reference-image.yml`](../.github/workflows/reference-image.yml) and a call to [`conformance.yml`](../.github/workflows/conformance.yml) | The image name and paths |
+
+**It is done when** the conformance workflow passes in the image repository's
+CI and reports a score. The score need not be perfect; every criterion it does
+not count must be a recorded deviation with an expiry, which is what makes the
+image aligned rather than finished. The reference image reports
+`hardening 31/34`, and its three gaps are deviations.
 
 Nothing here requires the image to meet every criterion on day one. It
 requires every gap to be visible: a criterion the image does not yet meet is a
@@ -93,8 +115,8 @@ jobs:
     with:
       standard-ref: <commit>
       requirements: requirements.md
-      requirement-pattern: '^###\s+(RWS-\d{3})\s*$'
       evidence-artifact: evidence
+      # requirement-pattern: only if headings are not like "### RWS-001"
 ```
 
 It fails if the profile names a different revision, if the profile or the

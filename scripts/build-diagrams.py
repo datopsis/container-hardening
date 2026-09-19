@@ -131,7 +131,39 @@ for i, (label, tags) in enumerate(steps):
     y += 46
 s.save("supply-chain.svg")
 
-# 3. An example implementation of the pipeline --------------------------------
+# 3a. The reference image's pipeline, as it actually runs ----------------------
+stages = [
+    ("Check the hardening profile and component definition", "IMG-26", False),
+    ("Install the pinned, verified scanners", "IMG-02", False),
+    ("Scan the source: secrets, dependencies, build definition", "IMG-34", False),
+    ("Retrieve and verify every input (the only networked step)", "IMG-01, IMG-02", False),
+    ("Show a tampered or missing input stops the build", "IMG-02, IMG-03", False),
+    ("Build with networking disabled", "IMG-03", True),
+    ("Run the image restricted; read every property back", "IMG-06 to IMG-20, IMG-30, IMG-32", False),
+    ("Bill of materials; vulnerability and malware gates", "IMG-21, IMG-25, IMG-28", False),
+    ("Fail on a base more than 30 days behind", "IMG-29", False),
+    ("Re-verify the latest published release", "IMG-21, IMG-22, IMG-24", False),
+    ("Score the evidence", "hardening 31/34", True),
+    ("On a version tag: publish, sign, attest, verify", "IMG-21, IMG-22, IMG-24", False),
+]
+s = SVG(760, 60 + len(stages) * 46, "The reference image's pipeline",
+        "The reference image's CI, in order: check the profile and component definition, install verified scanners, "
+        "scan the source, retrieve and verify inputs, show a defective input stops the build, build with networking "
+        "disabled, verify the running image, generate the bill of materials and run the vulnerability and malware "
+        "gates, check the base is current, re-verify the latest release, score the evidence, and on a version tag "
+        "publish, sign, attest, and verify.")
+s.text(250, 30, ".github/workflows/reference-image.yml", 13, "600", fill=MUTED, anchor="middle")
+y = 44
+for i, (label, tags, key) in enumerate(stages):
+    s.box(40, y, 420, 32, "", key=key)
+    s.text(250, y + 21, label, 12.5, "600", anchor="middle")
+    s.tag(478, y + 21, tags)
+    if i < len(stages) - 1:
+        s.arrow(250, y + 32, 250, y + 46)
+    y += 46
+s.save("reference-pipeline.svg")
+
+# 3b. The same stages on another stack ----------------------------------------
 s = SVG(760, 760, "Example implementation: GitLab, Nexus, Harbor, OpenShift",
         "An example implementation, not a requirement. GitLab source with protected branches, code review, and "
         "signed traceable source feeds a GitLab Runner that takes dependencies from Nexus and the UBI base from "
@@ -172,14 +204,15 @@ s.box(90, 138, 460, 90, "NIST SP 800-53A", ["How do I assess whether it actually
 s.save("control-and-assessment.svg")
 
 # 5. Traceability from requirement to evidence ---------------------------------
+# Followed through the reference image, so every step names a real file.
 chain = [
-    ("Requirement", "IMG-13 Works with no capabilities"),
+    ("Requirement", "IMG-13, stated by the image as RWS-013"),
     ("NIST SP 800-53 control", "AC-6(8)"),
-    ("DISA CCI / SRG requirement", "V-203696, through its CCI"),
-    ("Technical implementation", "service needs no capability"),
-    ("Automated test", "read CapEff from /proc for every process"),
-    ("Evidence artifact", "per-process report, runtime options"),
-    ("Continuous compliance result", "CI result on every change"),
+    ("DISA CCI / SRG requirement", "CCI-002233, GPOS SRG V-203696"),
+    ("Technical implementation", "Containerfile: USER 1001:0; nginx needs no capability"),
+    ("Automated test", "tests/smoke.py reads CapEff and NoNewPrivs from /proc"),
+    ("Evidence artifact", "evidence/smoke.json, kept with every CI run"),
+    ("Continuous compliance result", "scripts/score.py: hardening 31/34 on every change"),
 ]
 s = SVG(700, 20 + len(chain) * 62, "Traceability from requirement to evidence",
         "A requirement maps to an 800-53 control, to a DISA CCI or SRG requirement, to a technical implementation, "

@@ -29,39 +29,6 @@
   ],
   "deviations": [
     {
-      "id": "DEV-003",
-      "kind": "criterion",
-      "target": "IMG-21",
-      "reason": "The bill of materials is generated from the image and checked in CI, but no release yet attests it to a published digest.",
-      "compensating": "Every CI run keeps the SPDX document with its evidence, and it is checked to cover every locked package.",
-      "owner": "Joey",
-      "approved_by": "Joey",
-      "recorded_on": "2026-09-19",
-      "expires_on": "2027-03-17"
-    },
-    {
-      "id": "DEV-004",
-      "kind": "criterion",
-      "target": "IMG-22",
-      "reason": "No release workflow yet signs the image or attests its provenance.",
-      "compensating": "The image is built only in CI from a reviewed commit, and its labels name the commit and lock.",
-      "owner": "Joey",
-      "approved_by": "Joey",
-      "recorded_on": "2026-09-19",
-      "expires_on": "2027-03-17"
-    },
-    {
-      "id": "DEV-005",
-      "kind": "criterion",
-      "target": "IMG-24",
-      "reason": "Nothing is published yet, so there are no tags to protect.",
-      "compensating": "None.",
-      "owner": "Joey",
-      "approved_by": "Joey",
-      "recorded_on": "2026-09-19",
-      "expires_on": "2027-03-17"
-    },
-    {
       "id": "DEV-008",
       "kind": "criterion",
       "target": "IMG-31",

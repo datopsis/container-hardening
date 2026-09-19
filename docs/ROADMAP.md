@@ -135,23 +135,20 @@ The [reference web server](../examples/reference-web-server/README.md) is the
 template every image adopts from. It records what it does not yet evidence as
 deviations in its profile; each item below closes some of them.
 
-- [ ] Cut the reference image's first release, `reference-web-server/v0.1.0`,
-  once its release job is merged, and close its IMG-21, IMG-22, and IMG-24
-  deviations on the evidence the release records.
-- [ ] Adopt in the first image repository through
-  [ADOPTING.md](ADOPTING.md) and the conformance workflow, and fix whatever
-  the guide turns out not to say.
+- [ ] Adopt in each image repository through [ADOPTING.md](ADOPTING.md) and the
+  conformance workflow, and fix whatever the guide turns out not to say.
+  Adoption is under way in `datopsis/seaweedfs-ubi`.
 - [ ] Build the reference image's SCAP profile: the SCAP Security Guide's RHEL 9
   DISA STIG profile, pinned, tailored for an image, with each rule tied to the
   GPOS SRG rule it serves. It is what lets IMG-T3 become required.
 - [ ] Deploy the reference image under the Restricted Pod Security Standard in
   CI (IMG-31), and on OpenShift under `restricted-v2` and `restricted-v3` when a
   cluster is available.
-- [ ] Refuse a group- or world-readable key file at startup without a shell in
+- [ ] Refuse a world-readable key file at startup without a shell in
   the runtime path (IMG-16). nginx refuses a missing or empty key, not a
   permissive one.
-- [ ] Adopt in the image repositories, in the order and with the per-repository
-  notes in [adoption](adoption/README.md#planned-order).
+- [ ] Take into account the per-repository notes in
+  [adoption](adoption/README.md#notes-per-image-repository) when each adopts.
 - [ ] Add a hardening profile to each image repository and run
   `scripts/check-profile.py` in its CI.
 - [ ] Run `scripts/check-component.py` in each image repository's CI, against a

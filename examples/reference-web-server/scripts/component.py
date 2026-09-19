@@ -93,6 +93,12 @@ def build() -> str:
             origination, remarks = DECISIONS[control["id"]]
             criteria = LOGGING_CRITERIA if origination == "image-owned" else []
         props = [prop("origination", origination)]
+        if origination == "image-owned" and control["origination"] == "image-owned":
+            # An image-owned claim states what it rests on and where it stops.
+            titles = "; ".join(c + " " + BASELINE["criteria"][c]["title"] for c in criteria)
+            handoff = ", ".join(control["handoff"])
+            remarks = ("Rests on " + titles + ". The image cannot constrain what a deployment mounts or how it runs "
+                       "the image" + (": the platform's part is " + handoff + "." if handoff else "."))
         if origination == "image-owned":
             cited = [c for c in criteria if c not in deviated]
             pointers = sorted({r for c in cited for r in stated.get(c, [])})

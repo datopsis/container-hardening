@@ -145,6 +145,23 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   that version only, signs it keylessly, attests its bill of materials and
   SLSA provenance, and verifies all three before it finishes.
 
+- Released the reference image as 0.1.1: published publicly to GHCR,
+  signed keylessly, with its bill of materials and SLSA provenance attested.
+  CI now re-verifies the latest release on every run, as a consumer would,
+  and the image's IMG-21, IMG-22, and IMG-24 deviations are closed on that
+  evidence.
+
+- The walkthroughs now use the reference image. The traceability diagram
+  follows IMG-13 through its real files, from RWS-013 to the score; the
+  reference architecture shows the reference image's pipeline, generated as a
+  diagram, before the example on another stack; the control model's example is
+  the reference image's real CM-7 entry. ADOPTING.md opens with what an
+  adopting repository copies from the reference image and when it is done.
+- The reference image's image-owned controls now state what each claim rests
+  on and where it stops, rather than a generic remark.
+- `check-component.py` finds requirement headings such as `### RWS-001` by
+  default; `requirement-pattern` is optional in the conformance workflow.
+
 ### Fixed
 
 - The reference image's release job logged in to the registry at a custom

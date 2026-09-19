@@ -290,7 +290,7 @@
                   }
                 ],
                 "description": "AC-6 Least Privilege.",
-                "remarks": "The service runs as a non-root user with no capabilities and no way to gain privilege, which is least privilege for the process acting on a user's behalf. Least privilege for the image's own users, if it has any, is determined per image under AC-6 enhancements."
+                "remarks": "Rests on IMG-11 Non-root, with no privilege transition; IMG-13 Works with no capabilities and no new privileges. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-02."
               },
               {
                 "uuid": "5fce16ac-8cb4-55e6-b833-8f7af330aae9",
@@ -433,7 +433,7 @@
                   }
                 ],
                 "description": "AC-6(8) Privilege Levels for Code Execution.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-09 No privilege-raising files; IMG-11 Non-root, with no privilege transition; IMG-12 Runs under an arbitrary UID; IMG-13 Works with no capabilities and no new privileges; IMG-31 Admitted under the restricted-v2 SCC and the Restricted Pod Security Standard; IMG-32 Runs in a user namespace under the restricted-v3 SCC. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-02."
               },
               {
                 "uuid": "c592ea1c-6977-5b77-8fbe-4fbc0d4f754b",
@@ -479,7 +479,7 @@
                   }
                 ],
                 "description": "AC-6(10) Prohibit Non-privileged Users from Executing Privileged Functions.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-11 Non-root, with no privilege transition; IMG-31 Admitted under the restricted-v2 SCC and the Restricted Pod Security Standard. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-02."
               },
               {
                 "uuid": "af19454b-94da-5a51-aaaa-dcc49ad5b5d0",
@@ -1785,7 +1785,7 @@
                   }
                 ],
                 "description": "CM-2 Baseline Configuration.",
-                "remarks": "The image's baseline configuration is its lock, its build definition, and the labels that tie a built image to both. No SRG rule the standard cites reaches CM-2."
+                "remarks": "Rests on IMG-01 Base image pinned by digest; IMG-02 Every build input pinned and verified; IMG-23 Identifying labels. The image cannot constrain what a deployment mounts or how it runs the image."
               },
               {
                 "uuid": "3ebdba87-01c2-540c-9dd7-e6469726c02a",
@@ -1848,7 +1848,7 @@
                   }
                 ],
                 "description": "CM-2(2) Automation Support for Accuracy and Currency.",
-                "remarks": "The baseline is maintained automatically: the lock records every input, the build verifies it, and drift is reported without review being bypassed."
+                "remarks": "Rests on IMG-01 Base image pinned by digest; IMG-02 Every build input pinned and verified; IMG-04 Input refresh is a reviewed change; IMG-23 Identifying labels. The image cannot constrain what a deployment mounts or how it runs the image."
               },
               {
                 "uuid": "0b31a549-c881-5c03-9cf1-6d13f889bc2c",
@@ -1865,9 +1865,19 @@
                     "value": "IMG-23"
                   },
                   {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-24"
+                  },
+                  {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-023"
+                  },
+                  {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-024"
                   },
                   {
                     "name": "assessment-method",
@@ -1881,7 +1891,7 @@
                   }
                 ],
                 "description": "CM-2(3) Retention of Previous Configurations.",
-                "remarks": "Every released version is retained under an immutable tag, and the lock and build definition that produced it are in version control."
+                "remarks": "Rests on IMG-23 Identifying labels; IMG-24 Immutable tags. The image cannot constrain what a deployment mounts or how it runs the image."
               },
               {
                 "uuid": "0a3bea03-7e2a-530d-abc3-c32d5a32f0ad",
@@ -2122,7 +2132,7 @@
                   }
                 ],
                 "description": "CM-5(6) Limit Library Privileges.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-10 Software and configuration not writable by the service; IMG-15 Read-only root filesystem. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-03, PLT-12."
               },
               {
                 "uuid": "1419b4e7-aa23-5304-9050-01664e6941fa",
@@ -2249,7 +2259,7 @@
                   }
                 ],
                 "description": "CM-7 Least Functionality.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-06 No package manager; IMG-07 Only what the function needs; IMG-14 Unprivileged ports; IMG-27 No remote administration; IMG-30 Expected behaviour is declared. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-04, PLT-16."
               },
               {
                 "uuid": "fc668f65-bc8c-5ea8-b15b-06a26d5c6719",
@@ -2322,12 +2332,22 @@
                   {
                     "name": "criterion",
                     "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-21"
+                  },
+                  {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
                     "value": "IMG-23"
                   },
                   {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-008"
+                  },
+                  {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-021"
                   },
                   {
                     "name": "requirement",
@@ -2346,7 +2366,7 @@
                   }
                 ],
                 "description": "CM-8 System Component Inventory.",
-                "remarks": "The image carries an inventory of its packages, an SBOM, and labels identifying its inputs. No SRG rule the standard cites reaches CM-8."
+                "remarks": "Rests on IMG-08 Embedded package inventory; IMG-21 Bill of materials; IMG-23 Identifying labels. The image cannot constrain what a deployment mounts or how it runs the image."
               },
               {
                 "uuid": "4d0a065f-4000-532e-9b8d-44ba2ad8aba2",
@@ -2363,9 +2383,19 @@
                     "value": "IMG-08"
                   },
                   {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-21"
+                  },
+                  {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-008"
+                  },
+                  {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-021"
                   },
                   {
                     "name": "assessment-method",
@@ -2379,7 +2409,7 @@
                   }
                 ],
                 "description": "CM-8(1) Updates During Installation and Removal.",
-                "remarks": "The inventory is written at build time from what was actually installed, and regenerated with every build, so it cannot drift from the image."
+                "remarks": "Rests on IMG-08 Embedded package inventory; IMG-21 Bill of materials. The image cannot constrain what a deployment mounts or how it runs the image."
               },
               {
                 "uuid": "1c71b6dc-dae1-5536-9cc5-19fdf30aa5b7",
@@ -2396,9 +2426,19 @@
                     "value": "IMG-08"
                   },
                   {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-21"
+                  },
+                  {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-008"
+                  },
+                  {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-021"
                   },
                   {
                     "name": "assessment-method",
@@ -2412,7 +2452,7 @@
                   }
                 ],
                 "description": "CM-8(2) Automated Maintenance.",
-                "remarks": "The inventory is written at build time from what was actually installed, and regenerated with every build, so it cannot drift from the image."
+                "remarks": "Rests on IMG-08 Embedded package inventory; IMG-21 Bill of materials. The image cannot constrain what a deployment mounts or how it runs the image."
               },
               {
                 "uuid": "f20551c8-a4ef-504d-975b-c176d7ef1682",
@@ -2527,7 +2567,7 @@
                   }
                 ],
                 "description": "CM-11 User-installed Software.",
-                "remarks": "No software can be installed into a running image: it has no package manager and its software is not writable."
+                "remarks": "Rests on IMG-06 No package manager; IMG-10 Software and configuration not writable by the service. The image cannot constrain what a deployment mounts or how it runs the image."
               },
               {
                 "uuid": "8c63b9fa-b96b-563e-bd06-877faeccda32",
@@ -2560,7 +2600,7 @@
                   }
                 ],
                 "description": "CM-11(2) Software Installation with Privileged Status.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-06 No package manager. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-01, PLT-12."
               },
               {
                 "uuid": "a1852f19-5d92-5360-a5eb-4fe138e8fa86",
@@ -2628,6 +2668,11 @@
                     "value": "IMG-04"
                   },
                   {
+                    "name": "criterion",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "IMG-22"
+                  },
+                  {
                     "name": "requirement",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "RWS-001"
@@ -2648,6 +2693,11 @@
                     "value": "RWS-004"
                   },
                   {
+                    "name": "requirement",
+                    "ns": "https://datopsis.example/ns/oscal",
+                    "value": "RWS-022"
+                  },
+                  {
                     "name": "assessment-method",
                     "ns": "https://datopsis.example/ns/oscal",
                     "value": "test"
@@ -2659,7 +2709,7 @@
                   }
                 ],
                 "description": "CM-14 Signed Components.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-01 Base image pinned by digest; IMG-02 Every build input pinned and verified; IMG-03 Hermetic assembly; IMG-04 Input refresh is a reviewed change; IMG-22 Signed, with provenance. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-01."
               },
               {
                 "uuid": "1666104d-4070-54fa-8d29-9afb592e3ffb",
@@ -5739,7 +5789,7 @@
                   }
                 ],
                 "description": "SA-22 Unsupported System Components.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-01 Base image pinned by digest; IMG-29 Base kept current. The image cannot constrain what a deployment mounts or how it runs the image."
               },
               {
                 "uuid": "f2a0c520-dcea-5960-83d8-f35911abf85d",
@@ -5790,7 +5840,7 @@
                   }
                 ],
                 "description": "SC-2 Separation of System and User Functionality.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-27 No remote administration. The image cannot constrain what a deployment mounts or how it runs the image."
               },
               {
                 "uuid": "8253d860-e5e7-5bc5-8009-2f8983111579",
@@ -6263,7 +6313,7 @@
                   }
                 ],
                 "description": "SC-24 Fail in Known State.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-18 Fails closed. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-11."
               },
               {
                 "uuid": "bf051f40-5a3d-530a-bad8-8c2b6b2c7648",
@@ -6424,7 +6474,7 @@
                   }
                 ],
                 "description": "SI-2 Flaw Remediation.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-25 Vulnerability gate and remediation; IMG-26 Exceptions expire; IMG-29 Base kept current. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-08."
               },
               {
                 "uuid": "811647d8-fc55-5bd4-ace1-b8f9c45d13ba",
@@ -6475,7 +6525,7 @@
                   }
                 ],
                 "description": "SI-2(6) Removal of Previous Versions of Software and Firmware.",
-                "remarks": "Reached by a required image criterion."
+                "remarks": "Rests on IMG-25 Vulnerability gate and remediation. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-08."
               },
               {
                 "uuid": "ece9a19a-40da-573e-aa44-c669429b9da9",
@@ -6827,7 +6877,7 @@
                   }
                 ],
                 "description": "SI-7(15) Code Authentication.",
-                "remarks": "Every component is authenticated by digest and, where the publisher signs, by signature before it is installed into the image. No SRG rule the standard cites reaches SI-7(15)."
+                "remarks": "Rests on IMG-02 Every build input pinned and verified. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-01."
               },
               {
                 "uuid": "f559e739-36f2-52f1-89e6-8e0b2244db16",

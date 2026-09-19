@@ -33,9 +33,10 @@ on:
         required: true
         type: string
       requirement-pattern:
-        description: Regular expression capturing one requirement identifier per heading
-        required: true
+        description: Regular expression capturing one requirement identifier per heading; the default finds headings such as "### RWS-001"
+        required: false
         type: string
+        default: '^###\s+([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{3})\s*$'
       evidence-artifact:
         description: Name of the artifact holding the caller's evidence JSON files
         required: true

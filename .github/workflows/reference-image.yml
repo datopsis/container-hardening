@@ -50,6 +50,9 @@ jobs:
     name: build and verify
     runs-on: ubuntu-24.04
     timeout-minutes: 40
+    permissions:
+      contents: read
+      attestations: read
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -116,6 +119,12 @@ jobs:
       # A base more than 30 days behind its publisher stops the image (IMG-29).
       - name: Check the inputs are current
         run: python scripts/drift.py --enforce --report evidence/drift.json
+
+      # What was published is re-verified on every run, as a consumer would.
+      - name: Verify the latest published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tests/release_checks.py --bin "$RUNNER_TEMP/tools" --evidence evidence/release-latest.json
 
       - name: Score the image
         if: always()

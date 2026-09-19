@@ -4,7 +4,10 @@ This is what a hardened Datopsis container image is, what it refuses to do, and
 why. It is written to be read once, end to end, by an engineer who has never
 opened an SRG, and then applied.
 
-The testable form of each position is in [the criteria](criteria.md). What the
+The testable form of each position is in [the criteria](criteria.md). The
+[reference web server](../../examples/reference-web-server/README.md) in this
+repository is built to all of it, and shows each position in a real image. To
+align an image of your own, follow [adopting the standard](../ADOPTING.md). What the
 platform running the image must do is in [the platform expectations](platform.md).
 It follows [NIST SP 800-190](nist-800-190.md), the Application Container
 Security Guide, countermeasure by countermeasure, and the
