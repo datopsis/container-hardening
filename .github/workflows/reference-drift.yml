@@ -1,0 +1,46 @@
+name: Reference image drift
+
+# Reports how far the reference image's locked inputs are behind their
+# publishers. It has no write permission and changes nothing (IMG-04): a
+# refreshed lock is a pull request someone reviews. The report is the job
+# summary; CI on every change fails once a base is more than 30 days behind.
+
+on:
+  schedule:
+    - cron: "41 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reference-drift
+  cancel-in-progress: false
+
+jobs:
+  report:
+    name: report drift
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Report drift
+        working-directory: examples/reference-web-server
+        run: |
+          python scripts/drift.py --report "$RUNNER_TEMP/drift.json" | tee "$RUNNER_TEMP/drift.txt"
+          {
+            echo "## Reference image drift"
+            echo
+            echo '```text'
+            cat "$RUNNER_TEMP/drift.txt"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

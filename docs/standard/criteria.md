@@ -410,12 +410,53 @@ instead. See [ADR-0003](../adr/0003-secrets-reach-an-image-only-as-read-only-fil
   `/proc/*/cmdline`, in `/proc/1/environ`, or in the logs; the secret file is not
   writable by the runtime identity; a missing, empty, or world-readable secret
   file fails startup. Group read is expected: an image running under an
-  arbitrary UID in group 0 reads a mounted secret through its group.
+  arbitrary UID cannot own a mounted secret, so it reads one through a group it
+  belongs to. [Group read, by example](#group-read-by-example) shows both
+  cases.
 - **Expected:** No secret value appears in any process's arguments, in PID 1's
   environment, or in the logs; a malformed secret file stops startup.
 - **Evidence:** The secret-leak scan output; the negative-case results.
 - **Anchors:** [V-263660](../srg/general-purpose-operating-system-srg/rules/V-263660.md) → [SC-28(3)](../crosswalk/controls/sc-28.3.md)
 - **Platform:** [PLT-06](platform.md#plt-06-secrets-are-delivered-as-read-only-files)
+
+#### Group read, by example
+
+The runtime process may read a secret through a group it belongs to, and no
+other group; nobody else may read it at all.
+
+Under Podman or Docker, the process runs as an arbitrary UID with primary group
+0, so the secret is owned by root and group 0 and is readable by the group:
+
+```sh
+chown 0:0 server.key && chmod 0640 server.key      # -rw-r----- root root
+podman run --user 54321:0 --read-only \
+    --volume ./tls:/etc/nginx/tls:ro reference-web-server
+```
+
+UID 54321 does not own the key and is not root, so it reads it through group
+0. A mode of `0600` would be unreadable to it; `0644` would be readable by
+everyone, which the criterion refuses.
+
+Under Kubernetes and OpenShift, the platform does not use group 0 for a secret
+volume. It makes the files group-owned by the pod's `fsGroup`, and adds that
+group to the process's supplementary groups. OpenShift's restricted SCCs assign
+the `fsGroup` from the namespace's range:
+
+```yaml
+spec:
+  securityContext:
+    runAsNonRoot: true
+    fsGroup: 1000650000        # assigned by OpenShift from the namespace range
+  volumes:
+    - name: tls
+      secret:
+        secretName: reference-web-server-tls
+        defaultMode: 0440      # -r--r----- root 1000650000
+```
+
+The process, running as an arbitrary UID with 1000650000 among its groups,
+reads the key through that group. Kubernetes' default `defaultMode` is `0644`,
+world-readable, so a manifest must set it.
 
 ### IMG-17 Trust material supplied by the operator
 

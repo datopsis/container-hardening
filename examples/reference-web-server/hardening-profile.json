@@ -29,33 +29,11 @@
   ],
   "deviations": [
     {
-      "id": "DEV-001",
-      "kind": "criterion",
-      "target": "IMG-04",
-      "reason": "No drift job yet reports newer inputs; the lock is refreshed only by running acquire.py --refresh by hand.",
-      "compensating": "A refreshed lock is still a reviewed pull request; nothing edits it automatically.",
-      "owner": "Joey",
-      "approved_by": "Joey",
-      "recorded_on": "2026-09-19",
-      "expires_on": "2027-03-17"
-    },
-    {
-      "id": "DEV-002",
-      "kind": "criterion",
-      "target": "IMG-29",
-      "reason": "The base's age against the publisher's current release is not yet measured by any job.",
-      "compensating": "The base is refreshed by hand with acquire.py --refresh, and the lock records the date.",
-      "owner": "Joey",
-      "approved_by": "Joey",
-      "recorded_on": "2026-09-19",
-      "expires_on": "2027-03-17"
-    },
-    {
       "id": "DEV-003",
       "kind": "criterion",
       "target": "IMG-21",
-      "reason": "No release workflow yet generates or attests a bill of materials.",
-      "compensating": "The embedded package inventory records every installed package and is checked against the lock.",
+      "reason": "The bill of materials is generated from the image and checked in CI, but no release yet attests it to a published digest.",
+      "compensating": "Every CI run keeps the SPDX document with its evidence, and it is checked to cover every locked package.",
       "owner": "Joey",
       "approved_by": "Joey",
       "recorded_on": "2026-09-19",
@@ -84,28 +62,6 @@
       "expires_on": "2027-03-17"
     },
     {
-      "id": "DEV-006",
-      "kind": "criterion",
-      "target": "IMG-25",
-      "reason": "No vulnerability scan yet gates the build.",
-      "compensating": "The inputs are the current UBI 9 releases, refreshed by hand.",
-      "owner": "Joey",
-      "approved_by": "Joey",
-      "recorded_on": "2026-09-19",
-      "expires_on": "2027-03-17"
-    },
-    {
-      "id": "DEV-007",
-      "kind": "criterion",
-      "target": "IMG-28",
-      "reason": "No malware scan yet runs on the inputs or the image.",
-      "compensating": "Every input is verified by digest and Red Hat signature.",
-      "owner": "Joey",
-      "approved_by": "Joey",
-      "recorded_on": "2026-09-19",
-      "expires_on": "2027-03-17"
-    },
-    {
       "id": "DEV-008",
       "kind": "criterion",
       "target": "IMG-31",
@@ -122,17 +78,6 @@
       "target": "IMG-33",
       "reason": "This repository's default branch is not yet protected, which is Package 6 of the roadmap.",
       "compensating": "Changes arrive by pull request with CI; none is pushed directly by convention.",
-      "owner": "Joey",
-      "approved_by": "Joey",
-      "recorded_on": "2026-09-19",
-      "expires_on": "2027-03-17"
-    },
-    {
-      "id": "DEV-010",
-      "kind": "criterion",
-      "target": "IMG-34",
-      "reason": "No secret, static-analysis, or dependency scan yet runs before the build.",
-      "compensating": "The image contains no code of its own, only configuration and verified RPMs.",
       "owner": "Joey",
       "approved_by": "Joey",
       "recorded_on": "2026-09-19",

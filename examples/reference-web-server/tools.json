@@ -1,0 +1,44 @@
+{
+  "note": "The tools that judge the image are inputs too, and are pinned the same way (IMG-02). Each archive is verified against this digest before it is unpacked; a publisher's checksum file, fetched from the same place as the archive, is not relied on. Changing a version is a reviewed pull request.",
+  "tools": {
+    "syft": {
+      "version": "1.52.0",
+      "url": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.tar.gz",
+      "sha256": "caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d",
+      "size": 29289629,
+      "binary": "syft",
+      "purpose": "Bill of materials from the built image (IMG-21)"
+    },
+    "trivy": {
+      "version": "0.74.0",
+      "url": "https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz",
+      "sha256": "2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a",
+      "size": 50419107,
+      "binary": "trivy",
+      "purpose": "Vulnerability gate on the image (IMG-25); dependency, secret, and build-definition scan of the source (IMG-34)"
+    },
+    "grype": {
+      "version": "0.119.0",
+      "url": "https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_linux_amd64.tar.gz",
+      "sha256": "3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b",
+      "size": 30482169,
+      "binary": "grype",
+      "purpose": "Second, independent vulnerability gate on the bill of materials (IMG-25)"
+    },
+    "gitleaks": {
+      "version": "8.30.1",
+      "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz",
+      "sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+      "size": 8230402,
+      "binary": "gitleaks",
+      "purpose": "Committed-secret scan of the source (IMG-34)"
+    }
+  },
+  "images": {
+    "clamav": {
+      "reference": "docker.io/clamav/clamav@sha256:9cb27d7660bdf66e9878c832cb433dd8aa152cfbe16f3c2c0084c80b04ae22b4",
+      "tag": "stable",
+      "purpose": "Malware scan of the inputs and the image, with signatures refreshed in the same run (IMG-28)"
+    }
+  }
+}

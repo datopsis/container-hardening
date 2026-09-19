@@ -52,8 +52,12 @@ tmpfs mounts under `--read-only` unless given `--read-only-tmpfs=false`, which
 would hide a missing mount; the smoke suite always passes it.
 
 To serve TLS on 8443, mount a server block into `/etc/nginx/conf.d/`, and the
-certificate and key into `/etc/nginx/tls/`, all read-only. The image carries no
-trust anchors of its own; mount any the service needs.
+certificate and key into `/etc/nginx/tls/`, all read-only. The key must be
+readable by a group the server belongs to and by nobody else: owned `root:0`,
+mode `0640`, under Podman, as the smoke suite mounts it, or `defaultMode: 0440`
+with the pod's `fsGroup` under Kubernetes. Both are shown in
+[group read, by example](../../docs/standard/criteria.md#group-read-by-example).
+The image carries no trust anchors of its own; mount any the service needs.
 
 The healthcheck, `nginx -t`, proves the configuration parses. It does not prove
 the server answers; a platform's readiness probe should request a page.
