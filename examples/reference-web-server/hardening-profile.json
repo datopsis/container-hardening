@@ -6,7 +6,8 @@
   },
   "function": "Serves static content with nginx. It has no management interface, no user accounts, and hosts no application runtime.",
   "architectures": [
-    "amd64"
+    "amd64",
+    "arm64"
   ],
   "evidence": [
     {

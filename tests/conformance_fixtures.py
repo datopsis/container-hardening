@@ -10,7 +10,8 @@ Cases:
     pass          every expected file, every required criterion passing
     malformed     as pass, with one "passed" written as the string "false"
     failed-check  as pass, with one check failed
-    partial       as pass, with one per-architecture criterion unevidenced
+    partial       as pass, with one per-architecture criterion unevidenced on the
+                  last architecture only
 
 Usage:
     python tests/conformance_fixtures.py CASE OUT_DIR
@@ -56,12 +57,14 @@ def main() -> int:
             for name in names:
                 results = [{"id": "fixture." + c.lower(), "criterion": c, "check": "fixture for " + c, "passed": True}
                            for c in share[name]]
-                if architecture == profile["architectures"][0] and name == names[0]:
-                    if args.case == "malformed":
+                if name == names[0]:
+                    if args.case == "malformed" and architecture == profile["architectures"][0]:
                         results[0]["passed"] = "false"
-                    elif args.case == "failed-check":
+                    elif args.case == "failed-check" and architecture == profile["architectures"][0]:
                         results[0]["passed"] = False
-                    elif args.case == "partial" and scope == "architecture":
+                    # The gap is on the last architecture, with the first complete,
+                    # so the first cannot be seen to fill it.
+                    elif args.case == "partial" and architecture == profile["architectures"][-1]:
                         results = results[1:]
                 path = args.out / ("evidence-" + architecture) / name
                 path.parent.mkdir(parents=True, exist_ok=True)

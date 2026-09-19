@@ -180,7 +180,9 @@ hardening arm64 | 31/34 · 0123456 · 2026-09-19
 ```
 
 Each names its scope, the revision, and the day it was scored, so it never
-reads as more, or more current, than it is.
+reads as more, or more current, than it is. The reference image's badges are
+published to GitHub Pages from every run on main, under
+`https://datopsis.github.io/container-hardening/reference-web-server/`.
 
 | Colour | Means |
 | --- | --- |

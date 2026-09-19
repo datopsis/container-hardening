@@ -1,8 +1,9 @@
 name: Conformance self-test
 
 # Calls the conformance workflow the way an image's CI calls it, with evidence
-# that is complete, missing, malformed, failing, or partial, and with a
-# revision that does not bind, and checks each answer. The reference image's
+# that is complete, missing, malformed, failing, or partial, with one
+# architecture's evidence absent, and with a revision that does not bind, and
+# checks each answer. The reference image's
 # own CI is the passing caller with real evidence; this is every way a caller
 # can be wrong. See docs/EVIDENCE.md.
 
@@ -62,7 +63,9 @@ jobs:
             python tests/conformance_fixtures.py "$case" "$RUNNER_TEMP/fixtures/$case"
           done
 
-      - name: Keep the complete evidence
+      # The complete case as an image's CI uploads it: one artifact per
+      # architecture, the generic evidence with the first.
+      - name: Keep the complete amd64 evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: selftest-pass-amd64
@@ -70,29 +73,29 @@ jobs:
             ${{ runner.temp }}/fixtures/pass/evidence-amd64/
             ${{ runner.temp }}/fixtures/pass/evidence-generic/
 
+      - name: Keep the complete arm64 evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: selftest-pass-arm64
+          path: ${{ runner.temp }}/fixtures/pass/evidence-arm64/
+
       - name: Keep the malformed evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: selftest-malformed-amd64
-          path: |
-            ${{ runner.temp }}/fixtures/malformed/evidence-amd64/
-            ${{ runner.temp }}/fixtures/malformed/evidence-generic/
+          name: selftest-malformed-all
+          path: ${{ runner.temp }}/fixtures/malformed/
 
       - name: Keep the failing evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: selftest-failed-check-amd64
-          path: |
-            ${{ runner.temp }}/fixtures/failed-check/evidence-amd64/
-            ${{ runner.temp }}/fixtures/failed-check/evidence-generic/
+          name: selftest-failed-check-all
+          path: ${{ runner.temp }}/fixtures/failed-check/
 
       - name: Keep the partial evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: selftest-partial-amd64
-          path: |
-            ${{ runner.temp }}/fixtures/partial/evidence-amd64/
-            ${{ runner.temp }}/fixtures/partial/evidence-generic/
+          name: selftest-partial-all
+          path: ${{ runner.temp }}/fixtures/partial/
 
   pass:
     needs: fixtures
@@ -154,6 +157,19 @@ jobs:
       evidence-artifacts: selftest-partial-*
       score-artifact: selftest-score-partial
 
+  # Only the amd64 artifact: arm64 is declared, and its evidence is missing.
+  arm64-missing:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: ${{ github.sha }}
+      profile: examples/reference-web-server/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      enforce: false
+      evidence-artifacts: selftest-pass-amd64
+      score-artifact: selftest-score-arm64-missing
+
   # A full commit, but not the one the workflow runs from.
   wrong-revision:
     needs: fixtures
@@ -169,7 +185,7 @@ jobs:
 
   answers:
     name: check every answer
-    needs: [pass, missing, malformed, failed-check, partial, wrong-revision]
+    needs: [pass, missing, malformed, failed-check, partial, arm64-missing, wrong-revision]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -188,6 +204,7 @@ jobs:
               "malformed":      ("false", None,    "false", None),
               "failed-check":   ("true",  "true",  "false", None),
               "partial":        ("true",  "false", "false", "short"),
+              "arm64-missing":  ("false", None,    "false", None),
               "wrong-revision": ("true",  "true",  "false", None),
           }
           wrong = []

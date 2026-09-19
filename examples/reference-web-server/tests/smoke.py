@@ -162,7 +162,8 @@ def static_checks(suite: Suite, revision: str | None) -> None:
     else:
         body = archive.extractfile(manifest).read().decode()
         installed = {line.split("\t")[0] for line in body.splitlines()}
-        missing = [r["nevra"] for r in LOCK["rpms"] if r["nevra"] not in installed]
+        # The image's own architecture's lock, not the machine's.
+        missing = [r["nevra"] for r in LOCK["rpms"][config["Architecture"]] if r["nevra"] not in installed]
         suite.record("IMG-08", "smoke.inventory-mode-0444", "inventory is mode 0444", manifest.mode & 0o777 == 0o444, oct(manifest.mode))
         suite.record("IMG-08", "smoke.inventory-covers-lock", "inventory covers every locked package", not missing, ", ".join(missing))
     bundles = [n for n in members if n.startswith("etc/pki/ca-trust/extracted/") and members[n].isfile()] + \
