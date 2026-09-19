@@ -37,11 +37,13 @@ def main() -> int:
         if len(payload) != tool["size"] or digest != tool["sha256"]:
             print(name + ": does not match tools.json (" + digest + ", " + str(len(payload)) + " bytes)", file=sys.stderr)
             return 1
-        with tarfile.open(fileobj=io.BytesIO(payload)) as archive:
-            member = archive.getmember(tool["binary"])
-            target = args.bin / tool["binary"]
-            target.write_bytes(archive.extractfile(member).read())
-            target.chmod(0o755)
+        target = args.bin / tool["binary"]
+        if tool.get("archive", True):
+            with tarfile.open(fileobj=io.BytesIO(payload)) as archive:
+                target.write_bytes(archive.extractfile(archive.getmember(tool["binary"])).read())
+        else:
+            target.write_bytes(payload)
+        target.chmod(0o755)
         print("verified and installed " + name + " " + tool["version"])
     return 0
 

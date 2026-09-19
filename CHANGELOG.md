@@ -130,6 +130,21 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Added a worked example of group read to IMG-16, under Podman and under
   Kubernetes and OpenShift.
 
+- Added the adoption path: `docs/ADOPTING.md`, a step-by-step guide for an
+  image repository, and a reusable `conformance.yml` workflow an image
+  repository calls, pinned to a commit of this standard, to check its profile
+  and component definition and score its evidence. `scripts/score.py` scores
+  required criteria met with passing evidence and no active deviation, and
+  writes an SVG badge and a Shields endpoint file.
+- Gave the reference image its requirement statements, one per criterion, and
+  its OSCAL component definition, generated from the control baseline with its
+  own decisions for the controls the baseline leaves open. It scores 28/34 in
+  CI; its six gaps are recorded deviations.
+- Added a release job for the reference image: on a
+  `reference-web-server/v*` tag it publishes the verified image to GHCR under
+  that version only, signs it keylessly, attests its bill of materials and
+  SLSA provenance, and verifies all three before it finishes.
+
 ### Fixed
 
 - Corrected the process guide's register entry. Its title is *Container

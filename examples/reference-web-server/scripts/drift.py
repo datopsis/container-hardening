@@ -86,9 +86,13 @@ def main() -> int:
     rpms = rpm_drift()
     stale = [b for b in bases if b["days_behind"] > LIMIT_DAYS]
     args.report.parent.mkdir(parents=True, exist_ok=True)
+    results = [{
+        "criterion": "IMG-29", "check": "no base is more than " + str(LIMIT_DAYS) + " days behind its publisher",
+        "passed": not stale, "detail": ", ".join(b["base"] + " " + str(b["days_behind"]) + " days" for b in bases),
+    }]
     args.report.write_text(json.dumps({
         "checked_on": today.date().isoformat(), "lock_refreshed_on": LOCK.get("refreshed_on"),
-        "limit_days": LIMIT_DAYS, "bases": bases, "rpms": rpms,
+        "limit_days": LIMIT_DAYS, "bases": bases, "rpms": rpms, "results": results,
     }, indent=2) + "\n", encoding="utf-8")
 
     for base in bases:

@@ -204,6 +204,7 @@ def main() -> int:
     parser.add_argument("--register", type=Path, default=REGISTER, help="the source register (default: this repository's)")
     parser.add_argument("--baseline", type=Path, default=BASELINE, help="the control baseline (default: this repository's)")
     parser.add_argument("--today", type=datetime.date.fromisoformat, default=datetime.date.today(), help="evaluate expiry as of this date")
+    parser.add_argument("--report", type=Path, help="write the result as criterion evidence (IMG-26) to this file")
     args = parser.parse_args()
 
     profile = json.loads(args.profile.read_text(encoding="utf-8"))
@@ -211,6 +212,17 @@ def main() -> int:
     baseline = json.loads(args.baseline.read_text(encoding="utf-8"))
 
     violations, warnings = check(profile, register, baseline, args.today)
+    if args.report:
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+        args.report.write_text(json.dumps({
+            "checked_on": args.today.isoformat(),
+            "violations": violations, "warnings": warnings,
+            "results": [{
+                "criterion": "IMG-26",
+                "check": "every exception is a recorded deviation, none expired or over its limit",
+                "passed": not violations, "detail": "; ".join(violations),
+            }],
+        }, indent=2) + "\n", encoding="utf-8")
     for warning in warnings:
         print("warning: " + warning)
     for violation in violations:

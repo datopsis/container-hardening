@@ -131,7 +131,8 @@ def static_checks(suite: Suite, revision: str | None) -> None:
     suite.record("IMG-14", "every exposed port is 1024 or above", bool(ports) and min(ports) >= 1024, str(ports))
     labels = config["Config"].get("Labels") or {}
     required = ["org.opencontainers.image.source", "org.opencontainers.image.revision", "org.opencontainers.image.version",
-                "org.opencontainers.image.created", "org.opencontainers.image.base.name", "io.datopsis.lock.sha256"]
+                "org.opencontainers.image.created", "org.opencontainers.image.base.name",
+                "org.opencontainers.image.base.digest", "reference-web-server.lock.sha256"]
     missing = [label for label in required if not labels.get(label) or labels[label] == "unknown"]
     suite.record("IMG-23", "identifying labels are present", not missing, ", ".join(missing))
     if revision:

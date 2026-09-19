@@ -7,6 +7,8 @@ repository that names them.
 
 ## What adopting costs an image repository
 
+The step-by-step guide is [ADOPTING.md](../ADOPTING.md). In summary:
+
 An image repository adopts the standard by adding three files and running three
 checks, each against a pinned revision of this repository:
 

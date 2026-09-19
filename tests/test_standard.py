@@ -193,6 +193,9 @@ class LinkTests(unittest.TestCase):
             + [
                 REPOSITORY / "docs" / "CONTROL-MODEL.md",
                 REPOSITORY / "docs" / "TAILORING.md",
+                REPOSITORY / "docs" / "ADOPTING.md",
+                REPOSITORY / "examples" / "reference-web-server" / "README.md",
+                REPOSITORY / "examples" / "reference-web-server" / "requirements.md",
                 REPOSITORY / "docs" / "controls" / "README.md",
             ]
         )

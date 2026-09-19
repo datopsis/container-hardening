@@ -36,7 +36,7 @@ jobs:
       # the packages it derives from needs the packages, and is done by
       # verify-sources.yml.
       - name: Validate the register, catalogues, crosswalk, standard, controls, and tailoring
-        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls tests.test_tailoring tests.test_applicability -v
+        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls tests.test_tailoring tests.test_applicability tests.test_score -v
 
       # The diagrams need no source package, so their drift is checked here.
       - name: Check the diagrams match their generator
