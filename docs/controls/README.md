@@ -563,7 +563,7 @@ Where derivation would give the wrong answer. Each is held in [`artifacts/contro
 - **AC-11(1)** `not-applicable`. Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's.
 - **AC-17** `host-inherited`. Remote access to the system is administration of the platform (PLT-13). The image offers no remote access of its own (IMG-27).
 - **AC-17(1)** `host-inherited`. Remote access to the system is administration of the platform (PLT-13). The image offers no remote access of its own (IMG-27).
-- **AC-17(2)** `research-required`. Cryptographic protection of remote sessions. The platform protects registry transport and traffic leaving it (PLT-01, PLT-10), but an image that terminates TLS itself, as nginx-ubi does, implements part of this. Which applies depends on the image.
+- **AC-17(2)** `research-required`. Cryptographic protection of remote sessions. The platform protects registry transport and traffic leaving it (PLT-01, PLT-10), but an image that terminates TLS itself, as a web server or reverse proxy usually does, implements part of this. Which applies depends on the image.
 - **AC-17(3)** `host-inherited`. Remote access to the system is administration of the platform (PLT-13). The image offers no remote access of its own (IMG-27).
 - **AC-17(4)** `host-inherited`. Remote access to the system is administration of the platform (PLT-13). The image offers no remote access of its own (IMG-27).
 - **AC-18** `not-applicable`. Concerns a user's device or its radio, keyboard, or display. A container image has none, and runs on a server whose physical interfaces are the facility's.

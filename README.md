@@ -22,8 +22,9 @@ reinvented per application.
 | [NIST SP 800-190](docs/standard/nist-800-190.md) | Every countermeasure of the Application Container Security Guide, and what implements it. |
 | [Control baseline](docs/controls/README.md) | Every High-baseline control: who satisfies it, derived from the standard. |
 | [Control model](docs/CONTROL-MODEL.md) | How an image states its controls, and the checker that holds it to them. |
-| [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 391 rules today. |
+| [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 630 rules across four SRGs. |
 | [SRG to 800-53 crosswalk](docs/crosswalk/README.md) | Every rendered rule joined to NIST SP 800-53 Rev 5 through its CCIs. Derived, not hand-authored. |
+| [Adoption](docs/adoption/README.md) | How image repositories take the standard up, and the planned conformance badge. |
 | [Source register](artifacts/sources.json) | Eleven sources pinned by SHA-256, with role, rendering state, and redistribution terms. |
 | [Sources guide](docs/SOURCES.md) | How to obtain a package and regenerate the catalogue. |
 | [Roadmap](docs/ROADMAP.md) | What this repository is, and what remains. |

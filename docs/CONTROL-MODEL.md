@@ -1,9 +1,8 @@
 # Control model
 
 How a Datopsis image states what it contributes to each NIST SP 800-53 Rev 5
-control, and what it hands to someone else. It is carried over from
-`datopsis/nginx-ubi`, where it was written and first enforced, and generalized
-so that every image states it the same way.
+control, and what it hands to someone else, so that every image states it the
+same way.
 
 Where it lives, and why, is [ADR-0004](adr/0004-derive-the-control-baseline-here-validate-components-there.md).
 
@@ -92,8 +91,8 @@ static file server does not. Those are the ones each image decides.
 
 One entry per control, carrying properties in the namespace
 `https://datopsis.example/ns/oscal`. The namespace is an identifier, not a URL
-to resolve; it is the one nginx-ubi already uses, and changing it would orphan
-everything written against it.
+to resolve, and it is fixed: changing it would orphan every property written
+against it.
 
 ```json
 {
@@ -144,7 +143,8 @@ python ../container-hardening/scripts/check-component.py \
 ```
 
 `--requirement-pattern` sets the regular expression that finds requirement
-identifiers; the default matches nginx-ubi's `### L1-IMG-001` headings.
+identifiers; the default matches requirement headings of the form
+`### L1-IMG-001`.
 `--allow-incomplete` reports absent controls as warnings while a component
 definition is being written. It exits non-zero on any violation.
 

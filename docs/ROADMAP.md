@@ -60,8 +60,8 @@ revision and a replaced package is visible rather than silent.
 | DISA Container Hardening Process Guide | V1R2 | Process guide | n/a, prose |
 | NIST SP 800-190, Application Container Security Guide | Final, 2017 | Process guide | [Mapped, 24 countermeasures](standard/nist-800-190.md) |
 | DISA RHEL 9 STIG | V2R4 | Host controls | Not yet |
-| DISA Web Server SRG | V3R3 | Conditional | Not yet |
-| DISA Application Server SRG | V4R5 | Conditional | Not yet |
+| DISA Web Server SRG | V3R3 | Conditional | Yes, 102 rules |
+| DISA Application Server SRG | V4R5 | Conditional | Yes, 137 rules |
 | CIS Benchmarks | — | Cross-reference | Never — terms forbid it |
 
 **The GPOS SRG carries image-level controls.** Per DoD guidance it is used to
@@ -71,16 +71,17 @@ the Container Platform SRG; that one governs the platform, and most of it will
 originate as host-inherited for any image.
 
 A **conditional** source applies only to images of a particular function. The
-Application Server SRG is the worked example: it was assessed **not applicable**
-to `datopsis/nginx-ubi`, because 27 of its 137 rules presuppose a management
-interface or hosted applications and 18 refer to accounts, none of which that
-image has. Recording why a source does not apply is part of the standard, not
-an omission from it.
+Web Server SRG applies to an image that serves or proxies HTTP; the Application
+Server SRG to one that hosts an application runtime, and not to an image with
+no management interface, hosted applications, or accounts, which is what much
+of it presupposes. Recording why a source does not apply is part of the
+standard, not an omission from it.
 
 ## Package 1: sources and rendering
 
-- [ ] Render the RHEL 9 STIG, Web Server SRG, and Application Server SRG, which
-  are pinned but not yet converted.
+- [ ] Render the RHEL 9 STIG, which is pinned but not yet converted. Its
+  XCCDF digest must be pinned in the register first; the renderer skips a
+  package whose XCCDF is not.
 - [ ] Extend the weekly source verification to probe adjacent releases. It
   confirms a pinned package is unchanged, which is not the same as confirming
   it is current: DISA serves superseded releases alongside current ones, so a
@@ -96,7 +97,8 @@ an omission from it.
 
 - [ ] Agree a GPOS-derived OpenSCAP rule selection, so that
   [IMG-T3](standard/criteria.md#img-t3-compliance-scan) can become required.
-  `clickhouse-ubi` and `postgresql-ubi` currently scan against different ones.
+  It is built first as the reference image's SCAP tailoring, starting from the
+  SCAP Security Guide's RHEL 9 DISA STIG profile with host-only rules removed.
 - [ ] Define the exception register format that
   [IMG-26](standard/criteria.md#img-26-exceptions-expire) requires, together
   with the Package 4 deviation format; they are the same mechanism.
@@ -121,22 +123,15 @@ an omission from it.
 
 ## Package 5: adoption
 
-- [ ] Adopt in `datopsis/nginx-ubi` first, which already has the requirement
-  tree, trace matrix, and OSCAL component definition the mapping needs. Its
-  Package 5 is the reconciliation target.
-- [ ] Reconcile the two repositories' source registers. `nginx-ubi` currently
-  records the Container Platform SRG as unresolved at V2R1; the current release
-  is **V2R4** and it retrieves normally.
+- [ ] Adopt in the image repositories, in the order and with the per-repository
+  notes in [adoption](adoption/README.md#planned-order).
 - [ ] Run `scripts/check-component.py` in each image repository's CI, against a
-  pinned revision of this one. Run against `nginx-ubi` today it reports that
-  375 of 379 controls are absent and that its `cm-6` and `ac-6` entries do not
-  yet cite a criterion.
-- [ ] Close the gaps in the [conformance snapshot](standard/conformance.md).
-  The largest are `clickhouse-ubi`'s build (IMG-02, IMG-03) and secrets
-  (IMG-16), and the missing release workflows in `seaweedfs-ubi` and
-  `lakekeeper-ubi` (IMG-21, IMG-22). No image yet asserts IMG-14.
-- [ ] Define what adoption costs a repository: which files it must add, which
-  checks it must run, and what it must publish.
+  pinned revision of this one.
+- [ ] Close the gaps in the [adoption snapshot](adoption/snapshot-2026-09-18.md),
+  then delete it: each image repository tracks its own from then on.
+- [ ] Build the [conformance score and badge](adoption/README.md#plan-a-conformance-score-and-badge):
+  `scripts/score.py`, and a criteria evidence file in each image repository
+  mapping every required criterion to the tests that establish it.
 
 ## Package 6: publication
 
@@ -145,14 +140,16 @@ an omission from it.
   sites; neither is necessary for the content to be useful.
 - [ ] Add link checking and Markdown linting to CI. Register validation and
   weekly source verification are in place.
-- [ ] Protect `main` and require the checks, matching `datopsis/nginx-ubi`.
+- [ ] Protect `main` and require the checks.
 
 ## What the scaffold already established
 
 - `scripts/build-srg-markdown.py` converts a DISA XCCDF package into one
-  Markdown file per rule, with `--check` for drift. 391 rules across two
-  catalogues render today.
-- `docs/srg/` holds the generated Container Platform SRG V2R4 and GPOS SRG V3R3.
+  Markdown file per rule, with `--check` for drift. 630 rules across four
+  catalogues render today, and only packages whose XCCDF digest is pinned are
+  rendered.
+- `docs/srg/` holds the generated Container Platform SRG V2R4, GPOS SRG V3R3,
+  Web Server SRG V3R3, and Application Server SRG V4R5.
 - `artifacts/sources.json` pins eleven sources by digest, recording for each its
   role, whether it has been rendered, and whether it may be redistributed. All
   ten retrievable sources were verified against their recorded digests on
@@ -160,8 +157,10 @@ an omission from it.
 - `scripts/build-cci-crosswalk.py` joins every rendered rule's CCIs to 800-53
   Rev 5 through the pinned DISA CCI list, resolved against the pinned OSCAL
   catalogue. `docs/crosswalk/` and `artifacts/crosswalk.json` hold the result:
-  the Container Platform SRG reaches 80 controls and the GPOS SRG 97, 106
-  distinct. Every cited CCI resolved, and none was deprecated or unmapped. See
+  120 distinct controls across the four rendered SRGs. Every cited CCI resolved
+  and none was deprecated; three Web Server SRG rules cite CCIs that DISA maps
+  only to Revision 4 controls Revision 5 withdraws, which the crosswalk reports
+  as findings rather than dropping. See
   [ADR-0002](adr/0002-derive-800-53-cross-references-from-cci.md).
 - `scripts/verify-sources.py` re-verifies those digests and never edits the
   register: a replaced release is a finding to read, not a digest to update.
@@ -174,15 +173,14 @@ an omission from it.
 - [`docs/standard/`](standard/README.md) holds the standard: the prose account,
   30 required image criteria and three targets, 17 platform and 4 host
   expectations, a countermeasure-by-countermeasure mapping of NIST SP 800-190,
-  a comparison with the DISA Container Hardening Process Guide, and a
-  conformance snapshot of the five image repositories. `tests/test_standard.py` checks that
+  and a comparison with the DISA Container Hardening Process Guide.
+  `tests/test_standard.py` checks that
   every cited SRG rule reaches the 800-53 control cited beside it, that image
   criteria cite only image rules and platform expectations only platform rules,
   and that every link and anchor resolves.
-- [`docs/CONTROL-MODEL.md`](CONTROL-MODEL.md) carries the nginx-ubi control
-  model across, generalized: six originations, matching roles, and a
-  verification pointer that now names both a standard criterion and a
-  requirement the image states. [`docs/controls/`](controls/README.md) holds the
+- [`docs/CONTROL-MODEL.md`](CONTROL-MODEL.md) defines the control model: six
+  originations, matching roles, and a verification pointer naming both a
+  standard criterion and a requirement the image states. [`docs/controls/`](controls/README.md) holds the
   derived baseline for 379 controls: 20 image-owned, 13 deployment-configured,
   50 host-inherited, 228 organization-inherited, 11 not applicable, and 57
   left to each image. `scripts/check-component.py` checks an image's OSCAL

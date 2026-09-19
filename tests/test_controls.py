@@ -204,6 +204,19 @@ class CheckerTests(unittest.TestCase):
         self.entries[0]["props"].append(prop("cross-reference", "no source id"))
         self.assertTrue(any("cross-reference" in v for v in self.violations()))
 
+    def test_a_cross_reference_to_a_rule_that_does_not_exist_is_a_violation(self) -> None:
+        rules = checker.rendered_rules()
+        self.entries[0]["props"].append(prop("cross-reference", "disa-web-server-srg:V-000000"))
+        found, _ = checker.check(component(self.entries), self.baseline, self.requirements, False, rules)
+        self.assertTrue(any("names no rule in the rendered disa-web-server-srg" in v for v in found), found)
+
+    def test_a_cross_reference_to_a_real_rule_passes(self) -> None:
+        rules = checker.rendered_rules()
+        real = sorted(rules["disa-web-server-srg"])[0]
+        self.entries[0]["props"].append(prop("cross-reference", "disa-web-server-srg:" + real))
+        found, _ = checker.check(component(self.entries), self.baseline, self.requirements, False, rules)
+        self.assertEqual(found, [])
+
     def test_a_duplicated_control_is_a_violation(self) -> None:
         entries = self.entries + [copy.deepcopy(self.entries[0])]
         self.assertTrue(any("more than once" in v for v in self.violations(entries)))

@@ -118,8 +118,8 @@ the RHEL 9 STIG for the host. An OpenSCAP scan of the image is a
 
 **The mechanisms are our own.** Where the guide names a product (Prisma,
 StackRox, Anchore, ClamAV, GPG, Jenkins), the standard names the property and
-leaves the product to the image repository. Current images use Trivy and Grype
-for scanning and keyless cosign for signing.
+leaves the product to the image repository. Trivy and Grype for scanning and
+keyless cosign for signing are the products this standard's examples use.
 
 ## What the guide asks for that the standard does not yet cover
 

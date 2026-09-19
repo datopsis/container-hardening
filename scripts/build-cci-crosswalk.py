@@ -39,6 +39,7 @@ OUTPUT = REPOSITORY / "docs" / "crosswalk"
 
 CCI = "{http://iase.disa.mil/cci}"
 REV5 = "NIST SP 800-53 Revision 5"
+REV4 = "NIST SP 800-53 Revision 4"
 
 CCI_SOURCE = "disa-cci-list"
 CATALOGUE_SOURCE = "nist-sp800-53r5-catalog"
@@ -128,6 +129,21 @@ def control_id(reference: str) -> str | None:
     return oscal
 
 
+def unmapped_note(entry: dict, controls: dict) -> str:
+    """Say what DISA maps a CCI to when it gives no Rev 5 reference."""
+    if not entry["rev4"]:
+        return "No Rev 5 reference, and no Rev 4 one either"
+    parts = []
+    for reference in entry["rev4"]:
+        identifier = control_id(reference)
+        control = controls.get(identifier) if identifier else None
+        if control is not None and control.withdrawn:
+            parts.append("Rev 4 " + reference + ", which Rev 5 withdraws")
+        else:
+            parts.append("Rev 4 " + reference)
+    return "No Rev 5 reference; DISA maps it only to " + "; ".join(parts)
+
+
 def load_cci_list(path: Path) -> tuple[str, dict[str, dict]]:
     root = ET.parse(path).getroot()
     version = (root.findtext(CCI + "metadata/" + CCI + "version") or "").strip()
@@ -139,6 +155,11 @@ def load_cci_list(path: Path) -> tuple[str, dict[str, dict]]:
                 ref.get("index", "").strip()
                 for ref in item.iter(CCI + "reference")
                 if ref.get("title") == REV5
+            ],
+            "rev4": [
+                ref.get("index", "").strip()
+                for ref in item.iter(CCI + "reference")
+                if ref.get("title") == REV4
             ],
         }
     return version, items
@@ -226,7 +247,7 @@ def build() -> dict[Path, str]:
     catalogues.sort(key=lambda pair: pair[0].title)
 
     citations: dict[str, list[Citation]] = {}
-    unmapped: list[tuple[str, str, str]] = []
+    unmapped: list[tuple[str, str, str, str]] = []
     uncited: list[tuple[str, str]] = []
     deprecated: list[tuple[str, str, str]] = []
     data_catalogues = []
@@ -248,7 +269,7 @@ def build() -> dict[Path, str]:
                 if entry["status"] == "deprecated":
                     deprecated.append((catalogue.slug, rule.group_id, cci))
                 if not entry["rev5"]:
-                    unmapped.append((catalogue.slug, rule.group_id, cci))
+                    unmapped.append((catalogue.slug, rule.group_id, cci, unmapped_note(entry, controls)))
 
                 by_control: dict[str, list[str]] = {}
                 for reference in entry["rev5"]:
@@ -424,7 +445,7 @@ def index_page(
     titles: dict[str, str],
     cci_version: str,
     catalogue_version: str,
-    unmapped: list[tuple[str, str, str]],
+    unmapped: list[tuple[str, str, str, str]],
     deprecated: list[tuple[str, str, str]],
     uncited: list[tuple[str, str]],
 ) -> str:
@@ -481,8 +502,8 @@ def index_page(
         out.append("| --- | --- | --- | --- |")
         for slug, group_id, cci in deprecated:
             out.append("| " + titles[slug] + " | `" + group_id + "` | `" + cci + "` | Deprecated in the CCI list |")
-        for slug, group_id, cci in unmapped:
-            out.append("| " + titles[slug] + " | `" + group_id + "` | `" + cci + "` | No Rev 5 reference |")
+        for slug, group_id, cci, note in unmapped:
+            out.append("| " + titles[slug] + " | `" + group_id + "` | `" + cci + "` | " + note + " |")
         for slug, group_id in uncited:
             out.append("| " + titles[slug] + " | `" + group_id + "` | | Cites no CCI |")
     out.append("")

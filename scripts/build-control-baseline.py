@@ -50,13 +50,12 @@ SEARCH_ROOTS = (REPOSITORY, REPOSITORY / "sources")
 CATALOGUE_SOURCE = "nist-sp800-53r5-catalog"
 BASELINE_SOURCE = "nist-sp800-53r5-high-baseline"
 
-# The namespace nginx-ubi's component definition already uses. It is an
-# identifier, not a URL anyone resolves, and changing it would orphan every
-# property already written against it.
+# An identifier, not a URL anyone resolves. It is fixed: changing it would
+# orphan every property written against it.
 NAMESPACE = "https://datopsis.example/ns/oscal"
 
-# Origination values and the role that must act on each, carried from the
-# nginx-ubi control model unchanged.
+# Origination values and the role that must act on each. See
+# docs/CONTROL-MODEL.md.
 ROLES = {
     "image-owned": "image-project",
     "deployment-configured": "deployment-profile",

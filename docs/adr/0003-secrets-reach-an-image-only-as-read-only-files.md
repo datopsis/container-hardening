@@ -9,17 +9,17 @@ decision-makers: Joey
 ## Context and Problem Statement
 
 Every service a Datopsis image packages needs at least one secret: a database
-password, an S3 identity, an encryption key, a TLS private key. The images
-currently disagree about how that secret arrives:
+password, an S3 identity, an encryption key, a TLS private key. Three
+patterns are common in container images, and each is found in practice:
 
-* `postgresql-ubi` reads secrets only from `_FILE` paths. It rejects a symlink,
-  an empty file, or a permissive mode, and tests that no secret appears in any
-  process's arguments, in PID 1's environment, or in the logs.
-* `lakekeeper-ubi` takes its secrets only from environment variables and has no
-  file interface.
-* `clickhouse-ubi` accepts either. Its example `compose.yaml` ships
-  `CLICKHOUSE_PASSWORD: change-me`, and its entrypoint passes the password to
-  the client on the command line.
+* **Files only.** The image reads secrets only from `_FILE` paths, rejects a
+  symlink, an empty file, or a permissive mode, and tests that no secret
+  appears in any process's arguments, in PID 1's environment, or in the logs.
+* **Environment only.** The image takes its secrets only from environment
+  variables and has no file interface.
+* **Either.** The image accepts both. Its examples ship a default password such
+  as `change-me` in an environment variable, and its entrypoint passes the
+  password to a client on the command line.
 * The DISA Container Hardening Process Guide says secrets belong in a secret
   store, and elsewhere suggests base64 to "obfuscate and encrypt" them. Base64
   is an encoding.
@@ -58,7 +58,7 @@ describe command, a crash dump, a support bundle, and a child process that
 logs its environment are each a disclosure nobody chose.
 
 *Either, file preferred* was the real alternative. It keeps upstream
-compatibility, and it is roughly where `clickhouse-ubi` is today. It lost
+compatibility, and it is the most common pattern. It lost
 because a preference is not testable. An image that accepts both will be
 deployed with the environment variable, because that is what the upstream
 documentation shows, and the image's own tests cannot tell whether a given
@@ -76,8 +76,8 @@ could also replace it.
 * Good: one rule across every image, so a platform delivers secrets the same
   way to all of them
 * Bad: breaks compatibility with upstream documentation and with deployments
-  that set the upstream environment variable. `lakekeeper-ubi` and
-  `clickhouse-ubi` must change, and their users with them
+  that set the upstream environment variable. An image that takes secrets
+  from the environment must change, and so must its users
 * Bad: some upstream programs accept a secret only from the environment. There
   the image's entrypoint must read the file and pass the value on. That
   reintroduces the environment for one process, and it must be recorded as a
