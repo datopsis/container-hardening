@@ -38,7 +38,10 @@ identifier.
 | [IMG-23](criteria.md#img-23-identifying-labels) Labels | Partial | Met | Partial | Partial | Partial |
 | [IMG-25](criteria.md#img-25-vulnerability-gate-and-remediation) Vulnerabilities | Partial | Met | Partial | No | Partial |
 
-Criteria not in the table were not assessed.
+Criteria not in the table were not assessed. IMG-27 to IMG-30 were added from
+NIST SP 800-190 after this snapshot was taken and have not been assessed. None of the five images scans for malware (IMG-28).
+seaweedfs-ubi already checks the sockets it opens, which is the start of
+IMG-30.
 
 ## What the table shows
 

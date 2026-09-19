@@ -53,6 +53,16 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Recorded [ADR-0003](docs/adr/0003-secrets-reach-an-image-only-as-read-only-files.md):
   secrets reach an image only as read-only files.
 
+- Adopted NIST SP 800-190, the Application Container Security Guide. It is
+  pinned in the register, and `docs/standard/nist-800-190.md` assigns each of
+  its 24 countermeasures to the criteria or expectations that implement it,
+  with a test that fails if one is missing. Following it added IMG-27 (no
+  remote administration), IMG-28 (malware scan), IMG-29 (base kept current),
+  and IMG-30 (expected behaviour declared); PLT-12 to PLT-17 for the
+  registry, orchestrator, and runtime tiers; and host expectations HST-01 to
+  HST-04. It also tightened IMG-13 (default seccomp and SELinux) and IMG-25
+  (every layer scanned).
+
 ### Fixed
 
 - Corrected the process guide's register entry. Its title is *Container

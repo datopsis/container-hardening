@@ -127,6 +127,24 @@
       "notes": "Prose process guidance, not a rule catalogue, so it has no XCCDF and cannot be rendered by the SRG converter. The title is the one on the cover; the file is published as Final_DevSecOps_Enterprise_Container_Hardening_Guide_1.2.pdf, and an earlier revision of this register took its title from that filename. Much of it is Iron Bank and Platform One process. docs/standard/process-guide.md records where this standard follows it and where it departs."
     },
     {
+      "id": "nist-sp800-190",
+      "publisher": "National Institute of Standards and Technology",
+      "title": "NIST SP 800-190, Application Container Security Guide",
+      "release": "Final",
+      "released_on": "2017-09-25",
+      "retrieved_on": "2026-09-18",
+      "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-190.pdf",
+      "sha256": "0ebad52c4a3aba971b3a707b056e57238d1c4ad8f212dffd461ff9f5fed1bdb6",
+      "size": 666229,
+      "xccdf": null,
+      "rendered": null,
+      "status": "pinned",
+      "role": "process-guide",
+      "license": "Not subject to copyright in the United States; see NIST usage terms",
+      "redistributable": true,
+      "notes": "The only NIST publication specific to container security, and the one the DISA Container Hardening Process Guide requires images to be consistent with (Appendix B). Its Section 4 countermeasures are mapped one by one in docs/standard/nist-800-190.md. Confirmed current on 2026-09-18: CSRC lists the September 2017 final with no revision or draft since. Its Appendix B maps container technologies to 800-53 Revision 4, not Revision 5, so it is cited but not joined to the spine."
+    },
+    {
       "id": "disa-rhel9-stig",
       "publisher": "Defense Information Systems Agency",
       "title": "Red Hat Enterprise Linux 9 Security Technical Implementation Guide",

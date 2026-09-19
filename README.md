@@ -16,11 +16,12 @@ reinvented per application.
 | | |
 | --- | --- |
 | [**The standard**](docs/standard/README.md) | What a hardened Datopsis image is, and why. Start here. |
-| [Image criteria](docs/standard/criteria.md) | The standard as 26 testable properties, each anchored to an SRG rule. |
-| [Platform expectations](docs/standard/platform.md) | What the platform must impose for the image's properties to count. |
+| [Image criteria](docs/standard/criteria.md) | The standard as 30 testable properties, each anchored to an SRG rule. |
+| [Platform expectations](docs/standard/platform.md) | What the platform and host must impose for the image's properties to count. |
+| [NIST SP 800-190](docs/standard/nist-800-190.md) | Every countermeasure of the Application Container Security Guide, and what implements it. |
 | [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 391 rules today. |
 | [SRG to 800-53 crosswalk](docs/crosswalk/README.md) | Every rendered rule joined to NIST SP 800-53 Rev 5 through its CCIs. Derived, not hand-authored. |
-| [Source register](artifacts/sources.json) | Ten sources pinned by SHA-256, with role, rendering state, and redistribution terms. |
+| [Source register](artifacts/sources.json) | Eleven sources pinned by SHA-256, with role, rendering state, and redistribution terms. |
 | [Sources guide](docs/SOURCES.md) | How to obtain a package and regenerate the catalogue. |
 | [Roadmap](docs/ROADMAP.md) | What this repository is, and what remains. |
 | [Decisions](docs/adr/README.md) | Decisions that are expensive to reverse. |

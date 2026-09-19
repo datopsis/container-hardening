@@ -58,6 +58,7 @@ revision and a replaced package is visible rather than silent.
 | DISA Container Platform SRG | V2R4 | Platform controls | Yes, 188 rules |
 | DISA GPOS SRG | V3R3 | **Image controls** | Yes, 203 rules |
 | DISA Container Hardening Process Guide | V1R2 | Process guide | n/a, prose |
+| NIST SP 800-190, Application Container Security Guide | Final, 2017 | Process guide | [Mapped, 24 countermeasures](standard/nist-800-190.md) |
 | DISA RHEL 9 STIG | V2R4 | Host controls | Not yet |
 | DISA Web Server SRG | V3R3 | Conditional | Not yet |
 | DISA Application Server SRG | V4R5 | Conditional | Not yet |
@@ -96,8 +97,6 @@ an omission from it.
 - [ ] Agree a GPOS-derived OpenSCAP rule selection, so that
   [IMG-T3](standard/criteria.md#img-t3-compliance-scan) can become required.
   `clickhouse-ubi` and `postgresql-ubi` currently scan against different ones.
-- [ ] Decide whether to adopt antivirus scanning of retrieved build inputs,
-  which the DISA process guide asks for and the standard does not yet require.
 - [ ] Define the exception register format that
   [IMG-26](standard/criteria.md#img-26-exceptions-expire) requires, together
   with the Package 4 deviation format; they are the same mechanism.
@@ -155,9 +154,9 @@ an omission from it.
   Markdown file per rule, with `--check` for drift. 391 rules across two
   catalogues render today.
 - `docs/srg/` holds the generated Container Platform SRG V2R4 and GPOS SRG V3R3.
-- `artifacts/sources.json` pins ten sources by digest, recording for each its
+- `artifacts/sources.json` pins eleven sources by digest, recording for each its
   role, whether it has been rendered, and whether it may be redistributed. All
-  nine retrievable sources were verified against their recorded digests on
+  ten retrievable sources were verified against their recorded digests on
   2026-09-18.
 - `scripts/build-cci-crosswalk.py` joins every rendered rule's CCIs to 800-53
   Rev 5 through the pinned DISA CCI list, resolved against the pinned OSCAL
@@ -174,9 +173,10 @@ an omission from it.
   Markdown against the real packages weekly.
 - `.gitignore` keeps source packages out of the repository.
 - [`docs/standard/`](standard/README.md) holds the standard: the prose account,
-  26 required image criteria and three targets, 11 platform expectations, a
-  comparison with the DISA Container Hardening Process Guide, and a conformance
-  snapshot of the five image repositories. `tests/test_standard.py` checks that
+  30 required image criteria and three targets, 17 platform and 4 host
+  expectations, a countermeasure-by-countermeasure mapping of NIST SP 800-190,
+  a comparison with the DISA Container Hardening Process Guide, and a
+  conformance snapshot of the five image repositories. `tests/test_standard.py` checks that
   every cited SRG rule reaches the 800-53 control cited beside it, that image
   criteria cite only image rules and platform expectations only platform rules,
   and that every link and anchor resolves.
