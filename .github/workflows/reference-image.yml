@@ -1,0 +1,79 @@
+name: Reference image
+
+# Builds the reference web server the way every Datopsis image is built, and
+# verifies it against the criteria: inputs retrieved and verified in their own
+# step, assembly with networking disabled, a defective input shown to stop the
+# build, and a smoke suite reading every property back from the running image.
+# The evidence each step produces is kept with the run.
+
+on:
+  pull_request:
+    paths:
+      - "examples/reference-web-server/**"
+      - ".github/workflows/reference-image.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "examples/reference-web-server/**"
+      - ".github/workflows/reference-image.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reference-image-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: examples/reference-web-server
+
+jobs:
+  verify:
+    name: build and verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - name: Show the container engine
+        run: podman version
+
+      # Deviations are the exception register; an expired one fails here (IMG-26).
+      - name: Check the hardening profile
+        working-directory: .
+        run: python scripts/check-profile.py examples/reference-web-server/hardening-profile.json
+
+      # The only step with network access to inputs. It verifies every one
+      # against the lock before the build ever sees it.
+      - name: Retrieve and verify inputs
+        run: python scripts/acquire.py "$RUNNER_TEMP/bundle"
+
+      - name: Show a defective input stops the build
+        run: python tests/build_checks.py "$RUNNER_TEMP/bundle" --evidence evidence/build.json
+
+      - name: Build with networking disabled
+        run: python scripts/build.py "$RUNNER_TEMP/bundle" --tag localhost/reference-web-server:ci
+
+      - name: Verify the image against the criteria
+        env:
+          REVISION: ${{ github.sha }}
+        run: python tests/smoke.py localhost/reference-web-server:ci --revision "$REVISION" --evidence evidence/smoke.json
+
+      - name: Keep the evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: reference-image-evidence
+          path: examples/reference-web-server/evidence/
+          if-no-files-found: warn

@@ -106,6 +106,16 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (source and dependency scanning), PLT-18 (workload identity), and target
   IMG-T4 (SLSA Build Level 3).
 
+- Added the reference web server, `examples/reference-web-server/`: a generic
+  nginx image on UBI 9 Micro and the template for new images. Its lock pins
+  both bases by manifest-list digest and nine RPMs by SHA-256 and Red Hat
+  signing key; `acquire.py` is the only step with network access; assembly
+  runs with networking disabled and re-verifies every digest and signature.
+  CI shows a tampered or missing input stops the build, and a smoke suite reads
+  every runtime property back from the running image, 41 checks across 20
+  criteria, recording the evidence. What it does not yet evidence is recorded
+  as expiring deviations in its profile.
+
 ### Fixed
 
 - Corrected the process guide's register entry. Its title is *Container
