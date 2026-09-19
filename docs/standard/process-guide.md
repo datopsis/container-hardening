@@ -51,6 +51,8 @@ purpose and chooses its own mechanism, as below.
 | p13 note | A changed Dockerfile goes through hardening again | Every change runs the full criteria in CI |
 | §2.2; Appendix C | Containers inherit many controls from the platform and host | The [three layers](README.md#three-layers-and-why-they-stay-apart), made control-by-control through the [crosswalk](../crosswalk/README.md) |
 | Appendix D §6.1 | Evaluate findings; remediate true positives; document false positives | [IMG-25](criteria.md#img-25-vulnerability-gate-and-remediation), [IMG-26](criteria.md#img-26-exceptions-expire) |
+| §7.1 step 1f | Scan downloaded inputs with antivirus | [IMG-28](criteria.md#img-28-malware-scan), which also scans the built image |
+| Appendix B | Be consistent with NIST SP 800-190 | [The SP 800-190 mapping](nist-800-190.md), every countermeasure |
 | §2.6 | Stop the build on a new CVE | [IMG-25](criteria.md#img-25-vulnerability-gate-and-remediation), for fixed Critical and High |
 
 ## Where the standard goes further
@@ -121,9 +123,6 @@ for scanning and keyless cosign for signing.
 
 ## What the guide asks for that the standard does not yet cover
 
-- **Antivirus scanning of downloaded inputs** (§7.1 step 1f). Verifying inputs by
-  digest and signature establishes they are the reviewed bytes; it does not
-  establish those bytes are benign. Not yet adopted.
 - **Scanning candidate base images before choosing one** (§2.1 step 4). Each
   base refresh is scanned in CI once it is proposed, which is later than the
   guide asks.

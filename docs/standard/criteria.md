@@ -72,6 +72,19 @@ that merges without review.
   rather than commits.
 - **Anchors:** [V-203720](../srg/general-purpose-operating-system-srg/rules/V-203720.md) → [CM-14](../crosswalk/controls/cm-14.md)
 
+### IMG-29 Base kept current
+
+**Required.** The base image is refreshed whenever its publisher releases a
+security update, and never falls more than 30 days behind the publisher's
+current release. A current base is not the same as a patched one: the base
+carries fixes nobody has scanned for yet.
+
+- **Test:** the drift report from [IMG-04](#img-04-input-refresh-is-a-reviewed-change)
+  records the age of the pinned base against the publisher's current digest;
+  a release whose base is more than 30 days behind fails.
+- **Anchors:** [V-259333](../srg/general-purpose-operating-system-srg/rules/V-259333.md) → [SI-2](../crosswalk/controls/si-2.md); [V-278977](../srg/general-purpose-operating-system-srg/rules/V-278977.md) → [SA-22](../crosswalk/controls/sa-22.md)
+- **Source:** [NIST SP 800-190 §4.1.2](nist-800-190.md#image)
+
 ### IMG-05 No secrets in the build
 
 **Required.** No credential is passed as a build argument, copied into a layer,
@@ -102,6 +115,19 @@ features are declared and compared against the built image.
 - **Test:** `curl`, `wget`, and compilers are absent; the service's reported
   feature or module set matches a committed declaration.
 - **Anchors:** [V-203637](../srg/general-purpose-operating-system-srg/rules/V-203637.md) → [CM-7](../crosswalk/controls/cm-7.md); [V-203722](../srg/general-purpose-operating-system-srg/rules/V-203722.md) → [CM-7(5)](../crosswalk/controls/cm-7.5.md)
+
+### IMG-27 No remote administration
+
+**Required.** The image contains no SSH server, remote shell, or other remote
+administration service, and the service it packages exposes no administrative
+interface that is not part of its declared function. A container is
+administered by replacing it, or through the runtime's own interface.
+
+- **Test:** `sshd`, `telnetd`, and equivalent daemons are absent; the declared
+  listeners in [IMG-30](#img-30-expected-behaviour-is-declared) contain no
+  remote administration port.
+- **Anchors:** [V-203655](../srg/general-purpose-operating-system-srg/rules/V-203655.md) → [SC-2](../crosswalk/controls/sc-2.md); [V-203637](../srg/general-purpose-operating-system-srg/rules/V-203637.md) → [CM-7](../crosswalk/controls/cm-7.md)
+- **Source:** [NIST SP 800-190 §4.1.2](nist-800-190.md#image)
 
 ### IMG-08 Embedded package inventory
 
@@ -159,7 +185,10 @@ non-root UID in group 0.
 
 - **Test:** under `--cap-drop ALL` and `no-new-privileges`, every process
   reports `CapEff` of zero and `NoNewPrivs` of 1 in `/proc/*/status`. Passing
-  the flags is not evidence they applied.
+  the flags is not evidence they applied. The suite also runs with the
+  runtime's default seccomp profile in force, never `unconfined`, and, on an
+  SELinux host, in enforcing mode with the default container type.
+- **Source:** [NIST SP 800-190 §4.4.3](nist-800-190.md#container)
 - **Anchors:** [V-203696](../srg/general-purpose-operating-system-srg/rules/V-203696.md) → [AC-6(8)](../crosswalk/controls/ac-6.8.md)
 - **Platform:** [PLT-02](platform.md#plt-02-least-privilege-is-imposed)
 
@@ -246,6 +275,24 @@ image's documentation states what the healthcheck proves.
 - **Anchors:** No rendered SRG rule. Required by the
   [DISA process guide](process-guide.md), which asks for a healthcheck.
 
+### IMG-30 Expected behaviour is declared
+
+**Required.** The image declares, in a committed machine-readable file, what it
+does when it runs: its processes, its listening ports and protocols, its
+writable paths, and the outbound destinations it needs. The smoke suite runs
+the image and compares what it actually does with the declaration.
+
+A declaration is what lets the platform tell normal from anomalous. A runtime
+monitor that has to learn an image's behaviour by watching it cannot tell a
+compromise that happens during the learning period from the baseline.
+
+- **Test:** while the service runs, the processes in `/proc`, the listening
+  sockets, and the paths written match the declaration, and every declared port
+  is at least 1024 ([IMG-14](#img-14-unprivileged-ports)).
+- **Anchors:** [V-203638](../srg/general-purpose-operating-system-srg/rules/V-203638.md) → [CM-7](../crosswalk/controls/cm-7.md)
+- **Platform:** [PLT-16](platform.md#plt-16-runtime-behaviour-is-monitored)
+- **Source:** [NIST SP 800-190 §4.4.2, §4.4.4](nist-800-190.md#container)
+
 ## Release
 
 ### IMG-21 Bill of materials
@@ -294,9 +341,27 @@ available, it ships within 7 days for Critical or CISA KEV, 14 days for High,
 and 30 days otherwise.
 
 - **Test:** the scan step fails the build on fixed Critical or High findings;
-  the full findings report is attached to the release.
+  the full findings report is attached to the release. The scan covers every
+  layer, not only the base's packages: an upstream binary or archive is scanned
+  through the components the SBOM records for it.
+- **Source:** [NIST SP 800-190 §4.1.1](nist-800-190.md#image)
 - **Anchors:** [V-259333](../srg/general-purpose-operating-system-srg/rules/V-259333.md) → [SI-2](../crosswalk/controls/si-2.md); [V-203755](../srg/general-purpose-operating-system-srg/rules/V-203755.md) → [SI-2(6)](../crosswalk/controls/si-2.6.md)
 - **Platform:** [PLT-08](platform.md#plt-08-images-are-scanned-and-replaced)
+
+### IMG-28 Malware scan
+
+**Required.** Each built image is scanned for malware, with signatures updated
+before the scan, and so are the retrieved build inputs before assembly. A
+detection fails the build. Verifying an input by digest establishes that it is
+the file that was reviewed, not that the file is benign.
+
+- **Test:** the build scans the retrieved inputs and the exported image
+  filesystem with a malware scanner whose signature database was refreshed in
+  the same run, and fails on any detection.
+- **Anchors:** No rendered SRG rule. Serves SI-3 (malicious code protection).
+- **Platform:** [PLT-08](platform.md#plt-08-images-are-scanned-and-replaced)
+- **Source:** [NIST SP 800-190 §4.1.3](nist-800-190.md#image); DISA process
+  guide §7.1 step 1f
 
 ### IMG-26 Exceptions expire
 

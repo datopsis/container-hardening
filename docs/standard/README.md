@@ -6,8 +6,9 @@ opened an SRG, and then applied.
 
 The testable form of each position is in [the criteria](criteria.md). What the
 platform running the image must do is in [the platform expectations](platform.md).
-Where this departs from DISA's process guidance is in
-[the process guide comparison](process-guide.md). Nothing here is a STIG,
+It follows [NIST SP 800-190](nist-800-190.md), the Application Container
+Security Guide, countermeasure by countermeasure. Where it departs from DISA's
+process guidance is in [the process guide comparison](process-guide.md). Nothing here is a STIG,
 an authorization, or a claim of compliance; see [what this standard does not
 claim](#what-this-standard-does-not-claim).
 
@@ -19,9 +20,11 @@ its one function. It starts as an unprivileged user and stays one. It works
 with every privilege the kernel can take away already taken away: no
 capabilities, no new privileges, no writable root filesystem, no privileged
 port. It takes secrets and trust material only as read-only files the operator
-mounts. When something is wrong it stops and says what, rather than guessing.
-It arrives with the evidence to check all of that: an inventory, a bill of
-materials, a signature, and provenance.
+mounts. It has no way in for an administrator, and it says in advance exactly
+what it will do when it runs. When something is wrong it stops and says what,
+rather than guessing. It arrives with the evidence to check all of that: an
+inventory, a bill of materials, a signature, provenance, and clean
+vulnerability and malware scans.
 
 Everything below is the reasoning.
 
@@ -36,6 +39,12 @@ owner.
 | Image | DISA GPOS SRG, plus function-specific SRGs | The image repository |
 | Platform | DISA Container Platform SRG | Whoever runs the orchestrator |
 | Host | DISA RHEL 9 STIG | Whoever runs the host |
+
+NIST SP 800-190 draws the same picture with five tiers instead of three: image,
+registry, orchestrator, container, and host OS. The middle three are all run by
+one party, so here they are one layer, the platform. Every one of SP 800-190's
+countermeasures is assigned to a layer and to the criteria or expectations that
+implement it, in [the SP 800-190 mapping](nist-800-190.md).
 
 No container-specific STIG exists, so DoD guidance is to assess the image
 against the General Purpose Operating System SRG. That is what this standard
@@ -99,6 +108,13 @@ property the build enforces: an input nobody declared is an input that cannot
 arrive. It also rules out a layer cache restored from outside the build, which
 is the same problem with a different name.
 
+### The base is kept current
+
+A base pinned by digest stays exactly as it was reviewed, which is the point,
+and also means it ages. The base is refreshed whenever its publisher ships a
+security update and never falls more than 30 days behind. A pinned base that
+nobody refreshes becomes a well-verified old one.
+
 ### Nothing secret enters the build
 
 No credential is passed as a build argument, copied into a layer, or recorded in
@@ -125,6 +141,12 @@ install with.
 The image carries an inventory of the packages it contains, written at build
 time and checked against the lock, so what is inside can be established without
 trusting the scanner that looked.
+
+There is no SSH server, remote shell, or other remote administration service.
+A container is administered by replacing it, or through the runtime's own
+interface; a way to log into it is a way to change it that bypasses every
+property above. NIST SP 800-190 says remote administration tools "should never
+be enabled within containers", and this standard agrees without exception.
 
 The shell is the obvious next thing to remove, and none of the current images
 has removed it. It is a [target](criteria.md#targets), not a requirement: no
@@ -209,6 +231,20 @@ not fall back to packaged defaults, create what is missing, or start a repair
 shell. A service that starts with defaults its operator did not choose is
 running a configuration nobody reviewed.
 
+### Predictably
+
+The image declares, in a file committed beside it, what it does when it runs:
+which processes, which listening ports, which paths it writes, which
+destinations it calls. The smoke suite checks the running image against that
+declaration.
+
+This is the image's contribution to runtime defence. A platform's runtime
+monitor flags what an image does that it should not; it can only do that
+against a description of what the image should do. SP 800-190 expects such
+tools to learn that description by watching. An image that states it up front
+removes the learning period, and makes a new process or an unexpected listener
+evidence in itself.
+
 ### Observably
 
 Logs go to standard output and standard error, where the platform collects them,
@@ -257,6 +293,11 @@ and the Container Platform SRG requires the registry to hold images carrying
 them within 30 days
 ([V-233233](../srg/container-platform-srg/rules/V-233233.md)). A platform
 cannot meet its obligation if the image misses its own.
+
+The image is also scanned for malware, as are the inputs it was built from,
+with signatures refreshed in the same run. Verifying an input by digest proves
+it is the file that was reviewed. It does not prove the file is benign, and both
+NIST SP 800-190 and the DISA process guide ask for the second check.
 
 A finding that will not be fixed in time is an exception: scoped to one image
 digest, with a reason and an expiry. An exception without an expiry is a

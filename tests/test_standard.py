@@ -17,12 +17,24 @@ REPOSITORY = Path(__file__).resolve().parent.parent
 STANDARD = REPOSITORY / "docs" / "standard"
 CRITERIA = STANDARD / "criteria.md"
 PLATFORM = STANDARD / "platform.md"
+SP800190 = STANDARD / "nist-800-190.md"
 CROSSWALK = REPOSITORY / "artifacts" / "crosswalk.json"
 
-HEADING = re.compile(r"^### ((IMG|PLT)-(T?\d+)) (.+)$", re.M)
+HEADING = re.compile(r"^### ((IMG|PLT|HST)-(T?\d+)) (.+)$", re.M)
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
 RULE = re.compile(r"\.\./srg/([^/]+)/rules/(V-\d+)\.md")
 CONTROL = re.compile(r"\.\./crosswalk/controls/([a-z0-9.-]+)\.md")
+ORIGINATIONS = {"deployment-configured", "host-inherited"}
+
+# Every countermeasure in Section 4 of NIST SP 800-190.
+COUNTERMEASURES = (
+    ["4.1.%d" % n for n in range(1, 6)]
+    + ["4.2.%d" % n for n in range(1, 4)]
+    + ["4.3.%d" % n for n in range(1, 6)]
+    + ["4.4.%d" % n for n in range(1, 6)]
+    + ["4.5.%d" % n for n in range(1, 6)]
+    + ["4.6"]
+)
 
 
 def sections(path: Path) -> dict[str, str]:
@@ -65,14 +77,21 @@ def anchors_in(path: Path) -> set[str]:
 
 
 class CriteriaShapeTests(unittest.TestCase):
-    def test_identifiers_are_unique_and_in_order(self) -> None:
-        for path, prefix in ((CRITERIA, "IMG"), (PLATFORM, "PLT")):
+    def test_identifiers_are_unique_with_no_gaps(self) -> None:
+        # Identifiers are permanent once published, so a criterion added later
+        # takes the next number and sits in its topical section; order in the
+        # file is not order of number. A gap would mean one was deleted.
+        for path, prefixes in ((CRITERIA, ("IMG",)), (PLATFORM, ("PLT", "HST"))):
             ids = [m.group(1) for m in HEADING.finditer(path.read_text(encoding="utf-8"))]
             with self.subTest(document=path.name):
                 self.assertEqual(len(ids), len(set(ids)))
-                numbered = [int(i.split("-")[1]) for i in ids if not i.split("-")[1].startswith("T")]
-                self.assertEqual(numbered, list(range(1, len(numbered) + 1)))
-                self.assertTrue(all(i.startswith(prefix + "-") for i in ids))
+                for prefix in prefixes:
+                    numbered = sorted(
+                        int(i.split("-")[1]) for i in ids
+                        if i.startswith(prefix + "-") and not i.split("-")[1].startswith("T")
+                    )
+                    self.assertEqual(numbered, list(range(1, len(numbered) + 1)), prefix)
+                self.assertTrue(all(i.split("-")[0] in prefixes for i in ids))
 
     def test_every_required_criterion_states_its_level_test_and_anchors(self) -> None:
         for identifier, section in sections(CRITERIA).items():
@@ -88,6 +107,9 @@ class CriteriaShapeTests(unittest.TestCase):
             with self.subTest(expectation=identifier):
                 self.assertRegex(section, r"(?m)^- \*\*Image contribution:\*\* \S")
                 self.assertTrue(anchors_line(section).strip())
+                origination = re.search(r"(?m)^- \*\*Origination:\*\* `([a-z-]+)`$", section)
+                self.assertIsNotNone(origination, "an expectation must state its origination")
+                self.assertIn(origination.group(1), ORIGINATIONS)
 
     def test_platform_expectations_cite_only_platform_rules(self) -> None:
         # The layers stay apart: a platform expectation anchored to an image
@@ -102,6 +124,29 @@ class CriteriaShapeTests(unittest.TestCase):
             for catalogue, _ in RULE.findall(anchors_line(section)):
                 with self.subTest(criterion=identifier):
                     self.assertEqual(catalogue, "general-purpose-operating-system-srg")
+
+
+class SP800190Tests(unittest.TestCase):
+    def rows(self) -> dict[str, str]:
+        body = SP800190.read_text(encoding="utf-8")
+        found: dict[str, str] = {}
+        for line in body.splitlines():
+            match = re.match(r"^\| §(4\.\d(?:\.\d)?) ", line)
+            if match:
+                self.assertNotIn(match.group(1), found, "countermeasure listed twice")
+                found[match.group(1)] = line
+        return found
+
+    def test_every_countermeasure_is_listed(self) -> None:
+        self.assertEqual(sorted(self.rows()), sorted(COUNTERMEASURES))
+
+    def test_every_countermeasure_is_implemented_by_something_that_exists(self) -> None:
+        known = set(sections(CRITERIA)) | set(sections(PLATFORM))
+        for number, row in self.rows().items():
+            cited = set(re.findall(r"\[((?:IMG|PLT|HST)-T?\d+)\]", row))
+            with self.subTest(countermeasure=number):
+                self.assertTrue(cited, "a countermeasure must name what implements it")
+                self.assertEqual(cited - known, set())
 
 
 class AnchorTests(unittest.TestCase):
