@@ -211,6 +211,26 @@ owner. Then have someone other than the author review it, and record
 `reviewed_by` and `reviewed_on` on each row. An unreviewed decision is not an
 error in an audit, but it blocks a release.
 
+**Does the image take part in identity?** This is the question adopters get
+wrong, because the reference image's answer, that it has no accounts, is the
+answer for a static file server and almost nothing else. Work through it before
+deciding any AC or IA control:
+
+| What the image does | What that makes the control |
+| --- | --- |
+| Stores or creates user records, API keys, or S3 access keys | `image-owned`, at least in part: it manages accounts or authenticators |
+| Verifies a credential itself: a JWT signature, a session cookie, a client certificate, basic authentication | `image-owned` for IA-2, IA-5(2), IA-11, and usually AC-3. It authenticates, even though it issues nothing |
+| Holds a secret to do that: an OIDC client secret, a pinned JWKS, a signing key | IA-5 and IA-5(6) apply, met as read-only mounted files ([ADR-0003](adr/0003-secrets-reach-an-image-only-as-read-only-files.md)) |
+| Decides authorization from claims, such as roles or scopes | AC-3, and the AC-6 enhancements, are `image-owned` |
+| Receives an identity a proxy or mesh already verified, and verifies nothing itself | `deployment-configured` or `host-inherited`, and the image must also refuse to trust that header unverified, which is its own claim |
+| None of these: it never sees an identity | `not-applicable`, as the reference image |
+
+**Inherited is not the same as not applicable.** An image that delegates login
+to an identity provider still has accounts in its system; the provider and the
+organization manage them, so the control is `organization-inherited`.
+`not-applicable` says there is nothing for the control to apply to at all. The
+two look alike in a worksheet and mean different things to an assessor.
+
 **Decide these; do not copy them.** The reference image's
 [decisions](../examples/reference-web-server/decisions.json) are a static web
 server's: no accounts, no sessions, no stored data. The worksheet marks every

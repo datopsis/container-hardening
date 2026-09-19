@@ -99,7 +99,9 @@ class DecisionTests(unittest.TestCase):
 
     def test_account_controls_warn_against_a_copied_no_accounts(self) -> None:
         rows = {r["control"]: r for r in sheets.new_decisions("test")["decisions"]}
-        self.assertIn("S3 access key", rows["ac-2"]["warning"])
+        # The warning covers taking part in identity, not only storing accounts.
+        for phrase in ("JWT signature", "session cookie", "inherited from them, not not-applicable"):
+            self.assertIn(phrase, rows["ac-2"]["warning"])
         self.assertNotIn("warning", rows["sc-13"])
 
     def test_the_reference_images_decisions_are_complete_and_unreviewed(self) -> None:
