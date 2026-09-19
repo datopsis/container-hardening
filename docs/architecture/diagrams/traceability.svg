@@ -5,7 +5,7 @@
 <rect x="0.5" y="0.5" width="699" height="453" rx="10" fill="#ffffff" stroke="#d0d7de"/>
 <rect x="40" y="16" width="300" height="44" rx="6" fill="#ddf4ff" stroke="#0969da"/>
 <text x="190.0" y="37" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Requirement</text>
-<text x="360" y="43" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">IMG-13 Works with no capabilities</text>
+<text x="360" y="43" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">IMG-13, stated by the image as RWS-013</text>
 <line x1="190" y1="60" x2="190" y2="78" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="78" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
 <text x="190.0" y="99" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">NIST SP 800-53 control</text>
@@ -13,21 +13,21 @@
 <line x1="190" y1="122" x2="190" y2="140" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="140" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
 <text x="190.0" y="161" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">DISA CCI / SRG requirement</text>
-<text x="360" y="167" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">V-203696, through its CCI</text>
+<text x="360" y="167" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">CCI-002233, GPOS SRG V-203696</text>
 <line x1="190" y1="184" x2="190" y2="202" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="202" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
 <text x="190.0" y="223" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Technical implementation</text>
-<text x="360" y="229" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">service needs no capability</text>
+<text x="360" y="229" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">Containerfile: USER 1001:0; nginx needs no capability</text>
 <line x1="190" y1="246" x2="190" y2="264" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="264" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
 <text x="190.0" y="285" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Automated test</text>
-<text x="360" y="291" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">read CapEff from /proc for every process</text>
+<text x="360" y="291" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">tests/smoke.py reads CapEff and NoNewPrivs from /proc</text>
 <line x1="190" y1="308" x2="190" y2="326" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="326" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
 <text x="190.0" y="347" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Evidence artifact</text>
-<text x="360" y="353" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">per-process report, runtime options</text>
+<text x="360" y="353" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">evidence/smoke.json, kept with every CI run</text>
 <line x1="190" y1="370" x2="190" y2="388" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
 <rect x="40" y="388" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
 <text x="190.0" y="409" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Continuous compliance result</text>
-<text x="360" y="415" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">CI result on every change</text>
+<text x="360" y="415" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">scripts/score.py: hardening 31/34 on every change</text>
 </svg>

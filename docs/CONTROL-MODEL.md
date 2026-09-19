@@ -94,6 +94,9 @@ One entry per control, carrying properties in the namespace
 to resolve, and it is fixed: changing it would orphan every property written
 against it.
 
+The reference image's entry for CM-7, from its
+[component definition](../examples/reference-web-server/oscal/component-definition.json):
+
 ```json
 {
   "control-id": "cm-7",
@@ -101,16 +104,26 @@ against it.
     {"name": "origination", "ns": "https://datopsis.example/ns/oscal", "value": "image-owned"},
     {"name": "criterion", "ns": "https://datopsis.example/ns/oscal", "value": "IMG-06"},
     {"name": "criterion", "ns": "https://datopsis.example/ns/oscal", "value": "IMG-07"},
-    {"name": "requirement", "ns": "https://datopsis.example/ns/oscal", "value": "L1-IMG-002"},
-    {"name": "assessment-method", "ns": "https://datopsis.example/ns/oscal", "value": "test"},
-    {"name": "cross-reference", "ns": "https://datopsis.example/ns/oscal",
-     "value": "disa-gpos-srg:V-203637", "class": "disa-gpos-srg"}
+    {"name": "criterion", "ns": "https://datopsis.example/ns/oscal", "value": "IMG-14"},
+    {"name": "criterion", "ns": "https://datopsis.example/ns/oscal", "value": "IMG-27"},
+    {"name": "criterion", "ns": "https://datopsis.example/ns/oscal", "value": "IMG-30"},
+    {"name": "requirement", "ns": "https://datopsis.example/ns/oscal", "value": "RWS-006"},
+    {"name": "requirement", "ns": "https://datopsis.example/ns/oscal", "value": "RWS-007"},
+    {"name": "requirement", "ns": "https://datopsis.example/ns/oscal", "value": "RWS-014"},
+    {"name": "requirement", "ns": "https://datopsis.example/ns/oscal", "value": "RWS-027"},
+    {"name": "requirement", "ns": "https://datopsis.example/ns/oscal", "value": "RWS-030"},
+    {"name": "assessment-method", "ns": "https://datopsis.example/ns/oscal", "value": "test"}
   ],
   "responsible-roles": [{"role-id": "image-project"}],
-  "description": "What the image does, in terms an assessor can check.",
-  "remarks": "Limitations, and what the image cannot do."
+  "description": "CM-7 Least Functionality.",
+  "remarks": "Rests on IMG-06 No package manager; IMG-07 Only what the function needs; IMG-14 Unprivileged ports; IMG-27 No remote administration; IMG-30 Expected behaviour is declared. The image cannot constrain what a deployment mounts or how it runs the image: the platform's part is PLT-04, PLT-16."
 }
 ```
+
+Each `criterion` is one the [baseline](controls/README.md) gives for CM-7. Each
+`requirement` is the image's own statement of that criterion, in its
+[requirements](../examples/reference-web-server/requirements.md), naming the
+checks that verify it. The `remarks` say where the claim stops.
 
 `check-component.py` holds these rules:
 
@@ -145,8 +158,8 @@ python ../container-hardening/scripts/check-component.py \
 ```
 
 `--requirement-pattern` sets the regular expression that finds requirement
-identifiers; the default matches requirement headings of the form
-`### L1-IMG-001`.
+identifiers. The default finds a hyphenated identifier ending in three digits
+alone on a level-three heading, such as the reference image's `### RWS-001`.
 `--allow-incomplete` reports absent controls as warnings while a component
 definition is being written. It exits non-zero on any violation.
 

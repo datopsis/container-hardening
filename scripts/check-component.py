@@ -19,8 +19,8 @@ the rules in docs/CONTROL-MODEL.md:
 It never edits the component definition.
 
 Usage:
-    python check-component.py artifacts/oscal/component-definition.json \\
-        --requirements docs/L1-REQ.md docs/L2-REQ.md docs/L3-REQ.md
+    python check-component.py oscal/component-definition.json \\
+        --requirements requirements.md --profile hardening-profile.json
 """
 
 from __future__ import annotations
@@ -37,8 +37,9 @@ REPOSITORY = Path(__file__).resolve().parent.parent
 BASELINE = REPOSITORY / "artifacts" / "control-baseline.json"
 CROSSWALK = REPOSITORY / "artifacts" / "crosswalk.json"
 
-# Requirement headings of the form "### L1-IMG-001"; override per repository.
-DEFAULT_PATTERN = r"^###\s+(L[123]-[A-Z]{3}-\d{3})\s*$"
+# Requirement headings: a hyphenated identifier ending in three digits, alone
+# on a level-three heading, such as "### RWS-001". Override per repository.
+DEFAULT_PATTERN = r"^###\s+([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{3})\s*$"
 METHODS = {"examine", "test", "interview"}
 CROSS_REFERENCE = re.compile(r"^[a-z0-9][a-z0-9-]*:\S+$")
 

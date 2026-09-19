@@ -24,6 +24,11 @@ the control model that is a separate, evidenced claim.
 Criteria describe the image's half of a control. Where the platform must do the
 other half, the criterion names the matching [platform expectation](platform.md).
 
+The [reference web server](../../examples/reference-web-server/README.md) shows
+every criterion in a real image. It states criterion IMG-NN as requirement
+RWS-0NN in its [requirements](../../examples/reference-web-server/requirements.md),
+which names the checks that verify it.
+
 ## Build
 
 ### IMG-33 Source is protected and traceable

@@ -120,11 +120,20 @@ came from and how it was made
 [IMG-22](../standard/criteria.md#img-22-signed-with-provenance),
 [IMG-T4](../standard/criteria.md#img-t4-slsa-build-level-3)).
 
-### An example implementation
+### The reference image's pipeline
 
-The standard names properties, not products. This is one implementation of
-those properties, on GitLab, Nexus, Harbor, cosign, and OpenShift. It is an
-example, not a requirement.
+The [reference web server](../../examples/reference-web-server/README.md) in
+this repository runs these stages on every change, in
+[`reference-image.yml`](../../.github/workflows/reference-image.yml), and an
+adopting image copies it. Each stage leaves evidence, and the last scores it.
+
+![The reference image's pipeline, from checking its profile to scoring its evidence and, on a version tag, releasing it](diagrams/reference-pipeline.svg)
+
+### The same stages on another stack
+
+The standard names properties, not products. The same stages can run on
+GitLab, Nexus, Harbor, cosign, and OpenShift, which is how this example lays
+them out. It is an example, not a requirement.
 
 ![An example pipeline: GitLab source, a GitLab Runner using Nexus and Harbor, Harbor, admission policy, and OpenShift](diagrams/example-pipeline.svg)
 
@@ -148,7 +157,8 @@ OSCAL and NIST's online tools; the PDF is still the 2020 text. The pinned OSCAL
 catalogue carries the 800-53A procedures for every control, and the
 [assessment pages](../controls/README.md) are generated from it.
 
-That gives the design principle this standard follows:
+That gives the design principle this standard follows, shown here through the
+reference image, where every step is a real file:
 
 ![Requirement, 800-53 control, DISA CCI or SRG requirement, technical implementation, automated test, evidence artifact, continuous compliance result](diagrams/traceability.svg)
 
