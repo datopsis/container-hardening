@@ -110,10 +110,10 @@
     },
     {
       "id": "dod-container-hardening-guide",
-      "publisher": "Department of Defense, DevSecOps Initiative",
-      "title": "DevSecOps Enterprise Container Hardening Guide",
-      "release": "1.2",
-      "released_on": null,
+      "publisher": "Defense Information Systems Agency, for the Department of Defense",
+      "title": "Container Hardening Process Guide",
+      "release": "V1R2",
+      "released_on": "2022-08-24",
       "retrieved_on": "2026-09-18",
       "url": "https://dl.dod.cyber.mil/wp-content/uploads/devsecops/pdf/Final_DevSecOps_Enterprise_Container_Hardening_Guide_1.2.pdf",
       "sha256": "9a5d5babdf567d8ecbc8b62d3d06df8413f882dc3cf3123e61878bc9f417b124",
@@ -122,9 +122,9 @@
       "rendered": null,
       "status": "pinned",
       "role": "process-guide",
-      "license": "US Government work; distribution statement in the document",
-      "redistributable": false,
-      "notes": "Prose process guidance, not a rule catalogue, so it has no XCCDF and cannot be rendered by the SRG converter. It informs the hardening process and the criteria documents rather than producing per-rule pages."
+      "license": "Distribution Statement A: approved for public release, distribution unlimited",
+      "redistributable": true,
+      "notes": "Prose process guidance, not a rule catalogue, so it has no XCCDF and cannot be rendered by the SRG converter. The title is the one on the cover; the file is published as Final_DevSecOps_Enterprise_Container_Hardening_Guide_1.2.pdf, and an earlier revision of this register took its title from that filename. Much of it is Iron Bank and Platform One process. docs/standard/process-guide.md records where this standard follows it and where it departs."
     },
     {
       "id": "disa-rhel9-stig",
