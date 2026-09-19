@@ -66,7 +66,7 @@
                   }
                 ],
                 "description": "AC-2 Account Management.",
-                "remarks": "The image has no account of its own to manage: it ships no authentication configuration, no account store, and no management interface, and answers every request anonymously. The identity it runs as is the platform's: a numeric, non-root UID in group 0 (IMG-11), and any arbitrary UID the platform assigns (IMG-12). Account management for that identity is the platform's and the organization's, which the control baseline records as organization-inherited elsewhere."
+                "remarks": "The image has no account of its own to manage: it ships no authentication configuration, no account store, and no management interface, and answers every request anonymously. The identity it runs as is the platform's: a numeric, non-root UID in group 0 (IMG-11), and any arbitrary UID the platform assigns (IMG-12). Account management for that identity is the platform's and the organization's, which the control baseline records as organization-inherited elsewhere. This answer belongs to a static file server: an image that verifies a token or session, holds a client secret, or decides authorization from claims takes part in identity, and these controls are image-owned or inherited from its identity provider, not inapplicable."
               },
               {
                 "uuid": "74baaa25-30ec-5c23-bf38-3ece2455c28c",
@@ -3370,7 +3370,7 @@
                   }
                 ],
                 "description": "IA-2 Identification and Authentication (Organizational Users).",
-                "remarks": "The image identifies and authenticates no user: it has no logon, no session, and no credential store, and serves every request anonymously; see AC-2. Identifying the people who administer the platform is the platform's and the organization's."
+                "remarks": "The image identifies and authenticates no user: it has no logon, no session, and no credential store, and serves every request anonymously; see AC-2. Identifying the people who administer the platform is the platform's and the organization's. An image that validates a JWT, terminates mTLS, or keeps a session authenticates users, whoever issued the credential, and cannot answer this as this image does."
               },
               {
                 "uuid": "bbdc0b16-20da-5211-80ae-ff4858065277",
