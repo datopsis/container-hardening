@@ -17,8 +17,8 @@ source's determination in the hardening profile follows from the worksheet: it
 applies if any rule applies.
 
 **Decisions**: every control the control baseline leaves ``research-required``,
-decided for this image with an origination, a rationale, an owner, and a
-review. Access-control and identification controls carry a warning, because a
+decided for this image with an origination, a rationale, a statement of how the
+control is satisfied in terms of what the image does, an owner, and a review. Access-control and identification controls carry a warning, because a
 "no accounts" answer copied from the reference image is wrong for any image
 that authenticates a client, such as one holding API or S3 access keys.
 
@@ -163,7 +163,8 @@ def new_decisions(image: str) -> dict:
         if control["origination"] != "research-required":
             continue
         row = {"control": control["id"], "label": control["label"], "title": control["title"],
-               "origination": None, "rationale": "", "owner": "", "reviewed_by": None, "reviewed_on": None}
+               "origination": None, "rationale": "", "statement": "", "owner": "",
+               "reviewed_by": None, "reviewed_on": None}
         if control["id"].startswith(ACCOUNTS):
             row["warning"] = ACCOUNTS_WARNING
         rows.append(row)
@@ -192,7 +193,7 @@ def check_decisions(sheet: dict, component: dict | None = None) -> tuple[list[st
         if row.get("origination") not in originations and row.get("origination") != "research-required":
             errors.append(control + ": origination must be one of " + ", ".join(sorted(originations))
                           + ", or research-required with a reason it stays open")
-        for field in ("rationale", "owner"):
+        for field in ("rationale", "statement", "owner"):
             if not str(row.get(field) or "").strip():
                 errors.append(control + ": " + field + " is required")
         if not row.get("reviewed_by") or not row.get("reviewed_on"):

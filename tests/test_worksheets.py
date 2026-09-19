@@ -109,12 +109,18 @@ class DecisionTests(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(len(unreviewed), len(sheet["decisions"]))
 
-    def test_a_decision_needs_an_owner_and_a_rationale(self) -> None:
+    def test_a_decision_needs_an_owner_a_rationale_and_a_statement(self) -> None:
         sheet = json.loads((REFERENCE / "decisions.json").read_text(encoding="utf-8"))
-        sheet["decisions"][0] |= {"owner": "", "rationale": ""}
+        sheet["decisions"][0] |= {"owner": "", "rationale": "", "statement": ""}
         errors, _ = sheets.check_decisions(sheet)
-        self.assertTrue(any("owner is required" in e for e in errors))
-        self.assertTrue(any("rationale is required" in e for e in errors))
+        for field in ("owner", "rationale", "statement"):
+            self.assertTrue(any(field + " is required" in e for e in errors), field)
+
+    def test_every_decision_states_how_the_control_is_satisfied(self) -> None:
+        sheet = json.loads((REFERENCE / "decisions.json").read_text(encoding="utf-8"))
+        for row in sheet["decisions"]:
+            with self.subTest(control=row["control"]):
+                self.assertGreater(len(row["statement"].split()), 12, "a statement says how, not just that")
 
     def test_a_decision_the_component_contradicts_is_an_error(self) -> None:
         sheet = json.loads((REFERENCE / "decisions.json").read_text(encoding="utf-8"))

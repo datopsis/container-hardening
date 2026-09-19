@@ -3,8 +3,9 @@
 
 Every control in the standard's baseline gets one entry. Where the baseline
 settles a control, the entry takes its origination. Where the baseline leaves
-it research-required, decisions.json says what this image does, with the
-reason, the owner, and the review. An image-owned entry cites the criteria the baseline gives for it and
+it research-required, decisions.json says what this image does: its statement
+of how the control is satisfied becomes the entry's remarks, with the reason,
+the owner, and the review recorded beside it. An image-owned entry cites the criteria the baseline gives for it and
 the requirements that state them, as requirements-crosswalk.json maps them,
 which is the verification pointer; a criterion the profile records a
 deviation from is not cited.
@@ -43,7 +44,7 @@ SEED = uuid.UUID("6f1c0b52-3d1e-4c6a-9a55-2b6f3f0c7e10")
 # The controls the baseline leaves to the image, decided in the decisions
 # worksheet with a rationale, an owner, and a review.
 DECISIONS = {
-    row["control"]: (row["origination"], row["rationale"])
+    row["control"]: (row["origination"], row["statement"])
     for row in json.loads((HERE / "decisions.json").read_text(encoding="utf-8"))["decisions"]
 }
 LOGGING_CRITERIA = ["IMG-19"]
