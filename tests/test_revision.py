@@ -87,5 +87,15 @@ class RevisionTests(unittest.TestCase):
         self.assertTrue(any("checked out is at" in f for f in found))
 
 
+class FixtureTests(unittest.TestCase):
+    def test_the_multi_role_fixture_names_the_reference_revision(self) -> None:
+        # The self-test judges both against one checkout; bump them together.
+        import json
+        reference = REPOSITORY / "examples" / "reference-web-server" / "hardening-profile.json"
+        fixture = REPOSITORY / "tests" / "fixtures" / "multi-role" / "hardening-profile.json"
+        revisions = [json.loads(p.read_text(encoding="utf-8"))["standard"]["revision"] for p in (reference, fixture)]
+        self.assertEqual(revisions[0], revisions[1])
+
+
 if __name__ == "__main__":
     unittest.main()

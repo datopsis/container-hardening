@@ -149,6 +149,9 @@ deviations in its profile; each item below closes some of them.
 - [ ] Refuse a world-readable key file at startup without a shell in
   the runtime path (IMG-16). nginx refuses a missing or empty key, not a
   permissive one.
+- [ ] Decide [ADR-0007](adr/0007-record-manual-reviews-as-expiring-evidence.md),
+  manual reviews as expiring evidence, and which criteria allow one; then
+  implement it.
 - [ ] Consider a second badge for control coverage: baseline controls present
   in the component definition, out of all baseline controls.
 

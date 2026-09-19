@@ -47,3 +47,4 @@ record says so, because an unenforced decision decays quietly.
 | [0004](0004-derive-the-control-baseline-here-validate-components-there.md) | Derive the control baseline here, and validate each image's component there | accepted |
 | [0005](0005-tailor-by-profile-deviations-expire.md) | Tailor by a per-image profile in which every deviation expires | accepted |
 | [0006](0006-strict-per-architecture-evidence-and-release-eligibility.md) | Read evidence strictly, score it per architecture, and keep release eligibility apart from the score | accepted |
+| [0007](0007-record-manual-reviews-as-expiring-evidence.md) | Record manual reviews as expiring evidence | proposed |

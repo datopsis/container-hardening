@@ -16,6 +16,7 @@ on:
       - "artifacts/**"
       - "docs/standard/**"
       - "tests/conformance_fixtures.py"
+      - "tests/fixtures/**"
       - "examples/reference-web-server/hardening-profile.json"
       - "examples/reference-web-server/oscal/**"
       - "examples/reference-web-server/requirements.md"
@@ -29,6 +30,7 @@ on:
       - "artifacts/**"
       - "docs/standard/**"
       - "tests/conformance_fixtures.py"
+      - "tests/fixtures/**"
       - "examples/reference-web-server/hardening-profile.json"
       - "examples/reference-web-server/oscal/**"
       - "examples/reference-web-server/requirements.md"
@@ -62,6 +64,10 @@ jobs:
           for case in pass malformed failed-check partial; do
             python tests/conformance_fixtures.py "$case" "$RUNNER_TEMP/fixtures/$case"
           done
+          for case in pass role-gap; do
+            python tests/conformance_fixtures.py "$case" "$RUNNER_TEMP/fixtures/multi-role-$case" \
+              --profile tests/fixtures/multi-role/hardening-profile.json
+          done
 
       # The complete case as an image's CI uploads it: one artifact per
       # architecture, the generic evidence with the first.
@@ -78,6 +84,28 @@ jobs:
         with:
           name: selftest-pass-arm64
           path: ${{ runner.temp }}/fixtures/pass/evidence-arm64/
+
+      # A multi-role image's CI: per architecture, one directory for each role
+      # and topology, uploaded as one artifact per architecture.
+      - name: Keep the complete multi-role amd64 evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: selftest-multi-role-pass-amd64
+          path: |
+            ${{ runner.temp }}/fixtures/multi-role-pass/evidence-amd64-*/
+            ${{ runner.temp }}/fixtures/multi-role-pass/evidence-generic/
+
+      - name: Keep the complete multi-role arm64 evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: selftest-multi-role-pass-arm64
+          path: ${{ runner.temp }}/fixtures/multi-role-pass/evidence-arm64-*/
+
+      - name: Keep the multi-role evidence with one role's gap
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: selftest-multi-role-gap-all
+          path: ${{ runner.temp }}/fixtures/multi-role-role-gap/
 
       - name: Keep the malformed evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -162,6 +190,34 @@ jobs:
       evidence-artifacts: selftest-partial-*
       score-artifact: selftest-score-partial
 
+  # Two roles, two topologies, two architectures: complete.
+  multi-role:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: ${{ github.sha }}
+      profile: tests/fixtures/multi-role/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
+      enforce: false
+      evidence-artifacts: selftest-multi-role-pass-*
+      score-artifact: selftest-score-multi-role
+
+  # The same, with one criterion unevidenced for one role and topology on arm64.
+  role-gap:
+    needs: fixtures
+    uses: $/.github/workflows/conformance.yml
+    with:
+      standard-ref: ${{ github.sha }}
+      profile: tests/fixtures/multi-role/hardening-profile.json
+      component: examples/reference-web-server/oscal/component-definition.json
+      requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
+      enforce: false
+      evidence-artifacts: selftest-multi-role-gap-*
+      score-artifact: selftest-score-role-gap
+
   # Only the amd64 artifact: arm64 is declared, and its evidence is missing.
   arm64-missing:
     needs: fixtures
@@ -202,7 +258,7 @@ jobs:
 
   answers:
     name: check every answer
-    needs: [pass, missing, malformed, failed-check, partial, arm64-missing, draft, wrong-revision]
+    needs: [pass, missing, malformed, failed-check, partial, arm64-missing, multi-role, role-gap, draft, wrong-revision]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -223,6 +279,8 @@ jobs:
               "partial":        ("true",  "false", "false", "short"),
               "arm64-missing":  ("false", None,    "false", None),
               "draft":          ("true",  "false", "false", None),
+              "multi-role":     ("true",  "false", "true",  None),
+              "role-gap":       ("true",  "false", "false", "short"),
               "wrong-revision": ("true",  "true",  "false", None),
           }
           wrong = []

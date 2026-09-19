@@ -298,6 +298,52 @@ s.box(40, y, 680, 74, "For each conditional source that may apply",
        "the profile's determination follows from the worksheet: it applies if any rule applies"], key=True)
 s.save("srg-selection.svg")
 
+# 9. Releasing an image ---------------------------------------------------------
+person = [
+    "Main is green, and conformance says release eligible",
+    "No deviation expires before the next release",
+    "Unfixed findings are inside their remediation window",
+    "Inputs are current, or a refresh is under review",
+    "Decisions and worksheets are reviewed and current",
+    "Manual reviews that are due are done (ADR-0007)",
+    "The version is new; the changelog says what changed",
+]
+automated = [
+    ("Conformance: release eligible, or stop", "IMG-25, IMG-26"),
+    ("The tagged commit is on main", "IMG-33"),
+    ("Each image pushed by digest, tested there", "IMG-02, IMG-24"),
+    ("Index of exactly those digests", "IMG-24"),
+    ("Sign index and images; attest SBOMs, provenance", "IMG-21, IMG-22"),
+    ("Tag the index's digest with the version", "IMG-24"),
+    ("Verify from a clean runner", "IMG-21, IMG-22, IMG-24"),
+]
+s = SVG(920, 110 + len(person) * 44 + 40, "Releasing an image",
+        "Before tagging, a person checks that main is green and conformance says release eligible, that no deviation "
+        "expires before the next release, that unfixed findings are inside their remediation window, that inputs are "
+        "current, that decisions and worksheets are reviewed, that due manual reviews are done, and that the version "
+        "is new with a changelog. Tagging then starts what CI enforces: release eligibility, the commit on main, each "
+        "image pushed by digest and tested there, an index of exactly those digests, signatures and attestations, the "
+        "version tag on the index's digest, and verification from a clean runner.")
+s.text(200, 34, "A person checks, then tags", 14, "600", anchor="middle")
+s.text(580, 34, "CI enforces, or stops", 14, "600", anchor="middle")
+y = 52
+for i, line in enumerate(person):
+    s.box(30, y, 340, 32, "")
+    s.text(44, y + 21, line, 12)
+    if i < len(person) - 1:
+        s.arrow(200, y + 32, 200, y + 44)
+    y += 44
+for i, (line, tags) in enumerate(automated):
+    top = 52 + i * 44
+    s.box(410, top, 340, 32, "", key=i == 0)
+    s.text(424, top + 21, line, 12)
+    s.tag(762, top + 21, tags)
+    if i < len(automated) - 1:
+        s.arrow(580, top + 32, 580, top + 44)
+s.path(f"M 370 {52 + (len(person) - 1) * 44 + 16} C 390 {52 + (len(person) - 1) * 44 + 16}, 390 68, 410 68")
+s.text(390, 52 + len(person) * 44 + 20, "tag vX.Y.Z", 11.5, "600", fill=MUTED, anchor="middle")
+s.save("releasing.svg")
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)

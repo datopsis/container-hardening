@@ -244,6 +244,10 @@ def load(directory: Path, profile: dict, baseline: dict, draft: bool = False) ->
                 errors.append(at + ": a skipped check must say why in detail")
             if not isinstance(result.get("check"), str) or not result["check"].strip():
                 errors.append(at + ": check must say what was checked")
+            requirements = result.get("requirements", [])
+            if not isinstance(requirements, list) or not all(isinstance(r, str) and r for r in requirements):
+                errors.append(at + ": requirements must be a list of the image's requirement identifiers")
+                continue
 
             effective = architecture
             if "architecture" in result:
@@ -265,7 +269,7 @@ def load(directory: Path, profile: dict, baseline: dict, draft: bool = False) ->
             seen[key] = where
             evidence.results.append({
                 "id": check_id, "criterion": criterion, "passed": passed, "check": result.get("check"),
-                "architecture": effective, "file": where,
+                "architecture": effective, "file": where, "requirements": requirements,
                 **{q: subject.get(q) for q in QUALIFIERS if subject.get(q) is not None},
             })
 
