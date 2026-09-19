@@ -203,6 +203,18 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   image is not a template for.
 - The reference image's badges, one per architecture and one generic, are
   published to GitHub Pages from every run on main.
+- ADOPTING.md covers images the reference does not: more than one role, with
+  per-role evidence the scorer requires for every role; standalone and
+  clustered deployments, and what a single container's tests cannot show; and
+  inputs that are not RPMs, with the pattern for a signed, digest-pinned
+  upstream image. IMG-02 now states that a lock's digest, a publisher's
+  signature, and a checksum published beside an artifact are three different
+  claims, and that the last is never the integrity control.
+- An image's requirements are mapped to the criteria explicitly, in a
+  crosswalk that `check-component.py` and the conformance workflow check.
+  `check-component.py --list-requirements` shows which identifiers the pattern
+  finds, and it warns on a decision copied from the reference image word for
+  word.
 
 ### Fixed
 

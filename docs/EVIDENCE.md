@@ -88,7 +88,10 @@ A file with scope `architecture` is expected once for each architecture, a
 error; a file the profile does not list is an error.
 
 An image with more than one role, topology, or platform declares them, such as
-`"roles": ["server", "worker"]`, and every evidence subject then names one.
+`"roles": ["server", "worker"]`, and every architecture-scoped evidence
+subject then names one; a generic file names none. With roles, each
+architecture-scoped file is expected once for every architecture and role, and
+a per-architecture criterion is met only when it is met for every role.
 
 ## Scope: per architecture, or generic
 

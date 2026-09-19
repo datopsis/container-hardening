@@ -111,6 +111,7 @@ jobs:
           python examples/reference-web-server/scripts/component.py --check
           python scripts/check-component.py examples/reference-web-server/oscal/component-definition.json \
             --requirements examples/reference-web-server/requirements.md \
+            --crosswalk examples/reference-web-server/requirements-crosswalk.json \
             --requirement-pattern "$REQUIREMENT_PATTERN" \
             --profile examples/reference-web-server/hardening-profile.json
 
@@ -189,6 +190,7 @@ jobs:
       profile: examples/reference-web-server/hardening-profile.json
       component: examples/reference-web-server/oscal/component-definition.json
       requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
       requirement-pattern: '^###\s+(RWS-\d{3})\s*$'
       evidence-artifacts: reference-image-evidence-*
       score-artifact: reference-image-conformance

@@ -81,7 +81,7 @@ def scopes(files: dict[str, object], deviated: set[str] = frozenset(), profile: 
     loaded = load(files, profile)
     assert loaded.valid, loaded.errors
     results = loaded.results + [result("IMG-26", architecture="generic") | {"architecture": "generic"}]
-    return score.score(BASELINE, results, set(deviated), profile["architectures"])
+    return score.score(BASELINE, results, set(deviated), profile["architectures"], profile.get("roles"))
 
 
 def status(rows: list[dict], criterion: str) -> str:
@@ -174,6 +174,42 @@ class EvidenceTests(unittest.TestCase):
     def test_declared_roles_are_required_on_every_subject(self) -> None:
         profile = PROFILE | {"roles": ["server", "volume"]}
         self.assertIn("subject.role must be one of", errors(complete(), profile))
+
+
+def with_roles() -> dict[str, dict]:
+    """A complete set for an image with two roles: each role's runtime file per architecture."""
+    files = {"evidence-amd64/source.json": complete()["evidence-amd64/source.json"]}
+    for architecture in ("amd64", "arm64"):
+        for role in ("server", "worker"):
+            files["evidence-" + architecture + "-" + role + "/runtime.json"] = document(
+                architecture, [result(c) for c in PER_ARCHITECTURE], role=role)
+    return files
+
+
+ROLES = PROFILE | {"roles": ["server", "worker"]}
+
+
+class RoleTests(unittest.TestCase):
+    def test_a_complete_set_with_roles_is_valid(self) -> None:
+        self.assertEqual(errors(with_roles(), ROLES), "")
+
+    def test_each_role_is_expected_on_each_architecture(self) -> None:
+        files = with_roles()
+        del files["evidence-arm64-worker/runtime.json"]
+        self.assertIn("runtime.json (arm64, worker): expected, and missing", errors(files, ROLES))
+
+    def test_a_generic_file_names_no_role(self) -> None:
+        files = with_roles()
+        files["evidence-amd64/source.json"]["subject"]["role"] = "server"
+        self.assertIn("names no role", errors(files, ROLES))
+
+    def test_one_role_does_not_fill_another_roles_gap(self) -> None:
+        files = with_roles()
+        runtime = files["evidence-amd64-worker/runtime.json"]
+        runtime["results"] = [r for r in runtime["results"] if r["criterion"] != "IMG-13"]
+        rows = scopes(files, profile=ROLES)
+        self.assertEqual(status(rows["amd64"], "IMG-13"), "no evidence")
+        self.assertEqual(status(rows["arm64"], "IMG-13"), "met")
 
 
 class ScoreTests(unittest.TestCase):

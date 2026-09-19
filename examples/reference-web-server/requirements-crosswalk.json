@@ -1,0 +1,109 @@
+{
+  "schema": "container-hardening/requirements-crosswalk",
+  "schema_version": 1,
+  "note": "Which of this image's requirements states each criterion of the standard. The component definition cites these as its verification pointers, and check-component.py holds it to this map.",
+  "criteria": {
+    "IMG-01": [
+      "RWS-001"
+    ],
+    "IMG-02": [
+      "RWS-002"
+    ],
+    "IMG-03": [
+      "RWS-003"
+    ],
+    "IMG-04": [
+      "RWS-004"
+    ],
+    "IMG-05": [
+      "RWS-005"
+    ],
+    "IMG-06": [
+      "RWS-006"
+    ],
+    "IMG-07": [
+      "RWS-007"
+    ],
+    "IMG-08": [
+      "RWS-008"
+    ],
+    "IMG-09": [
+      "RWS-009"
+    ],
+    "IMG-10": [
+      "RWS-010"
+    ],
+    "IMG-11": [
+      "RWS-011"
+    ],
+    "IMG-12": [
+      "RWS-012"
+    ],
+    "IMG-13": [
+      "RWS-013"
+    ],
+    "IMG-14": [
+      "RWS-014"
+    ],
+    "IMG-15": [
+      "RWS-015"
+    ],
+    "IMG-16": [
+      "RWS-016"
+    ],
+    "IMG-17": [
+      "RWS-017"
+    ],
+    "IMG-18": [
+      "RWS-018"
+    ],
+    "IMG-19": [
+      "RWS-019"
+    ],
+    "IMG-20": [
+      "RWS-020"
+    ],
+    "IMG-21": [
+      "RWS-021"
+    ],
+    "IMG-22": [
+      "RWS-022"
+    ],
+    "IMG-23": [
+      "RWS-023"
+    ],
+    "IMG-24": [
+      "RWS-024"
+    ],
+    "IMG-25": [
+      "RWS-025"
+    ],
+    "IMG-26": [
+      "RWS-026"
+    ],
+    "IMG-27": [
+      "RWS-027"
+    ],
+    "IMG-28": [
+      "RWS-028"
+    ],
+    "IMG-29": [
+      "RWS-029"
+    ],
+    "IMG-30": [
+      "RWS-030"
+    ],
+    "IMG-31": [
+      "RWS-031"
+    ],
+    "IMG-32": [
+      "RWS-032"
+    ],
+    "IMG-33": [
+      "RWS-033"
+    ],
+    "IMG-34": [
+      "RWS-034"
+    ]
+  }
+}

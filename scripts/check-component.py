@@ -16,11 +16,23 @@ the rules in docs/CONTROL-MODEL.md:
 - every control in the baseline is present, unless --allow-incomplete
 - a cross-reference to a rendered SRG names a rule that exists in it
 
+With --crosswalk, the image's explicit map from each criterion to the
+requirements that state it, it also holds that every required criterion not
+deviated from maps to at least one requirement the image states, and that an
+image-owned control cites only requirements its criteria map to. Without one,
+the pointers are checked only for existing.
+
+It warns when a decision the baseline leaves to the image has exactly the
+reference image's remarks: those were written for a static web server, and an
+image with a different function decides for itself.
+
 It never edits the component definition.
 
 Usage:
     python check-component.py oscal/component-definition.json \\
-        --requirements requirements.md --profile hardening-profile.json
+        --requirements requirements.md --crosswalk requirements-crosswalk.json \\
+        --profile hardening-profile.json
+    python check-component.py --requirements docs/*.md --list-requirements
 """
 
 from __future__ import annotations
@@ -36,6 +48,8 @@ from pathlib import Path
 REPOSITORY = Path(__file__).resolve().parent.parent
 BASELINE = REPOSITORY / "artifacts" / "control-baseline.json"
 CROSSWALK = REPOSITORY / "artifacts" / "crosswalk.json"
+REFERENCE = REPOSITORY / "examples" / "reference-web-server" / "oscal" / "component-definition.json"
+MAP_SCHEMA = "container-hardening/requirements-crosswalk"
 
 # Requirement headings: a hyphenated identifier ending in three digits, alone
 # on a level-three heading, such as "### RWS-001". Override per repository.
@@ -68,6 +82,30 @@ def stated_requirements(files: list[Path], pattern: str) -> set[str]:
     return found
 
 
+def check_crosswalk(mapping: dict, baseline: dict, requirements: set[str] | None, deviations: list[dict] = ()) -> list[str]:
+    """What is wrong with the image's map from criteria to its requirements."""
+    problems: list[str] = []
+    if mapping.get("schema") != MAP_SCHEMA or mapping.get("schema_version") != 1:
+        return ["crosswalk: schema must be " + MAP_SCHEMA + ", schema_version 1"]
+    criteria = mapping.get("criteria")
+    if not isinstance(criteria, dict):
+        return ["crosswalk: criteria must map each criterion to a list of requirement identifiers"]
+    deviated = {d["target"] for d in deviations if d.get("kind") == "criterion"}
+    for criterion, stated in criteria.items():
+        if criterion not in baseline["criteria"]:
+            problems.append("crosswalk: " + criterion + " is not a criterion of this revision")
+        elif not isinstance(stated, list) or not all(isinstance(s, str) for s in stated):
+            problems.append("crosswalk: " + criterion + " must map to a list of requirement identifiers")
+        elif requirements is not None:
+            for requirement in stated:
+                if requirement not in requirements:
+                    problems.append("crosswalk: " + criterion + " maps to " + requirement + ", which this repository does not state")
+    for criterion, meta in baseline["criteria"].items():
+        if meta["level"] == "required" and criterion not in deviated and not criteria.get(criterion):
+            problems.append("crosswalk: required criterion " + criterion + " maps to no requirement, and the profile records no deviation from it")
+    return problems
+
+
 def check(
     component: dict,
     baseline: dict,
@@ -75,6 +113,8 @@ def check(
     allow_incomplete: bool = False,
     deviations: list[dict] = (),
     rules: dict[str, set[str]] | None = None,
+    mapping: dict | None = None,
+    copied_from: dict | None = None,
 ) -> tuple[list[str], list[str]]:
     """Return (violations, warnings). Deviations are the profile's active ones."""
     deviated_controls = {d["target"]: d["origination"] for d in deviations if d.get("kind") == "control"}
@@ -131,6 +171,12 @@ def check(
                 for pointer in pointers:
                     if pointer not in requirements:
                         violations.append(where + ": requirement " + pointer + " is not stated by this repository")
+            if mapping is not None and isinstance(mapping.get("criteria"), dict):
+                mapped = {r for c in criteria for r in (mapping["criteria"].get(c) or [])}
+                for pointer in pointers:
+                    if pointer not in mapped:
+                        violations.append(where + ": cites requirement " + pointer + ", which the crosswalk maps to none of "
+                                          + ", ".join(criteria))
             if not methods:
                 violations.append(where + ": image-owned without an assessment method")
             if not (entry.get("remarks") or "").strip():
@@ -154,6 +200,10 @@ def check(
             warnings.append(where + ": not in the baseline; nothing to check it against")
             continue
         base = expected[control]
+        remarks = (entry.get("remarks") or "").strip()
+        if copied_from and base["origination"] == "research-required" and remarks and copied_from.get(control) == remarks:
+            warnings.append(where + ": decided with the reference image's remarks word for word; those were written "
+                            "for a static web server, so decide this control for this image")
         if base["origination"] != "research-required" and origination != base["origination"]:
             if deviated_controls.get(control) != origination:
                 violations.append(
@@ -173,6 +223,20 @@ def check(
     return violations, warnings
 
 
+def titles(component: dict) -> set[str]:
+    return {c.get("title", "") for c in component["component-definition"].get("components", [])}
+
+
+def reference_remarks(component: dict, path: Path = REFERENCE) -> dict[str, str]:
+    """The reference image's remarks, by control, to recognise one copied unchanged."""
+    if not path.exists():
+        return {}
+    reference = json.loads(path.read_text(encoding="utf-8"))
+    if titles(reference) & titles(component):
+        return {}
+    return {e.get("control-id", ""): (e.get("remarks") or "").strip() for e in implemented(reference)}
+
+
 def rendered_rules(path: Path = CROSSWALK) -> dict[str, set[str]]:
     """Group IDs of every rendered catalogue, keyed by register source id."""
     crosswalk = json.loads(path.read_text(encoding="utf-8"))
@@ -181,10 +245,12 @@ def rendered_rules(path: Path = CROSSWALK) -> dict[str, set[str]]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("component", type=Path, help="the OSCAL component definition to check")
+    parser.add_argument("component", type=Path, nargs="?", help="the OSCAL component definition to check")
     parser.add_argument("--baseline", type=Path, default=BASELINE, help="the control baseline (default: this repository's)")
     parser.add_argument("--requirements", type=Path, nargs="*", help="files stating the image's requirement identifiers")
     parser.add_argument("--requirement-pattern", default=DEFAULT_PATTERN, help="regular expression capturing one identifier per match")
+    parser.add_argument("--crosswalk", type=Path, help="the image's map from each criterion to its requirement identifiers")
+    parser.add_argument("--list-requirements", action="store_true", help="print the requirement identifiers the pattern finds, and stop")
     parser.add_argument("--allow-incomplete", action="store_true", help="report absent baseline controls as warnings")
     parser.add_argument("--profile", type=Path, help="the image's hardening profile, whose active deviations are honoured")
     parser.add_argument("--today", type=datetime.date.fromisoformat, default=datetime.date.today(), help="evaluate deviation expiry as of this date")
@@ -197,16 +263,29 @@ def main() -> int:
         spec.loader.exec_module(profiles)
         deviations = profiles.active_deviations(json.loads(args.profile.read_text(encoding="utf-8")), args.today)
 
-    component = json.loads(args.component.read_text(encoding="utf-8"))
-    baseline = json.loads(args.baseline.read_text(encoding="utf-8"))
     requirements = stated_requirements(args.requirements, args.requirement_pattern) if args.requirements else None
     if requirements is not None and not requirements:
         print("no requirement identifiers found; check --requirement-pattern", file=sys.stderr)
         return 2
+    if args.list_requirements:
+        if requirements is None:
+            parser.error("--list-requirements needs --requirements")
+        print("\n".join(sorted(requirements)))
+        print(str(len(requirements)) + " requirement identifiers found", file=sys.stderr)
+        return 0
+    if args.component is None:
+        parser.error("a component definition is required")
 
+    component = json.loads(args.component.read_text(encoding="utf-8"))
+    baseline = json.loads(args.baseline.read_text(encoding="utf-8"))
+    mapping = json.loads(args.crosswalk.read_text(encoding="utf-8")) if args.crosswalk else None
     violations, warnings = check(
-        component, baseline, requirements, args.allow_incomplete, deviations, rendered_rules()
+        component, baseline, requirements, args.allow_incomplete, deviations, rendered_rules(), mapping, reference_remarks(component)
     )
+    if mapping is not None:
+        violations = check_crosswalk(mapping, baseline, requirements, deviations) + violations
+    elif requirements is not None:
+        warnings.append("no --crosswalk: which requirement states which criterion is not checked")
     for warning in warnings:
         print("warning: " + warning)
     for violation in violations:

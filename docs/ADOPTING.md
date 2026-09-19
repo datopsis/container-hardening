@@ -14,6 +14,7 @@ reference image and changed for its own service:
 | --- | --- | --- |
 | A hardening profile | [`hardening-profile.json`](../examples/reference-web-server/hardening-profile.json) | Image name, function, the pinned commit, architectures, expected evidence, applicability, deviations |
 | Requirement statements | [`requirements.md`](../examples/reference-web-server/requirements.md) | The wording, an identifier prefix, and the checks that verify each |
+| A crosswalk from criteria to requirements | [`requirements-crosswalk.json`](../examples/reference-web-server/requirements-crosswalk.json) | Which of the image's requirements states each criterion |
 | A locked, hermetic build | [`lock.json`](../examples/reference-web-server/lock.json), [`scripts/acquire.py`](../examples/reference-web-server/scripts/acquire.py), [`scripts/build.py`](../examples/reference-web-server/scripts/build.py), [`Containerfile`](../examples/reference-web-server/Containerfile) | The packages and what the image ships |
 | Checks that write evidence | [`tests/`](../examples/reference-web-server/tests/), [`tools.json`](../examples/reference-web-server/tools.json), [`scripts/drift.py`](../examples/reference-web-server/scripts/drift.py) | The runtime probes in `smoke.py` for the service |
 | A behaviour declaration | [`behaviour.json`](../examples/reference-web-server/behaviour.json) | Processes, listeners, writable paths, outbound destinations |
@@ -75,8 +76,33 @@ python ../container-hardening/scripts/check-profile.py hardening-profile.json
 
 Write one requirement per criterion, in the image's own words, naming the
 check that verifies it: [`requirements.md`](../examples/reference-web-server/requirements.md)
-is the pattern. Choose an identifier prefix and a heading form, such as
-`### RWS-001`; the checks find them with a regular expression you supply.
+is the pattern. The requirements can live in one file or several, in any
+prose the repository already uses.
+
+**Identifiers.** Each requirement is a level-three heading whose identifier
+ends in three digits. The prefix is the image's: `### RWS-001` and
+`### L1-SUP-001` both match the default pattern, so most repositories need no
+pattern of their own. To see what the checks find:
+
+```sh
+python ../container-hardening/scripts/check-component.py --requirements docs/*.md --list-requirements
+```
+
+If that lists nothing, or not everything, pass `--requirement-pattern` with a
+regular expression that captures one identifier per match.
+
+**The crosswalk.** Record which requirement states each criterion, explicitly,
+in a file like the reference image's
+[`requirements-crosswalk.json`](../examples/reference-web-server/requirements-crosswalk.json):
+
+```json
+{"schema": "container-hardening/requirements-crosswalk", "schema_version": 1,
+ "criteria": {"IMG-01": ["L1-SUP-001"], "IMG-13": ["L2-RUN-004", "L2-RUN-005"]}}
+```
+
+The checks then hold that every required criterion maps to a requirement the
+image states, unless the profile records a deviation from it, and that a
+control the image claims cites only requirements its criteria map to.
 
 This is the verification pointer: a control the image claims cites both the
 standard's criterion and the image's own requirement.
@@ -140,6 +166,12 @@ asks the image to decide only the controls the baseline leaves
 `research-required`, each with a reason. Those depend on what the image does:
 a database has accounts and a static server does not.
 
+**Decide these; do not copy them.** The reference image's `DECISIONS` are a
+static web server's: no accounts, no sessions, no stored data. An image with
+credentials, replication, or a storage API decides each control again, and the
+check warns on any decision whose remarks are the reference image's word for
+word.
+
 ## 7. Call the conformance workflow
 
 ```yaml
@@ -151,6 +183,7 @@ jobs:
     with:
       standard-ref: <the same commit>
       requirements: requirements.md
+      crosswalk: requirements-crosswalk.json
       evidence-artifacts: evidence-*
       # requirement-pattern: only if headings are not like "### RWS-001" or "### L1-SUP-001"
 
@@ -166,6 +199,73 @@ failed check. Otherwise it scores each architecture and keeps the score and a
 badge per architecture with the run. Its outputs are `evidence-valid`,
 `failing`, `coverage`, `score`, and `release-eligible`; gate a release on the
 last, never on the run succeeding.
+
+## Images the reference does not cover
+
+The reference image is one process, one role, and one container, built from
+RPMs. What changes for other shapes:
+
+### More than one role
+
+An image that runs as different roles, such as a server and its workers,
+declares them in its profile:
+
+```json
+"roles": ["server", "worker"]
+```
+
+Each role then has its own behaviour declaration, with the processes,
+listeners, health check, secrets, and writable paths of that role, and its own
+runtime evidence: every architecture-scoped evidence file is written once per
+role, naming the role in its subject. A per-architecture criterion is met only
+when it is met for every role; one role's pass never covers another's gap.
+Evidence about the source or the process, in a generic file, names no role.
+
+### Standalone and clustered
+
+What a single container's tests show is the image's half: that each role runs
+restricted, listens where it declares, reads its secrets from files, and fails
+closed. They cannot show replication, or that the components authenticate and
+encrypt the traffic between them. That is the platform's half, stated in
+[PLT-10](standard/platform.md#plt-10-traffic-is-controlled-and-encrypted) and
+[PLT-18](standard/platform.md#plt-18-workloads-have-identities-and-authenticate-each-other),
+and is shown by deploying the image as it runs clustered.
+
+Record the topology an evidence file was produced in, by declaring
+`"topologies": ["standalone", "clustered"]` and naming one in each
+architecture-scoped subject. Keep evidence from a clustered deployment
+separate from the image's own, and do not claim a platform expectation as an
+image criterion.
+
+### Inputs that are not RPMs
+
+[IMG-02](standard/criteria.md#img-02-every-build-input-pinned-and-verified)
+keeps three claims apart. Record each input under the strongest one it has,
+and say which:
+
+| Evidence | What it shows | Where it belongs |
+| --- | --- | --- |
+| The publisher's signature, verified against a pinned key or identity | Who published it, and that it is unchanged | The integrity control |
+| A digest recorded in the lock when it was reviewed | That it is unchanged since review; not who published it | The integrity control, stated as review, not provenance |
+| A checksum published beside it, such as an `.md5` file | Neither | Metadata at most; never the integrity control |
+
+For an input taken from an upstream container image:
+
+1. **Pin the image by digest** in the lock, with the publisher's signing
+   identity and issuer.
+2. **Verify the signature at that digest** with `cosign verify
+   --certificate-identity ... --certificate-oidc-issuer ...`, in the networked
+   acquisition step, before anything is read from it. A tag is never verified;
+   a digest is.
+3. **Extract only the files the image needs**, from a container created from the
+   verified digest, and record each file's size and SHA-256 in the lock.
+4. **Build from the extracted files**, which the build verifies against the lock
+   again, with networking disabled, as for any other input.
+
+An upstream archive with no signature is pinned by the digest recorded when it
+was reviewed, and the lock says so. The reference image has an example of that
+kind: its scanner images are pinned by digest and not signature-verified, and
+its [tools](../examples/reference-web-server/tools.json) by archive digest.
 
 ## 8. Keep aligned
 

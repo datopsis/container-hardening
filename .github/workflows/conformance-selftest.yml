@@ -105,6 +105,7 @@ jobs:
       profile: examples/reference-web-server/hardening-profile.json
       component: examples/reference-web-server/oscal/component-definition.json
       requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
       enforce: false
       evidence-artifacts: selftest-pass-*
       score-artifact: selftest-score-pass
@@ -117,6 +118,7 @@ jobs:
       profile: examples/reference-web-server/hardening-profile.json
       component: examples/reference-web-server/oscal/component-definition.json
       requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
       enforce: false
       evidence-artifacts: selftest-none-*
       score-artifact: selftest-score-missing
@@ -129,6 +131,7 @@ jobs:
       profile: examples/reference-web-server/hardening-profile.json
       component: examples/reference-web-server/oscal/component-definition.json
       requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
       enforce: false
       evidence-artifacts: selftest-malformed-*
       score-artifact: selftest-score-malformed
@@ -141,6 +144,7 @@ jobs:
       profile: examples/reference-web-server/hardening-profile.json
       component: examples/reference-web-server/oscal/component-definition.json
       requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
       enforce: false
       evidence-artifacts: selftest-failed-check-*
       score-artifact: selftest-score-failed-check
@@ -153,6 +157,7 @@ jobs:
       profile: examples/reference-web-server/hardening-profile.json
       component: examples/reference-web-server/oscal/component-definition.json
       requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
       enforce: false
       evidence-artifacts: selftest-partial-*
       score-artifact: selftest-score-partial
@@ -166,6 +171,7 @@ jobs:
       profile: examples/reference-web-server/hardening-profile.json
       component: examples/reference-web-server/oscal/component-definition.json
       requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
       enforce: false
       evidence-artifacts: selftest-pass-amd64
       score-artifact: selftest-score-arm64-missing
@@ -179,6 +185,7 @@ jobs:
       profile: examples/reference-web-server/hardening-profile.json
       component: examples/reference-web-server/oscal/component-definition.json
       requirements: examples/reference-web-server/requirements.md
+      crosswalk: examples/reference-web-server/requirements-crosswalk.json
       enforce: false
       evidence-artifacts: selftest-pass-*
       score-artifact: selftest-score-wrong-revision

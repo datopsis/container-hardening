@@ -193,6 +193,40 @@ class CheckerTests(unittest.TestCase):
         target["responsible-roles"] = []
         self.assertTrue(any("baseline is organization-inherited" in v for v in self.violations()))
 
+    def crosswalk(self) -> dict:
+        required = [c for c, m in self.baseline["criteria"].items() if m["level"] == "required"]
+        return {"schema": checker.MAP_SCHEMA, "schema_version": 1, "criteria": {c: ["L1-IMG-001"] for c in required}}
+
+    def test_a_complete_crosswalk_passes(self) -> None:
+        self.assertEqual(checker.check_crosswalk(self.crosswalk(), self.baseline, self.requirements), [])
+        found, _ = checker.check(component(self.entries), self.baseline, self.requirements, mapping=self.crosswalk())
+        self.assertEqual(found, [])
+
+    def test_a_required_criterion_the_crosswalk_leaves_out_is_a_violation_unless_deviated(self) -> None:
+        mapping = self.crosswalk()
+        del mapping["criteria"]["IMG-13"]
+        self.assertTrue(any("IMG-13 maps to no requirement" in v
+                            for v in checker.check_crosswalk(mapping, self.baseline, self.requirements)))
+        deviation = [{"kind": "criterion", "target": "IMG-13"}]
+        self.assertEqual(checker.check_crosswalk(mapping, self.baseline, self.requirements, deviation), [])
+
+    def test_a_crosswalk_naming_an_unstated_requirement_is_a_violation(self) -> None:
+        mapping = self.crosswalk()
+        mapping["criteria"]["IMG-13"] = ["L9-XXX-999"]
+        self.assertTrue(any("does not state" in v for v in checker.check_crosswalk(mapping, self.baseline, self.requirements)))
+
+    def test_a_pointer_the_crosswalk_does_not_map_is_a_violation(self) -> None:
+        self.requirements.add("L1-IMG-002")
+        self.image_owned()["props"].append(prop("requirement", "L1-IMG-002"))
+        found, _ = checker.check(component(self.entries), self.baseline, self.requirements, mapping=self.crosswalk())
+        self.assertTrue(any("maps to none of" in v for v in found))
+
+    def test_a_decision_copied_from_the_reference_image_is_warned_of(self) -> None:
+        undecided = next(c["id"] for c in self.baseline["controls"] if c["origination"] == "research-required")
+        self.index[undecided]["remarks"] = "Copied."
+        _, warnings = checker.check(component(self.entries), self.baseline, self.requirements, copied_from={undecided: "Copied."})
+        self.assertTrue(any("reference image's remarks word for word" in w for w in warnings))
+
     def test_deciding_a_research_required_control_is_allowed(self) -> None:
         # The baseline leaves these to the image, so any valid answer passes.
         undecided = [c["id"] for c in self.baseline["controls"] if c["origination"] == "research-required"]
