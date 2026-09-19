@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="250" viewBox="0 0 640 250" role="img" aria-labelledby="t d">
+<title id="t">SP 800-53 and SP 800-53A</title>
+<desc id="d">SP 800-53 states what security control must exist. SP 800-53A states how to assess whether it actually exists and works correctly.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="639" height="249" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<rect x="90" y="24" width="460" height="72" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="320.0" y="45" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">NIST SP 800-53</text>
+<text x="104.0" y="66" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">What security control must exist?</text>
+<line x1="320" y1="96" x2="320" y2="138" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="90" y="138" width="460" height="90" rx="6" fill="#ddf4ff" stroke="#0969da"/>
+<text x="320.0" y="159" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">NIST SP 800-53A</text>
+<text x="104.0" y="180" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">How do I assess whether it actually exists</text>
+<text x="104.0" y="198" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">and works correctly?</text>
+</svg>

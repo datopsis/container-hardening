@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="760" viewBox="0 0 760 760" role="img" aria-labelledby="t d">
+<title id="t">Example implementation: GitLab, Nexus, Harbor, OpenShift</title>
+<desc id="d">An example implementation, not a requirement. GitLab source with protected branches, code review, and signed traceable source feeds a GitLab Runner that takes dependencies from Nexus and the UBI base from Harbor, produces a CycloneDX SBOM, scans, checks policy, attests in-toto SLSA provenance, and signs with cosign. Images go to Harbor, then through admission policy checks, then to OpenShift.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="759" height="759" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<text x="380" y="34" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#57606a" text-anchor="middle" font-style="italic">Example implementation, not a requirement</text>
+<rect x="40" y="52" width="520" height="96" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="300.0" y="73" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">GitLab source</text>
+<text x="54.0" y="94" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">protected branches</text>
+<text x="54.0" y="112" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">code review</text>
+<text x="54.0" y="130" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">signed, traceable source</text>
+<text x="575" y="100" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-33</text>
+<line x1="300" y1="148" x2="300" y2="172" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="172" width="520" height="170" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="300.0" y="193" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">GitLab Runner</text>
+<text x="54.0" y="214" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">controlled dependencies from Nexus</text>
+<text x="54.0" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">UBI base from Harbor</text>
+<text x="54.0" y="250" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">SBOM: CycloneDX</text>
+<text x="54.0" y="268" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">vulnerability scan</text>
+<text x="54.0" y="286" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">policy checks</text>
+<text x="54.0" y="304" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">in-toto / SLSA provenance</text>
+<text x="54.0" y="322" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">cosign signature</text>
+<text x="575" y="215" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-01 to IMG-03</text>
+<text x="575" y="233" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-21, IMG-22</text>
+<text x="575" y="251" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-25, IMG-28, IMG-34</text>
+<line x1="300" y1="342" x2="300" y2="366" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="366" width="520" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="300.0" y="387" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Harbor</text>
+<text x="575" y="393" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-12, PLT-08</text>
+<line x1="300" y1="410" x2="300" y2="434" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="434" width="520" height="170" rx="6" fill="#ddf4ff" stroke="#0969da"/>
+<text x="300.0" y="455" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Admission policy</text>
+<text x="54.0" y="476" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">known registry?</text>
+<text x="54.0" y="494" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">signature valid?</text>
+<text x="54.0" y="512" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">approved signer?</text>
+<text x="54.0" y="530" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">provenance valid?</text>
+<text x="54.0" y="548" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">approved base?</text>
+<text x="54.0" y="566" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">vulnerability threshold?</text>
+<text x="54.0" y="584" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">securityContext acceptable?</text>
+<text x="575" y="520" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-01, PLT-02</text>
+<line x1="300" y1="604" x2="300" y2="628" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="628" width="520" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="300.0" y="649" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">OpenShift</text>
+<text x="575" y="655" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-02 to PLT-18</text>
+<text x="40" y="712" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#57606a" text-anchor="start">Cosign verifies the image digest and in-toto attestations at the Harbor to OpenShift boundary.</text>
+<text x="40" y="732" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#57606a" text-anchor="start">Product names are one worked implementation of the properties the criteria state.</text>
+</svg>

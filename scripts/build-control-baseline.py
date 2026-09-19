@@ -45,6 +45,8 @@ CRITERIA = REPOSITORY / "docs" / "standard" / "criteria.md"
 PLATFORM = REPOSITORY / "docs" / "standard" / "platform.md"
 DATA = REPOSITORY / "artifacts" / "control-baseline.json"
 OUTPUT = REPOSITORY / "docs" / "controls" / "README.md"
+ASSESSMENT = REPOSITORY / "docs" / "assessment"
+INSERT = re.compile(r"\{\{\s*insert:\s*param,\s*([\w.-]+)\s*\}\}")
 SEARCH_ROOTS = (REPOSITORY, REPOSITORY / "sources")
 
 CATALOGUE_SOURCE = "nist-sp800-53r5-catalog"
@@ -80,6 +82,8 @@ class Item:
     platform: list[str] = field(default_factory=list)
     contributions: list[str] = field(default_factory=list)
     origination: str | None = None
+    verification: str = ""
+    evidence: str = ""
 
 
 @dataclass
@@ -120,6 +124,8 @@ def parse_standard(
         ]
         origination = re.search(r"`([a-z-]+)`", field_line(section, "Origination"))
         item.origination = origination.group(1) if origination else None
+        item.verification = " ".join(field_line(section, "Verification").split())
+        item.evidence = " ".join(field_line(section, "Evidence").split())
         items[identifier] = item
     return items
 
@@ -315,7 +321,9 @@ def pinned(source: dict) -> Path:
     return path
 
 
-def load_controls(register: dict[str, dict], reached_ids: set[str]) -> tuple[str, list[Control]]:
+def load_controls(
+    register: dict[str, dict], reached_ids: set[str]
+) -> tuple[str, list[Control], dict[str, dict], dict[str, dict]]:
     catalogue = json.loads(pinned(register[CATALOGUE_SOURCE]).read_text(encoding="utf-8"))["catalog"]
     profile = json.loads(pinned(register[BASELINE_SOURCE]).read_text(encoding="utf-8"))["profile"]
     high = {
@@ -326,6 +334,8 @@ def load_controls(register: dict[str, dict], reached_ids: set[str]) -> tuple[str
 
     entries: dict[str, Control] = {}
     withdrawn: set[str] = set()
+    nodes: dict[str, dict] = {}
+    params: dict[str, dict] = {}
 
     def label_of(node: dict) -> str:
         for prop in node.get("props", []):
@@ -333,8 +343,11 @@ def load_controls(register: dict[str, dict], reached_ids: set[str]) -> tuple[str
                 return prop["value"]
         return node["id"].upper()
 
-    def walk(nodes: list[dict], family: str) -> None:
-        for node in nodes:
+    def walk(children: list[dict], family: str) -> None:
+        for node in children:
+            nodes[node["id"]] = node
+            for param in node.get("params", []):
+                params[param["id"]] = param
             if any(p.get("name") == "status" and p.get("value") == "withdrawn" for p in node.get("props", [])):
                 withdrawn.add(node["id"])
             else:
@@ -351,7 +364,8 @@ def load_controls(register: dict[str, dict], reached_ids: set[str]) -> tuple[str
     missing = sorted(wanted - set(entries))
     if missing:
         raise SystemExit("not in the pinned catalogue, or withdrawn: " + ", ".join(missing))
-    return catalogue["metadata"]["version"], sorted((entries[i] for i in wanted), key=lambda c: sort_key(c.id))
+    chosen = sorted((entries[i] for i in wanted), key=lambda c: sort_key(c.id))
+    return catalogue["metadata"]["version"], chosen, nodes, params
 
 
 def build() -> dict[Path, str]:
@@ -371,13 +385,174 @@ def build() -> dict[Path, str]:
             reached_ids |= item.controls
     reached_ids |= {d["control"] for d in determinations["determinations"]}
 
-    version, controls = load_controls(register, reached_ids)
+    version, controls, nodes, params = load_controls(register, reached_ids)
     resolved = determine(controls, criteria, expectations, determinations)
     data = assemble(resolved, criteria, expectations, register, version)
-    return {
+    pages = {
         DATA: json.dumps(data, indent=2, ensure_ascii=False) + "\n",
         OUTPUT: page(data, determinations),
     }
+    anchors = heading_anchors()
+    BASELINE_IDS.clear()
+    BASELINE_IDS.update(c["id"] for c in resolved)
+    for control in resolved:
+        pages[ASSESSMENT / (control["id"] + ".md")] = assessment_page(
+            control, nodes[control["id"]], params, criteria, anchors, version
+        )
+    return pages
+
+
+def heading_anchors() -> dict[str, str]:
+    anchors = {}
+    for path in (CRITERIA, PLATFORM):
+        for match in HEADING.finditer(path.read_text(encoding="utf-8")):
+            slug = re.sub(r"[^\w\- ]", "", match.group(0).lstrip("#").strip().lower()).replace(" ", "-")
+            anchors[match.group(1)] = slug
+    return anchors
+
+
+CATALOGUE_LINK = re.compile(r"\[([^\]]*)\]\(#([^)]+)\)")
+LOCAL_LINK = re.compile(r"\]\((#|criteria\.md|platform\.md)")
+BASELINE_IDS: set[str] = set()
+
+
+def prose(text: str, params: dict[str, dict]) -> str:
+    """Render OSCAL prose, marking organization-defined parameters as assignments.
+
+    The catalogue links to its own anchors: another control, or a part of one.
+    A control this baseline covers links to its assessment page here; anything
+    else becomes plain text, since the anchor does not exist on these pages.
+    """
+    def assignment(match: re.Match) -> str:
+        param = params.get(match.group(1), {})
+        label = param.get("label") or " ".join(
+            g.get("prose", "") for g in param.get("guidelines", [])
+        ).strip().rstrip(";") or match.group(1)
+        return "[*Assignment: " + label + "*]"
+
+    def relink(match: re.Match) -> str:
+        label, target = match.groups()
+        if target in BASELINE_IDS:
+            return "[" + label + "](" + target + ".md)"
+        return label
+
+    text = INSERT.sub(assignment, text or "")
+    return " ".join(CATALOGUE_LINK.sub(relink, text).split())
+
+
+def rebase(text: str) -> str:
+    """Re-point a criterion's own links so they resolve from docs/assessment/."""
+    def fix(match: re.Match) -> str:
+        target = match.group(1)
+        if target == "#":
+            return "](../standard/criteria.md#"
+        return "](../standard/" + target
+    return LOCAL_LINK.sub(fix, text)
+
+
+def label_prop(part: dict) -> str:
+    for prop in part.get("props", []):
+        if prop.get("name") == "label":
+            return prop["value"]
+    return ""
+
+
+def outline(part: dict, params: dict[str, dict], kind: str, depth: int = 0) -> list[str]:
+    """A nested list of a statement or objective and its sub-parts."""
+    lines = []
+    text = prose(part.get("prose", ""), params)
+    label = label_prop(part)
+    if text or label:
+        lines.append("  " * depth + "- " + ("**" + label + "** " if label else "") + text)
+    for child in part.get("parts", []):
+        if child.get("name") == kind:
+            lines.extend(outline(child, params, kind, depth + (1 if (text or label) else 0)))
+    return lines
+
+
+def assessment_page(control, node, params, criteria, anchors, version) -> str:
+    def ref(identifier: str) -> str:
+        target = "criteria.md" if identifier.startswith("IMG-") else "platform.md"
+        return "[" + identifier + "](../standard/" + target + "#" + anchors[identifier] + ")"
+
+    parts = node.get("parts", [])
+    out: list[str] = []
+    out.append("# " + control["label"] + " " + control["title"])
+    out.append("")
+    out.append("| | |")
+    out.append("| --- | --- |")
+    out.append("| Origination | `" + control["origination"] + "` |")
+    out.append("| High baseline | " + ("Selected" if control["high_baseline"] else "Not selected") + " |")
+    if control["criteria"]:
+        out.append("| Criteria | " + ", ".join(ref(i) for i in control["criteria"]) + " |")
+    if control["handoff"]:
+        out.append("| Handoff | " + ", ".join(ref(i) for i in control["handoff"]) + " |")
+    out.append("| Catalogue | NIST SP 800-53 Rev 5, " + version + ", with SP 800-53A procedures |")
+    out.append("")
+    out.append(control["reason"])
+    out.append("")
+
+    for part in parts:
+        if part.get("name") == "statement":
+            out.append("## Control")
+            out.append("")
+            out.extend(outline(part, params, "item") or [prose(part.get("prose", ""), params)])
+            out.append("")
+
+    goals = [p for p in parts if p.get("name") == "assessment-objective"]
+    out.append("## Assessment objective")
+    out.append("")
+    if goals:
+        out.append("Determine if:")
+        out.append("")
+        for goal in goals:
+            out.extend(outline(goal, params, "assessment-objective"))
+    else:
+        out.append("_The pinned catalogue gives no assessment objective for this control._")
+    out.append("")
+
+    methods = [p for p in parts if p.get("name") == "assessment-method"]
+    if methods:
+        out.append("## Assessment methods")
+        out.append("")
+        for method in methods:
+            name = next((q["value"] for q in method.get("props", []) if q.get("name") == "method"), "")
+            out.append("### " + name.title())
+            out.append("")
+            for objects in method.get("parts", []):
+                for item in (objects.get("prose") or "").split("\n"):
+                    if item.strip():
+                        out.append("- " + prose(item, params))
+            out.append("")
+
+    if control["origination"] == "image-owned":
+        out.append("## What the image's evidence answers")
+        out.append("")
+        out.append(
+            "The Test method is answered by the image's own verification of each "
+            "criterion this claim rests on, and the evidence it records. Examine "
+            "and Interview are answered by the image's documentation and by the "
+            "people responsible for it."
+        )
+        out.append("")
+        out.append("| Criterion | Verification | Evidence |")
+        out.append("| --- | --- | --- |")
+        for identifier in control["criteria"]:
+            item = criteria[identifier]
+            out.append(
+                "| " + ref(identifier) + " | " + rebase(item.verification).replace("|", "\\|")
+                + " | " + rebase(item.evidence).replace("|", "\\|") + " |"
+            )
+        out.append("")
+
+    out.append("---")
+    out.append("")
+    out.append(
+        "Generated by `scripts/build-control-baseline.py` from the pinned NIST "
+        "catalogue, which carries the SP 800-53A procedures. Do not edit by hand."
+    )
+    out.append("")
+    return "\n".join(out)
 
 
 def assemble(resolved, criteria, expectations, register, version) -> dict:
@@ -502,7 +677,8 @@ def page(data: dict, determinations: dict) -> str:
         out.append("| --- | --- | :-: | --- | --- | --- | --- |")
         for control in members:
             out.append(
-                "| " + control["label"] + " | " + control["title"].replace("|", "\\|")
+                "| [" + control["label"] + "](../assessment/" + control["id"] + ".md) | "
+                + control["title"].replace("|", "\\|")
                 + " | " + ("Yes" if control["high_baseline"] else "")
                 + " | `" + control["origination"] + "` | "
                 + ", ".join(ref(i) for i in control["criteria"]) + " | "
@@ -545,12 +721,13 @@ def main() -> int:
     args = parser.parse_args()
 
     pages = build()
+    orphans = [p for p in ASSESSMENT.glob("*.md") if p not in pages] if ASSESSMENT.is_dir() else []
     if args.check:
         stale = [
             Path(os.path.relpath(p, REPOSITORY)).as_posix()
             for p, body in pages.items()
             if not p.exists() or p.read_text(encoding="utf-8") != body
-        ]
+        ] + ["orphaned " + Path(os.path.relpath(p, REPOSITORY)).as_posix() for p in orphans]
         if stale:
             print("the control baseline is stale: " + ", ".join(stale), file=sys.stderr)
             print("Regenerate: python scripts/build-control-baseline.py", file=sys.stderr)
@@ -558,6 +735,8 @@ def main() -> int:
         print("the control baseline is up to date")
         return 0
 
+    for orphan in orphans:
+        orphan.unlink()
     for path, body in pages.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(body, encoding="utf-8", newline="\n")

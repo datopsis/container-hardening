@@ -156,6 +156,22 @@
       "title": "Expected behaviour is declared",
       "level": "required"
     },
+    "IMG-31": {
+      "title": "Admitted under the restricted-v2 SCC and the Restricted Pod Security Standard",
+      "level": "required"
+    },
+    "IMG-32": {
+      "title": "Runs in a user namespace under the restricted-v3 SCC",
+      "level": "required"
+    },
+    "IMG-33": {
+      "title": "Source is protected and traceable",
+      "level": "required"
+    },
+    "IMG-34": {
+      "title": "Source and dependencies are scanned before build",
+      "level": "required"
+    },
     "IMG-T1": {
       "title": "No shell",
       "level": "target"
@@ -166,6 +182,10 @@
     },
     "IMG-T3": {
       "title": "Compliance scan",
+      "level": "target"
+    },
+    "IMG-T4": {
+      "title": "SLSA Build Level 3",
       "level": "target"
     }
   },
@@ -236,6 +256,10 @@
     },
     "PLT-17": {
       "title": "Data volumes are encrypted at rest",
+      "origination": "host-inherited"
+    },
+    "PLT-18": {
+      "title": "Workloads have identities and authenticate each other",
       "origination": "host-inherited"
     },
     "HST-01": {
@@ -559,7 +583,9 @@
         "IMG-09",
         "IMG-11",
         "IMG-12",
-        "IMG-13"
+        "IMG-13",
+        "IMG-31",
+        "IMG-32"
       ],
       "handoff": [
         "PLT-02"
@@ -589,7 +615,8 @@
       "origination": "image-owned",
       "responsible_role": "image-project",
       "criteria": [
-        "IMG-11"
+        "IMG-11",
+        "IMG-31"
       ],
       "handoff": [
         "PLT-02"
@@ -2627,9 +2654,11 @@
       "origination": "research-required",
       "responsible_role": "image-project",
       "criteria": [],
-      "handoff": [],
-      "basis": "undetermined",
-      "reason": "Not yet determined for images in general. Whether the image implements this depends on its function; a database authenticates users and a static file server does not. Each image determines it in its own component definition."
+      "handoff": [
+        "PLT-18"
+      ],
+      "basis": "determination",
+      "reason": "The platform identifies and authenticates workloads acting on a user's behalf (PLT-18). Whether the image identifies and authenticates users of its own depends on its function: a database does, a static file server does not."
     },
     {
       "id": "ia-2.1",

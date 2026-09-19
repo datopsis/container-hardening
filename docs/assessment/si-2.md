@@ -1,0 +1,82 @@
+# SI-2 Flaw Remediation
+
+| | |
+| --- | --- |
+| Origination | `image-owned` |
+| High baseline | Selected |
+| Criteria | [IMG-25](../standard/criteria.md#img-25-vulnerability-gate-and-remediation), [IMG-26](../standard/criteria.md#img-26-exceptions-expire), [IMG-29](../standard/criteria.md#img-29-base-kept-current) |
+| Handoff | [PLT-08](../standard/platform.md#plt-08-images-are-scanned-and-replaced) |
+| Catalogue | NIST SP 800-53 Rev 5, 5.2.0, with SP 800-53A procedures |
+
+Reached by a required image criterion.
+
+## Control
+
+- **a.** Identify, report, and correct system flaws;
+- **b.** Test software and firmware updates related to flaw remediation for effectiveness and potential side effects before installation;
+- **c.** Install security-relevant software and firmware updates within [*Assignment: time period*] of the release of the updates; and
+- **d.** Incorporate flaw remediation into the organizational configuration management process.
+
+## Assessment objective
+
+Determine if:
+
+- **SI-02** 
+  - **SI-02a.** 
+    - **SI-02a.[01]** system flaws are identified;
+    - **SI-02a.[02]** system flaws are reported;
+    - **SI-02a.[03]** system flaws are corrected;
+  - **SI-02b.** 
+    - **SI-02b.[01]** software updates related to flaw remediation are tested for effectiveness before installation;
+    - **SI-02b.[02]** software updates related to flaw remediation are tested for potential side effects before installation;
+    - **SI-02b.[03]** firmware updates related to flaw remediation are tested for effectiveness before installation;
+    - **SI-02b.[04]** firmware updates related to flaw remediation are tested for potential side effects before installation;
+  - **SI-02c.** 
+    - **SI-02c.[01]** security-relevant software updates are installed within [*Assignment: time period*] of the release of the updates;
+    - **SI-02c.[02]** security-relevant firmware updates are installed within [*Assignment: time period*] of the release of the updates;
+  - **SI-02d.** flaw remediation is incorporated into the organizational configuration management process.
+
+## Assessment methods
+
+### Examine
+
+- System and information integrity policy
+- system and information integrity procedures
+- procedures addressing flaw remediation
+- procedures addressing configuration management
+- list of flaws and vulnerabilities potentially affecting the system
+- list of recent security flaw remediation actions performed on the system (e.g., list of installed patches, service packs, hot fixes, and other software updates to correct system flaws)
+- test results from the installation of software and firmware updates to correct system flaws
+- installation/change control records for security-relevant software and firmware updates
+- system security plan
+- privacy plan
+- other relevant documents or records
+
+### Interview
+
+- System/network administrators
+- organizational personnel with information security and privacy responsibilities
+- organizational personnel responsible for installing, configuring, and/or maintaining the system
+- organizational personnel responsible for flaw remediation
+- organizational personnel with configuration management responsibilities
+
+### Test
+
+- Organizational processes for identifying, reporting, and correcting system flaws
+- organizational process for installing software and firmware updates
+- mechanisms supporting and/or implementing the reporting and correcting of system flaws
+- mechanisms supporting and/or implementing testing software and firmware updates
+
+## What the image's evidence answers
+
+The Test method is answered by the image's own verification of each criterion this claim rests on, and the evidence it records. Examine and Interview are answered by the image's documentation and by the people responsible for it.
+
+| Criterion | Verification | Evidence |
+| --- | --- | --- |
+| [IMG-25](../standard/criteria.md#img-25-vulnerability-gate-and-remediation) | The scan step fails the build on fixed Critical or High findings; the full findings report is attached to the release. The scan covers every layer, not only the base's packages: an upstream binary or archive is scanned through the components the SBOM records for it. | The scan report attached to the release. |
+| [IMG-26](../standard/criteria.md#img-26-exceptions-expire) | Exceptions are the `deviations` in the image's [hardening profile](../TAILORING.md#deviations), checked in CI by `check-profile.py`; an entry past its expiry, or recorded for longer than its kind allows, fails. | The profile; the checker's output. |
+| [IMG-29](../standard/criteria.md#img-29-base-kept-current) | The drift report from [IMG-04](../standard/criteria.md#img-04-input-refresh-is-a-reviewed-change) records the age of the pinned base against the publisher's current digest; a release whose base is more than 30 days behind fails. | The drift report with the base age; the release check's result. |
+
+---
+
+Generated by `scripts/build-control-baseline.py` from the pinned NIST catalogue, which carries the SP 800-53A procedures. Do not edit by hand.

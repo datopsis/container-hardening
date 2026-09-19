@@ -7,7 +7,11 @@ opened an SRG, and then applied.
 The testable form of each position is in [the criteria](criteria.md). What the
 platform running the image must do is in [the platform expectations](platform.md).
 It follows [NIST SP 800-190](nist-800-190.md), the Application Container
-Security Guide, countermeasure by countermeasure. Where it departs from DISA's
+Security Guide, countermeasure by countermeasure, and the
+[reference architecture](../architecture/README.md) shows where it sits among
+the other sources a modern container-security standard needs: NIST IR 8176,
+SP 800-53A, the DISA product STIGs, SSDF, SLSA, and the Kubernetes and
+OpenShift workload-security models. Where it departs from DISA's
 process guidance is in [the process guide comparison](process-guide.md). Nothing here is a STIG,
 an authorization, or a claim of compliance; see [what this standard does not
 claim](#what-this-standard-does-not-claim).

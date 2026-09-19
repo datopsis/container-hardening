@@ -25,6 +25,7 @@ LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
 RULE = re.compile(r"\.\./srg/([^/]+)/rules/(V-\d+)\.md")
 CONTROL = re.compile(r"\.\./crosswalk/controls/([a-z0-9.-]+)\.md")
 ORIGINATIONS = {"deployment-configured", "host-inherited"}
+SHAPE = ("Implementation", "Verification", "Expected", "Evidence")
 
 # Every countermeasure in Section 4 of NIST SP 800-190.
 COUNTERMEASURES = (
@@ -93,19 +94,24 @@ class CriteriaShapeTests(unittest.TestCase):
                     self.assertEqual(numbered, list(range(1, len(numbered) + 1)), prefix)
                 self.assertTrue(all(i.split("-")[0] in prefixes for i in ids))
 
-    def test_every_required_criterion_states_its_level_test_and_anchors(self) -> None:
+    def test_every_required_criterion_has_the_full_assessment_shape(self) -> None:
+        # Requirement, implementation, verification, expected result, and
+        # evidence: the shape an assessor needs to reproduce the check.
         for identifier, section in sections(CRITERIA).items():
             if identifier.startswith("IMG-T"):
                 continue
             with self.subTest(criterion=identifier):
                 self.assertIn("**Required.**", section)
-                self.assertRegex(section, r"(?m)^- \*\*Test:\*\* \S")
+                for field in SHAPE:
+                    self.assertRegex(section, r"(?m)^- \*\*" + field + r":\*\* \S", field)
                 self.assertTrue(anchors_line(section).strip())
 
     def test_every_platform_expectation_names_the_image_contribution(self) -> None:
         for identifier, section in sections(PLATFORM).items():
             with self.subTest(expectation=identifier):
                 self.assertRegex(section, r"(?m)^- \*\*Image contribution:\*\* \S")
+                for field in SHAPE:
+                    self.assertRegex(section, r"(?m)^- \*\*" + field + r":\*\* \S", field)
                 self.assertTrue(anchors_line(section).strip())
                 origination = re.search(r"(?m)^- \*\*Origination:\*\* `([a-z-]+)`$", section)
                 self.assertIsNotNone(origination, "an expectation must state its origination")
@@ -182,6 +188,8 @@ class LinkTests(unittest.TestCase):
             + list((REPOSITORY / "docs" / "adr").glob("*.md"))
             + list((REPOSITORY / "docs" / "adoption").glob("*.md"))
             + list((REPOSITORY / "docs" / "applicability").glob("*.md"))
+            + list((REPOSITORY / "docs" / "architecture").glob("*.md"))
+            + list((REPOSITORY / "docs" / "assessment").glob("*.md"))
             + [
                 REPOSITORY / "docs" / "CONTROL-MODEL.md",
                 REPOSITORY / "docs" / "TAILORING.md",

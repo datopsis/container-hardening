@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="454" viewBox="0 0 700 454" role="img" aria-labelledby="t d">
+<title id="t">Traceability from requirement to evidence</title>
+<desc id="d">A requirement maps to an 800-53 control, to a DISA CCI or SRG requirement, to a technical implementation, to an automated test, to an evidence artifact, and to a continuous compliance result. The example follows IMG-13 through each step.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="699" height="453" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<rect x="40" y="16" width="300" height="44" rx="6" fill="#ddf4ff" stroke="#0969da"/>
+<text x="190.0" y="37" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Requirement</text>
+<text x="360" y="43" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">IMG-13 Works with no capabilities</text>
+<line x1="190" y1="60" x2="190" y2="78" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="78" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="190.0" y="99" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">NIST SP 800-53 control</text>
+<text x="360" y="105" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">AC-6(8)</text>
+<line x1="190" y1="122" x2="190" y2="140" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="140" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="190.0" y="161" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">DISA CCI / SRG requirement</text>
+<text x="360" y="167" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">V-203696, through its CCI</text>
+<line x1="190" y1="184" x2="190" y2="202" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="202" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="190.0" y="223" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Technical implementation</text>
+<text x="360" y="229" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">service needs no capability</text>
+<line x1="190" y1="246" x2="190" y2="264" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="264" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="190.0" y="285" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Automated test</text>
+<text x="360" y="291" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">read CapEff from /proc for every process</text>
+<line x1="190" y1="308" x2="190" y2="326" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="326" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="190.0" y="347" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Evidence artifact</text>
+<text x="360" y="353" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">per-process report, runtime options</text>
+<line x1="190" y1="370" x2="190" y2="388" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="388" width="300" height="44" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="190.0" y="409" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Continuous compliance result</text>
+<text x="360" y="415" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#8250df" text-anchor="start">CI result on every change</text>
+</svg>
