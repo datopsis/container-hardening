@@ -29,6 +29,7 @@ reinvented per application.
 | [Tailoring](docs/TAILORING.md) | How an image records which sources apply to it and where it deviates, with an expiry. |
 | [Requirement catalogues](docs/srg/README.md) | DISA packages rendered to Markdown, one file per rule. 630 rules across four SRGs. |
 | [SRG to 800-53 crosswalk](docs/crosswalk/README.md) | Every rendered rule joined to NIST SP 800-53 Rev 5 through its CCIs. Derived, not hand-authored. |
+| [Releasing](docs/RELEASING.md) | What a person checks before a release, and what CI then enforces. |
 | [Evidence](docs/EVIDENCE.md) | What an image's CI must record, and how it is scored per architecture and judged release eligible. |
 | [Adoption](docs/adoption/README.md) | How image repositories take the standard up. |
 | [Source register](artifacts/sources.json) | Thirty sources recorded, twenty-eight pinned by SHA-256, with role, rendering state, and redistribution terms. |

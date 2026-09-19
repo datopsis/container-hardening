@@ -233,6 +233,19 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   into one, and await review.
 - Released the reference image 0.2.0, its first multi-architecture index,
   verified from a clean runner.
+- Coverage by requirement: a result names the requirements it verifies, and
+  with a crosswalk a criterion is met only when every requirement it maps to
+  has a passing check of its own, in every declared role and topology; short
+  of that it is `partial`. Topologies, like roles, must each be evidenced. The
+  conformance workflow's `candidates` binds the evidence to the digests to be
+  released.
+- A multi-architecture, multi-role caller: ADOPTING.md shows the CI, and the
+  self-test calls the conformance workflow with that shape, complete and with
+  one role's gap.
+- [Releasing an image](docs/RELEASING.md): what a person checks before a
+  release and what CI then enforces, with a flowchart.
+- Proposed [ADR-0007](docs/adr/0007-record-manual-reviews-as-expiring-evidence.md):
+  manual reviews as expiring evidence, allowed only where a criterion says so.
 
 ### Fixed
 

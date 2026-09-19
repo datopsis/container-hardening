@@ -47,7 +47,22 @@ def image_subject(image: str) -> dict:
     return subject(inspected["Architecture"], **extra)
 
 
+def requirements(criterion: str) -> list[str]:
+    """The requirement a check verifies, from the crosswalk.
+
+    Filled in only where a criterion maps to exactly one requirement, as every
+    one does in this image. Where it maps to more, the check must say which it
+    verifies, or one passing check would stand for all of them.
+    """
+    mapping = json.loads((HERE / "requirements-crosswalk.json").read_text(encoding="utf-8"))["criteria"]
+    stated = mapping.get(criterion, [])
+    if len(stated) != 1:
+        raise SystemExit(criterion + " maps to " + str(len(stated)) + " requirements; name the one this check verifies")
+    return stated
+
+
 def write(path: Path, about: dict, results: list[dict], **extra) -> None:
+    results = [r if "requirements" in r else r | {"requirements": requirements(r["criterion"])} for r in results]
     passed = sum(r["passed"] is True for r in results)
     failed = sum(r["passed"] is False for r in results)
     path.parent.mkdir(parents=True, exist_ok=True)

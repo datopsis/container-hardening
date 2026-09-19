@@ -155,6 +155,10 @@ value makes the evidence invalid. The reference image's
 [`tests/evidence.py`](../examples/reference-web-server/tests/evidence.py)
 writes the header for you.
 
+Each result names the requirements it verifies, from the crosswalk in step 4.
+With a crosswalk, a criterion is met only when every requirement it maps to has
+a passing check of its own; a check that names none counts for none.
+
 Build and test each architecture natively, and upload each architecture's
 evidence as its own artifact, such as `evidence-amd64` and `evidence-arm64`.
 Evidence about a built image is per architecture; a passing result on one never
@@ -243,6 +247,54 @@ jobs:
     if: needs.conformance.outputs.release-eligible == 'true'
 ```
 
+For an image built for two architectures, with a server and a worker role,
+each run standalone and clustered, the CI writes each architecture's evidence
+once per role and topology, and uploads one artifact per architecture:
+
+```yaml
+jobs:
+  verify:
+    strategy:
+      matrix:
+        include:
+          - {architecture: amd64, runner: ubuntu-24.04}
+          - {architecture: arm64, runner: ubuntu-24.04-arm}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      # ... build natively, then test each role in each topology; each run
+      # writes evidence/<role>-<topology>/smoke.json naming its role and
+      # topology in its subject
+      - uses: actions/upload-artifact@<sha> # pinned
+        with:
+          name: evidence-${{ matrix.architecture }}
+          path: evidence/
+
+  conformance:
+    needs: verify
+    if: ${{ !cancelled() }}
+    uses: datopsis/container-hardening/.github/workflows/conformance.yml@<commit>
+    with:
+      standard-ref: <the same commit>
+      requirements: docs/L1-REQ.md docs/L2-REQ.md
+      crosswalk: requirements-crosswalk.json
+      decisions: decisions.json
+      evidence-artifacts: evidence-*
+```
+
+with the profile declaring:
+
+```json
+"architectures": ["amd64", "arm64"],
+"roles": ["server", "worker"],
+"topologies": ["standalone", "clustered"],
+"evidence": [{"file": "smoke.json", "scope": "architecture"}, {"file": "gates-source.json", "scope": "generic"}]
+```
+
+The self-test calls the conformance workflow with exactly this shape, from the
+fixture profile in [`tests/fixtures/multi-role/`](../tests/fixtures/multi-role/hardening-profile.json).
+Remember what a single container's tests cannot show; see
+[standalone and clustered](#standalone-and-clustered).
+
 `standard-ref` must be the full commit in the `uses:` line; the workflow checks
 it against the commit it actually ran from. It fails on invalid evidence, a
 revision that does not bind, a profile or component that breaks a rule, or a
@@ -317,6 +369,11 @@ An upstream archive with no signature is pinned by the digest recorded when it
 was reviewed, and the lock says so. The reference image has an example of that
 kind: its scanner images are pinned by digest and not signature-verified, and
 its [tools](../examples/reference-web-server/tools.json) by archive digest.
+
+## Releasing
+
+Before each release, a person works through [Releasing an image](RELEASING.md);
+CI then enforces the rest.
 
 ## 8. Keep aligned
 

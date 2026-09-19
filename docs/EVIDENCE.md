@@ -44,7 +44,8 @@ Each check the image's CI runs writes its results to a JSON file:
       "criterion": "IMG-13",
       "check": "every process has an empty effective capability set",
       "passed": true,
-      "detail": ""
+      "detail": "",
+      "requirements": ["RWS-013"]
     }
   ]
 }
@@ -61,6 +62,7 @@ Each check the image's CI runs writes its results to a JSON file:
 | `results[].id` | A stable, lower-case identifier for the check, such as `smoke.no-root-process`. One check has one result per architecture: the same `id` twice is an error, whatever the outcomes |
 | `results[].criterion` | A criterion of the pinned revision |
 | `results[].passed` | `true`, `false`, or `null`. Nothing else: `"false"`, `0`, and `1` are errors, not results. `null` is a check that could not run where it ran, which is not a pass, and must say why in `detail` |
+| `results[].requirements` | The image's requirements this check verifies. With a crosswalk, each must be one the crosswalk maps the result's criterion to |
 | `results[].architecture` | Only in a `generic` file: names the architecture a result is about, such as a release's per-architecture bill of materials |
 
 Other JSON files, such as scanner reports, are ignored. A file that does not
@@ -125,7 +127,18 @@ each file, not its location, says what it is about.
 
 A criterion is met on an architecture when at least one check names it, every
 check that names it passed, none was merely skipped, and the profile records no
-active deviation from it. A deviation is visible and temporary, and does not
+active deviation from it.
+
+It must be met in every combination of the roles and topologies the profile
+declares: a server's pass does not cover a worker, and a standalone run does
+not cover a clustered one.
+
+With a crosswalk, it must also be met **for every requirement** the crosswalk
+maps it to: each requirement needs a passing check that names it, in each of
+those combinations. A criterion whose checks all pass but leave a mapped
+requirement without one is `partial`, which is not met and blocks a release.
+The mapping is many to many, and one broad requirement, or one passing suite,
+does not close a criterion the image states in several requirements. A deviation is visible and temporary, and does not
 score as a pass. The exception register itself, IMG-26, is judged by the
 conformance workflow from the profile, not taken from the image's evidence.
 
@@ -140,6 +153,16 @@ score but a failure because a number beside them would mislead:
 - [`check-component.py`](../scripts/check-component.py) reports a violation.
 - Any check failed.
 
+## Draft assessments
+
+A draft, the conformance workflow's `mode: draft`, is for an image still
+researching the standard. The profile may be incomplete, the component
+definition and requirements absent, and the architectures and evidence files
+are then taken from the evidence headers. The evidence is still read strictly.
+Gaps are reported as things to do, and changes to the standard since any pinned
+revision as drift. A draft claims nothing, never fails, and is never release
+eligible; its badge says `draft`, in blue.
+
 ## Release eligibility
 
 An image is release eligible only when all of these hold:
@@ -149,6 +172,9 @@ An image is release eligible only when all of these hold:
    by an active deviation.
 3. No active deviation is about a vulnerability: neither a `vulnerability`
    deviation, nor a criterion deviation from the vulnerability gate, IMG-25.
+4. Every decision in the decisions worksheet, when one is given, is reviewed.
+5. With `candidates`, every architecture's evidence is about the digest to be
+   released.
 
 A criterion deviation, with its owner, reason, and expiry, does not block a
 release: that is what a deviation is for. A vulnerability deviation does,
@@ -193,6 +219,7 @@ published to GitHub Pages from every run on main, under
 | Yellow | Valid and passing, not release eligible |
 | Red | `failing` |
 | Grey | `evidence invalid` |
+| Blue | `draft`: a draft assessment, which claims nothing |
 
 ## What it must never claim
 

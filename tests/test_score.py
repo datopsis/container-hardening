@@ -212,6 +212,74 @@ class RoleTests(unittest.TestCase):
         self.assertEqual(status(rows["arm64"], "IMG-13"), "met")
 
 
+def with_requirements(files: dict[str, dict], mapping: dict[str, list[str]]) -> dict[str, dict]:
+    for document_ in files.values():
+        for r in document_["results"]:
+            r["requirements"] = list(mapping.get(r["criterion"], []))
+    return files
+
+
+class CoverageTests(unittest.TestCase):
+    """Every requirement a criterion maps to needs evidence of its own."""
+
+    def mapping(self) -> dict[str, list[str]]:
+        return {c: ["REQ-" + c[4:]] for c in REQUIRED}
+
+    def rows(self, files: dict, mapping: dict, profile: dict = PROFILE) -> dict:
+        loaded = load(files, profile)
+        assert loaded.valid, loaded.errors
+        extra = [result("IMG-26") | {"architecture": "generic", "requirements": mapping.get("IMG-26", [])}]
+        return score.score(BASELINE, loaded.results + extra, set(), profile["architectures"], profile.get("roles"),
+                           mapping, profile.get("topologies"))
+
+    def test_each_mapped_requirement_is_evidenced(self) -> None:
+        mapping = self.mapping()
+        rows = self.rows(with_requirements(complete(), mapping), mapping)
+        self.assertTrue(all(r["status"] == "met" for rows_ in rows.values() for r in rows_))
+
+    def test_one_passing_check_does_not_close_a_criterion_mapped_to_two_requirements(self) -> None:
+        mapping = self.mapping() | {"IMG-13": ["REQ-13", "REQ-13B"]}
+        files = with_requirements(complete(), self.mapping())
+        rows = self.rows(files, mapping)
+        self.assertEqual(status(rows["amd64"], "IMG-13"), "partial")
+        row = next(r for r in rows["amd64"] if r["criterion"] == "IMG-13")
+        self.assertEqual(row["requirements_without_evidence"], ["REQ-13B"])
+
+    def test_a_check_linked_to_no_requirement_does_not_count(self) -> None:
+        mapping = self.mapping()
+        files = with_requirements(complete(), mapping)
+        for r in files["evidence-arm64/runtime.json"]["results"]:
+            if r["criterion"] == "IMG-13":
+                r["requirements"] = []
+        self.assertEqual(status(self.rows(files, mapping)["arm64"], "IMG-13"), "partial")
+
+    def test_a_requirement_the_criterion_does_not_map_to_is_an_error(self) -> None:
+        mapping = self.mapping()
+        files = with_requirements(complete(), mapping)
+        files["evidence-amd64/runtime.json"]["results"][0]["requirements"] = ["REQ-99"]
+        loaded = load(files)
+        self.assertIn("does not map", " ".join(score.scope_errors(loaded, {"criteria": mapping}, [])))
+
+    def test_every_declared_topology_is_evidenced(self) -> None:
+        profile = PROFILE | {"topologies": ["standalone", "clustered"]}
+        files = complete()
+        for name in list(files):
+            if name.endswith("runtime.json"):
+                files[name]["subject"]["topology"] = "standalone"
+        rows = score.score(
+            BASELINE, load(files, profile).results + [result("IMG-26") | {"architecture": "generic"}], set(),
+            profile["architectures"], None, None, profile["topologies"])
+        self.assertEqual(status(rows["amd64"], "IMG-13"), "no evidence")
+
+    def test_evidence_about_another_image_than_the_candidate_is_an_error(self) -> None:
+        files = complete()
+        files["evidence-amd64/runtime.json"]["subject"]["digest"] = "sha256:" + "3" * 64
+        loaded = load(files)
+        found = score.scope_errors(loaded, None, ["amd64=sha256:" + "4" * 64])
+        self.assertIn("not the amd64 candidate", " ".join(found))
+        self.assertEqual(score.scope_errors(loaded, None, ["amd64=sha256:" + "3" * 64]), [])
+
+
 class ScoreTests(unittest.TestCase):
     def test_passing_evidence_is_met_on_every_architecture(self) -> None:
         result_scopes = scopes(complete())

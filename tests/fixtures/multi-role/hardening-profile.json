@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "image": "multi-role-example",
+  "standard": {
+    "revision": "30757690911b52f715f2b9d140bb97837c646693"
+  },
+  "function": "A fixture for the conformance self-test: an image with a server and a worker role, run standalone and clustered. It is the reference image's profile with roles and topologies declared, and nothing is built from it.",
+  "architectures": [
+    "amd64",
+    "arm64"
+  ],
+  "roles": [
+    "server",
+    "worker"
+  ],
+  "topologies": [
+    "standalone",
+    "clustered"
+  ],
+  "evidence": [
+    {
+      "file": "build.json",
+      "scope": "architecture"
+    },
+    {
+      "file": "smoke.json",
+      "scope": "architecture"
+    },
+    {
+      "file": "gates-image.json",
+      "scope": "architecture"
+    },
+    {
+      "file": "gates-source.json",
+      "scope": "generic"
+    },
+    {
+      "file": "drift.json",
+      "scope": "generic"
+    },
+    {
+      "file": "release-latest.json",
+      "scope": "generic"
+    }
+  ],
+  "applicability": [
+    {
+      "source": "disa-application-server-srg",
+      "release": "V4R5",
+      "sha256": "ea33d7f18f950e86c9e0cc63835cf8802d319804ac143b2020b1fbac13ff2643",
+      "applies": false,
+      "basis": "27 of the 137 rules in V4R5 govern a management interface, hosted applications, or user accounts and identities, and this image has none of those. The rest state logging, TLS, and session requirements that the Web Server SRG states in terms that fit an HTTP server.",
+      "evidence": "docs/applicability/application-server-srg.md",
+      "reviewed_on": "2026-09-18",
+      "reviewed_by": "Joey"
+    },
+    {
+      "source": "disa-web-server-srg",
+      "release": "V3R3",
+      "sha256": "7345e31a61c162ee4ca0253e3f44b729c18bb45b3a17cb364e5d08422412b409",
+      "applies": true,
+      "basis": "The image's function is serving and proxying HTTP, which is the subject of the Web Server SRG.",
+      "evidence": "docs/srg/web-server-srg/README.md",
+      "reviewed_on": "2026-09-18",
+      "reviewed_by": "Joey"
+    }
+  ],
+  "deviations": [
+    {
+      "id": "DEV-008",
+      "kind": "criterion",
+      "target": "IMG-31",
+      "reason": "The image has not yet been deployed under the Restricted Pod Security Standard or OpenShift's restricted-v2 SCC.",
+      "compensating": "The smoke suite runs it with every capability dropped, no new privileges, the default seccomp profile, and an arbitrary UID, which is what both profiles require.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-009",
+      "kind": "criterion",
+      "target": "IMG-33",
+      "reason": "This repository's default branch is not yet protected, which is Package 6 of the roadmap.",
+      "compensating": "Changes arrive by pull request with CI; none is pushed directly by convention.",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    },
+    {
+      "id": "DEV-011",
+      "kind": "criterion",
+      "target": "IMG-16",
+      "reason": "nginx does not refuse a world-readable key file, which the criterion requires. It does refuse a missing or empty one.",
+      "compensating": "The key is mounted read-only and never reaches arguments, environment, or logs; the platform mounts it with restrictive permissions (PLT-06).",
+      "owner": "Joey",
+      "approved_by": "Joey",
+      "recorded_on": "2026-09-19",
+      "expires_on": "2027-03-17"
+    }
+  ]
+}

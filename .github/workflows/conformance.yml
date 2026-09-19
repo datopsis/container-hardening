@@ -64,6 +64,11 @@ on:
         required: false
         type: string
         default: ""
+      candidates:
+        description: Space-separated ARCH=DIGEST pairs naming the images to be released; each architecture's evidence must then be about that digest
+        required: false
+        type: string
+        default: ""
       evidence-artifacts:
         description: Name or glob of the artifacts holding the evidence, such as "evidence-*" for one per architecture; each is kept in its own directory
         required: true
@@ -151,6 +156,7 @@ jobs:
           CROSSWALK: ${{ inputs.crosswalk }}
           DECISIONS: ${{ inputs.decisions }}
           MODE: ${{ inputs.mode }}
+          CANDIDATES: ${{ inputs.candidates }}
           STANDARD_REF: ${{ inputs.standard-ref }}
           WORKFLOW_SHA: ${{ job.workflow_sha }}
         run: |
@@ -159,6 +165,7 @@ jobs:
           if [ -n "$CROSSWALK" ]; then options+=(--crosswalk "image/$CROSSWALK"); fi
           if [ -n "$DECISIONS" ]; then options+=(--decisions "image/$DECISIONS"); fi
           if [ -n "$REQUIREMENTS" ]; then options+=(--requirements "${files[@]}"); fi
+          for candidate in $CANDIDATES; do options+=(--candidate "$candidate"); done
           case "$MODE" in
             audit) options+=(--standard-ref "$STANDARD_REF" --workflow-sha "$WORKFLOW_SHA") ;;
             draft) options+=(--draft) ;;

@@ -79,15 +79,32 @@ def status(checks: list[dict], deviated: bool) -> str:
     return "met"
 
 
+ORDER = ["failed", "no evidence", "partial", "skipped", "met"]
+
+
+def combinations(qualifiers: dict[str, list[str]] | None) -> list[dict[str, str]]:
+    """Every combination of the declared roles and topologies; one empty one if none."""
+    combos: list[dict[str, str]] = [{}]
+    for name, values in (qualifiers or {}).items():
+        if values:
+            combos = [c | {name: v} for c in combos for v in values]
+    return combos
+
+
 def score(baseline: dict, results: list[dict], deviated: set[str], architectures: list[str],
-          roles: list[str] | None = None) -> dict[str, list[dict]]:
+          roles: list[str] | None = None, mapping: dict[str, list[str]] | None = None,
+          topologies: list[str] | None = None) -> dict[str, list[dict]]:
     """Rows per scope: each architecture, then generic.
 
-    With roles, a per-architecture criterion is met on an architecture only if
-    it is met for every role; the worst role's status is the criterion's.
+    A per-architecture criterion is met on an architecture only if it is met in
+    every declared role and topology; the worst combination's status is the
+    criterion's. With a crosswalk, a criterion is met only when every
+    requirement it maps to has a passing check of its own, in each of those
+    combinations: a broad link, or one passing suite, does not close it. Short
+    of that, it is "partial".
     """
     required = {c: m for c, m in baseline["criteria"].items() if m["level"] == "required"}
-    order = ["failed", "no evidence", "skipped", "met"]
+    combos = combinations({"role": roles or [], "topology": topologies or []})
     scopes: dict[str, list[dict]] = {}
     for scope in [*architectures, GENERIC]:
         rows = []
@@ -97,10 +114,27 @@ def score(baseline: dict, results: list[dict], deviated: set[str], architectures
                 continue
             checks = [r for r in results if r["criterion"] == criterion
                       and (not per_architecture or r["architecture"] == scope)]
-            found = status(checks, criterion in deviated)
-            if per_architecture and roles and found != "deviated":
-                found = min((status([c for c in checks if c.get("role") == role], False) for role in roles), key=order.index)
-            rows.append({"criterion": criterion, "title": meta["title"], "status": found, "checks": len(checks)})
+            if criterion in deviated:
+                found, uncovered = "deviated", []
+            else:
+                statuses, uncovered = [], set()
+                for combo in (combos if per_architecture else [{}]):
+                    subset = [c for c in checks if all(c.get(k) == v for k, v in combo.items())]
+                    found = status(subset, False)
+                    wanted = (mapping or {}).get(criterion) or []
+                    if mapping is not None and found == "met":
+                        passing = {r for c in subset if c["passed"] is True for r in c.get("requirements", [])}
+                        missing = [r for r in wanted if r not in passing]
+                        if missing:
+                            found = "partial"
+                            uncovered.update(missing)
+                    statuses.append(found)
+                found = min(statuses, key=ORDER.index)
+                uncovered = sorted(uncovered)
+            row = {"criterion": criterion, "title": meta["title"], "status": found, "checks": len(checks)}
+            if uncovered:
+                row["requirements_without_evidence"] = uncovered
+            rows.append(row)
         scopes[scope] = rows
     return scopes
 
@@ -110,7 +144,7 @@ def blockers(scopes: dict[str, list[dict]], active: list[dict]) -> list[str]:
     found = []
     for scope, rows in scopes.items():
         for row in rows:
-            if row["status"] in ("no evidence", "skipped", "failed"):
+            if row["status"] in ("no evidence", "skipped", "failed", "partial"):
                 found.append(row["criterion"] + " on " + scope + ": " + row["status"])
     for deviation in active:
         if deviation.get("kind") == "vulnerability":
@@ -118,6 +152,25 @@ def blockers(scopes: dict[str, list[dict]], active: list[dict]) -> list[str]:
         elif deviation.get("kind") == "criterion" and deviation.get("target") == VULNERABILITY_GATE:
             found.append(deviation.get("id", "?") + ": a deviation from the vulnerability gate, " + VULNERABILITY_GATE)
     return found
+
+
+def scope_errors(evidence, mapping: dict | None, candidates: list[str]) -> list[str]:
+    """What binds a result to a requirement and an image: it must name only
+    requirements its criterion maps to, and be about the candidate digest."""
+    errors = []
+    criteria = (mapping or {}).get("criteria") if isinstance(mapping, dict) else None
+    for result in evidence.results:
+        for requirement in result.get("requirements", []):
+            if criteria is not None and requirement not in (criteria.get(result["criterion"]) or []):
+                errors.append(result["file"] + " " + result["id"] + ": names " + requirement + ", which the crosswalk does not map "
+                              + result["criterion"] + " to")
+    wanted = dict(c.split("=", 1) for c in candidates if "=" in c)
+    for where, subject in evidence.subjects.items():
+        architecture = subject.get("architecture")
+        if architecture in wanted and subject.get("digest") != wanted[architecture]:
+            errors.append(where + ": is about " + str(subject.get("digest") or subject.get("image_id")) + ", not the "
+                          + architecture + " candidate " + wanted[architecture])
+    return errors
 
 
 def badge(label: str, message: str, colour: str) -> str:
@@ -147,6 +200,8 @@ def main() -> int:
     parser.add_argument("--requirement-pattern", default=None)
     parser.add_argument("--crosswalk", type=Path, help="the image's map from each criterion to its requirement identifiers")
     parser.add_argument("--decisions", type=Path, help="the image's decisions worksheet for the controls left to it")
+    parser.add_argument("--candidate", action="append", default=[], metavar="ARCH=DIGEST",
+                        help="the digest to be released for an architecture; that architecture's evidence must be about it")
     parser.add_argument("--draft", action="store_true",
                         help="a draft assessment: report what adopting would need, claim nothing, and never fail")
     parser.add_argument("--out", type=Path, default=Path("score"))
@@ -192,17 +247,24 @@ def main() -> int:
         component_violations += ["decisions: " + e for e in decision_errors]
 
     evidence = evidence_module.load(args.evidence, profile, baseline, draft=args.draft)
+    if evidence.valid:
+        evidence.errors.extend(scope_errors(evidence, mapping, args.candidate))
     # The exception register is judged here, from the profile itself, rather
     # than taken from the image's word for it (IMG-26).
     results = evidence.results + [{
         "id": "conformance.exceptions", "criterion": "IMG-26", "architecture": GENERIC, "file": "(conformance)",
         "check": "every exception is a recorded deviation, none expired or over its limit",
         "passed": not profile_violations,
+        # It judges the whole register, so it verifies whatever the image
+        # states IMG-26 as.
+        "requirements": list(((mapping or {}).get("criteria") or {}).get("IMG-26") or []),
     }]
     architectures = evidence.architectures
     deviated = {d["target"] for d in active if d.get("kind") == "criterion"}
     roles = profile.get("roles") if isinstance(profile.get("roles"), list) else None
-    scopes = score(baseline, results, deviated, architectures, roles) if evidence.valid else {}
+    topologies = profile.get("topologies") if isinstance(profile.get("topologies"), list) else None
+    criteria_map = mapping.get("criteria") if isinstance(mapping, dict) and isinstance(mapping.get("criteria"), dict) else None
+    scopes = score(baseline, results, deviated, architectures, roles, criteria_map, topologies) if evidence.valid else {}
 
     failed_rows = [s + " " + r["criterion"] for s, rows in scopes.items() for r in rows if r["status"] == "failed"]
     failing = bool(revision_errors or profile_violations or component_violations or failed_rows)
