@@ -1,16 +1,16 @@
 {
   "schema_version": 2,
-  "standard_revision": "94665340d9027f20b79a59e3ed20eecd4c783057",
+  "standard_revision": "4d56705ab26a4a9fc00d16830a5fff71846c6bcb",
   "scored_on": "2026-09-19",
   "mode": "audit",
-  "source_commit": "94665340d9027f20b79a59e3ed20eecd4c783057",
+  "source_commit": "4d56705ab26a4a9fc00d16830a5fff71846c6bcb",
   "state": "not eligible",
   "evidence_valid": true,
   "failing": false,
   "release_eligible": false,
   "coverage": {
-    "evidenced": 68,
-    "required": 68
+    "evidenced": 70,
+    "required": 70
   },
   "release_blockers": [
     "57 decisions not yet reviewed: ac-2, ac-2.1, ac-2.2, ac-2.3, ac-2.4, ac-2.5 and more"
@@ -80,9 +80,9 @@
   ],
   "scopes": {
     "amd64": {
-      "met": 31,
-      "required": 34,
-      "evidenced": 34,
+      "met": 32,
+      "required": 35,
+      "evidenced": 35,
       "criteria": [
         {
           "criterion": "IMG-01",
@@ -94,13 +94,13 @@
           "criterion": "IMG-02",
           "title": "Every build input pinned and verified",
           "status": "met",
-          "checks": 1
+          "checks": 3
         },
         {
           "criterion": "IMG-03",
           "title": "Hermetic assembly",
           "status": "met",
-          "checks": 2
+          "checks": 4
         },
         {
           "criterion": "IMG-04",
@@ -112,7 +112,7 @@
           "criterion": "IMG-05",
           "title": "No secrets in the build",
           "status": "met",
-          "checks": 2
+          "checks": 5
         },
         {
           "criterion": "IMG-06",
@@ -287,13 +287,19 @@
           "title": "Source and dependencies are scanned before build",
           "status": "met",
           "checks": 2
+        },
+        {
+          "criterion": "IMG-35",
+          "title": "The pipeline is pinned and least-privileged",
+          "status": "met",
+          "checks": 6
         }
       ]
     },
     "arm64": {
-      "met": 31,
-      "required": 34,
-      "evidenced": 34,
+      "met": 32,
+      "required": 35,
+      "evidenced": 35,
       "criteria": [
         {
           "criterion": "IMG-01",
@@ -305,13 +311,13 @@
           "criterion": "IMG-02",
           "title": "Every build input pinned and verified",
           "status": "met",
-          "checks": 1
+          "checks": 3
         },
         {
           "criterion": "IMG-03",
           "title": "Hermetic assembly",
           "status": "met",
-          "checks": 2
+          "checks": 4
         },
         {
           "criterion": "IMG-04",
@@ -323,7 +329,7 @@
           "criterion": "IMG-05",
           "title": "No secrets in the build",
           "status": "met",
-          "checks": 2
+          "checks": 5
         },
         {
           "criterion": "IMG-06",
@@ -498,13 +504,19 @@
           "title": "Source and dependencies are scanned before build",
           "status": "met",
           "checks": 2
+        },
+        {
+          "criterion": "IMG-35",
+          "title": "The pipeline is pinned and least-privileged",
+          "status": "met",
+          "checks": 6
         }
       ]
     },
     "generic": {
-      "met": 8,
-      "required": 9,
-      "evidenced": 9,
+      "met": 9,
+      "required": 10,
+      "evidenced": 10,
       "criteria": [
         {
           "criterion": "IMG-01",
@@ -522,7 +534,7 @@
           "criterion": "IMG-05",
           "title": "No secrets in the build",
           "status": "met",
-          "checks": 2
+          "checks": 5
         },
         {
           "criterion": "IMG-22",
@@ -559,6 +571,12 @@
           "title": "Source and dependencies are scanned before build",
           "status": "met",
           "checks": 2
+        },
+        {
+          "criterion": "IMG-35",
+          "title": "The pipeline is pinned and least-privileged",
+          "status": "met",
+          "checks": 6
         }
       ]
     }
