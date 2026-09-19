@@ -43,7 +43,22 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Linked every rendered rule page to the 800-53 controls it reaches, read from
   the committed crosswalk so the join lives in one place.
 
+- Wrote the hardening standard in `docs/standard/`: the prose account of what
+  a hardened Datopsis image is and why; 26 testable image criteria and three
+  targets, each anchored to a GPOS SRG rule and its 800-53 control; 11 platform
+  expectations anchored to the Container Platform SRG; a comparison with the
+  DISA Container Hardening Process Guide; and a dated conformance snapshot of
+  the five image repositories. `tests/test_standard.py` checks every citation
+  against the crosswalk.
+- Recorded [ADR-0003](docs/adr/0003-secrets-reach-an-image-only-as-read-only-files.md):
+  secrets reach an image only as read-only files.
+
 ### Fixed
+
+- Corrected the process guide's register entry. Its title is *Container
+  Hardening Process Guide*, V1R2, 24 August 2022, published by DISA under
+  Distribution Statement A; the register had taken a title from the PDF's
+  filename, left the date empty, and marked it not redistributable.
 
 - The weekly source verification would have failed on every run.
   `verify-sources.py --fetch` extracts every pinned package, including the RHEL
