@@ -83,11 +83,12 @@ def source(gates: Gates) -> int:
 def image(gates: Gates, reference: str, bundle: Path) -> int:
     with tempfile.TemporaryDirectory() as scratch:
         work = Path(scratch)
+        # A docker-archive is the format both scanners read directly.
         archive = work / "image.tar"
-        subprocess.run(["podman", "save", "--format", "oci-archive", "--output", str(archive), reference], check=True)
+        subprocess.run(["podman", "save", "--format", "docker-archive", "--output", str(archive), reference], check=True)
 
         sbom = gates.evidence / "sbom.spdx.json"
-        result = gates.run(gates.tool("syft"), "scan", "oci-archive:" + str(archive), "--quiet",
+        result = gates.run(gates.tool("syft"), "scan", "docker-archive:" + str(archive), "--quiet",
                            "--output", "spdx-json=" + str(sbom))
         packages = set()
         if result.returncode == 0 and sbom.exists():
@@ -99,12 +100,14 @@ def image(gates: Gates, reference: str, bundle: Path) -> int:
                      "sbom.spdx.json")
 
         full = gates.evidence / "trivy-image.json"
-        gates.run(gates.tool("trivy"), "image", "--quiet", "--input", str(archive), "--format", "json",
-                  "--output", str(full))
-        gate = gates.run(gates.tool("trivy"), "image", "--quiet", "--input", str(archive), "--ignore-unfixed",
-                         "--severity", "HIGH,CRITICAL", "--exit-code", "1", "--format", "table")
+        report = gates.run(gates.tool("trivy"), "image", "--input", str(archive), "--format", "json",
+                           "--output", str(full))
+        gate = gates.run(gates.tool("trivy"), "image", "--input", str(archive), "--skip-db-update",
+                         "--ignore-unfixed", "--severity", "HIGH,CRITICAL", "--exit-code", "1", "--format", "table")
+        # A scan that produced no report has not passed; say why.
+        detail = gate.stdout.strip()[-400:] if full.exists() else "no report: " + report.stderr.strip()[-400:]
         gates.record("IMG-25", "no fixed High or Critical vulnerability (Trivy, every finding recorded)",
-                     gate.returncode == 0 and full.exists(), gate.stdout.strip()[-400:], "trivy-image.json")
+                     report.returncode == 0 and gate.returncode == 0 and full.exists(), detail, "trivy-image.json")
 
         grype = gates.evidence / "grype.json"
         result = gates.run(gates.tool("grype"), "sbom:" + str(sbom), "--only-fixed", "--fail-on", "high",

@@ -116,6 +116,20 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   criteria, recording the evidence. What it does not yet evidence is recorded
   as expiring deviations in its profile.
 
+- Added supply-chain gates to the reference image. The scanners are pinned by
+  archive digest and verified before use. Before the build, the source is
+  scanned for committed secrets and for dependency, secret, and
+  build-definition findings; after it, an SPDX bill of materials is generated
+  and checked against the lock, Trivy and Grype gate on fixed High and Critical
+  vulnerabilities, and ClamAV scans the image and its inputs with refreshed
+  signatures. A drift report fails CI once a base is more than 30 days behind,
+  and a weekly read-only job reports it.
+- Moved the reference image to the nginx 1.26 module stream. The gates found
+  that RHEL 9's default nginx, 1.20, carries CVE-2026-42945 (Critical) and
+  eight High CVEs fixed only in the 1.24 and 1.26 streams.
+- Added a worked example of group read to IMG-16, under Podman and under
+  Kubernetes and OpenShift.
+
 ### Fixed
 
 - Corrected the process guide's register entry. Its title is *Container

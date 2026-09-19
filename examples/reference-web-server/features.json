@@ -1,6 +1,6 @@
 {
   "note": "What the image's nginx is built with (nginx -V configure flags), and which dynamic modules are installed. The smoke suite compares the running image with this declaration (IMG-07). Modules built =dynamic are absent unless listed under dynamic_modules.",
-  "version": "nginx/1.20.1",
+  "version": "nginx/1.26.3",
   "configure_flags": [
     "--with-cc",
     "--with-compat",
@@ -24,12 +24,15 @@
     "--with-http_stub_status_module",
     "--with-http_sub_module",
     "--with-http_v2_module",
+    "--with-http_v3_module",
     "--with-http_xslt_module=dynamic",
     "--with-ld",
     "--with-mail=dynamic",
     "--with-mail_ssl_module",
+    "--with-openssl",
     "--with-pcre",
     "--with-stream=dynamic",
+    "--with-stream_realip_module",
     "--with-stream_ssl_module",
     "--with-stream_ssl_preread_module",
     "--with-threads"

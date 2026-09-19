@@ -55,10 +55,13 @@ def base_drift(name: str, base: dict, today: datetime) -> dict:
 def rpm_drift() -> list[dict]:
     builder = "registry.access.redhat.com/" + LOCK["bases"]["builder"]["repository"] + "@" + LOCK["bases"]["builder"]["digest"]
     names = " ".join(r["name"] for r in LOCK["rpms"])
-    result = subprocess.run(
-        ["podman", "run", "--rm", builder, "bash", "-c",
-         "dnf -q repoquery --latest-limit 1 --arch x86_64,noarch --qf '%{name} %{epoch}:%{version}-%{release}.%{arch}' " + names],
-        text=True, capture_output=True, check=True)
+    # The locked module streams must be enabled, or their newer builds are hidden.
+    enable = ""
+    if LOCK.get("modules"):
+        enable = "dnf -q -y module enable " + " ".join(LOCK["modules"]) + " >/dev/null && "
+    query = "dnf -q repoquery --latest-limit 1 --arch x86_64,noarch --qf '%{name} %{epoch}:%{version}-%{release}.%{arch}' "
+    result = subprocess.run(["podman", "run", "--rm", builder, "bash", "-c", enable + query + names],
+                            text=True, capture_output=True, check=True)
     latest = {}
     for line in result.stdout.splitlines():
         name, evra = line.split(" ", 1)

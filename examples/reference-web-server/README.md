@@ -6,14 +6,14 @@ worked example of every file and check an image repository needs, and the
 starting point for a new image: copy this directory, change what the image
 runs, and keep the checks.
 
-It serves static content with nginx from Red Hat UBI 9 Micro. It has no
+It serves static content with nginx 1.26 from Red Hat UBI 9 Micro. It has no
 management interface, no user accounts, and hosts no application runtime.
 
 ## What is here
 
 | File | What it is | Criteria |
 | --- | --- | --- |
-| [`lock.json`](lock.json) | Every input: both bases by manifest-list digest, nine RPMs by SHA-256 and signing key, and the dependencies deliberately left out, with reasons | IMG-01, IMG-02, IMG-07 |
+| [`lock.json`](lock.json) | Every input: both bases by manifest-list digest, the nginx 1.26 module stream, eight RPMs by SHA-256 and signing key, and the dependencies deliberately left out, with reasons | IMG-01, IMG-02, IMG-07 |
 | [`scripts/acquire.py`](scripts/acquire.py) | The only step with network access: retrieves and verifies every input, or with `--refresh` rewrites the lock for review | IMG-02 to IMG-04 |
 | [`Containerfile`](Containerfile) | Assembly from the verified bundle, with networking disabled | IMG-01 to IMG-23 |
 | [`scripts/build.py`](scripts/build.py) | The only supported way to build it | IMG-03, IMG-23 |
@@ -22,6 +22,9 @@ management interface, no user accounts, and hosts no application runtime.
 | [`features.json`](features.json) | The nginx build flags and dynamic modules it declares | IMG-07 |
 | [`hardening-profile.json`](hardening-profile.json) | Its applicability determinations and deviations | IMG-26 |
 | [`tests/build_checks.py`](tests/build_checks.py) | Shows a tampered or missing input stops the build, and reads the build definition | IMG-01 to IMG-05 |
+| [`tools.json`](tools.json), [`scripts/install_tools.py`](scripts/install_tools.py) | The scanners, pinned by archive digest and verified before they are unpacked | IMG-02 |
+| [`tests/gates.py`](tests/gates.py) | Source scans before the build; bill of materials, two vulnerability gates, and a malware scan after it | IMG-21, IMG-25, IMG-28, IMG-34 |
+| [`scripts/drift.py`](scripts/drift.py) | How far the inputs are behind their publishers; fails CI once a base is more than 30 days behind | IMG-04, IMG-29 |
 | [`tests/smoke.py`](tests/smoke.py) | Reads every runtime property back from the running image, and records the evidence | IMG-06 to IMG-20, IMG-27, IMG-30, IMG-32 |
 
 ## Building and verifying it
@@ -31,7 +34,13 @@ python scripts/acquire.py /tmp/bundle          # retrieve and verify every input
 python tests/build_checks.py /tmp/bundle       # a defective input must stop the build
 python scripts/build.py /tmp/bundle            # assemble with networking disabled
 python tests/smoke.py localhost/reference-web-server:dev
+python scripts/install_tools.py /tmp/tools     # pinned scanners, verified
+python tests/gates.py source --bin /tmp/tools
+python tests/gates.py image localhost/reference-web-server:dev --bundle /tmp/bundle --bin /tmp/tools
+python scripts/drift.py --enforce
 ```
+
+The gates need Linux, because the scanners are pinned as Linux binaries.
 
 It needs Podman and Python 3. CI does the same on every change to this
 directory, in [`reference-image.yml`](../../.github/workflows/reference-image.yml),
@@ -64,8 +73,14 @@ the server answers; a platform's readiness probe should request a page.
 
 ## What the build found
 
-Building this image to the criteria found three things a less strict build
+Building this image to the criteria found four things a less strict build
 would have shipped:
+
+- **The default nginx carries a Critical vulnerability.** RHEL 9's default
+  nginx stream, 1.20, is affected by CVE-2026-42945 (Critical) and eight High
+  CVEs that Red Hat fixes only in the 1.24 and 1.26 module streams. Both
+  vulnerability gates stopped the build; the image now enables the 1.26
+  stream, recorded in the lock.
 
 - **The base carries build residue.** UBI Micro contains a subscription-manager
   repository file, a package-manager history database, and a package-manager
