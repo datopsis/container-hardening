@@ -107,6 +107,11 @@ in place. Its register entry records the package digest and, under `input`,
 the digest of the `U_CCI_List.xml` the generator reads. The weekly verification
 is the only thing that notices a replacement.
 
+Each rule page links the controls it reaches. The SRG renderer reads those
+from the committed `artifacts/crosswalk.json` rather than repeating the join,
+so **regenerate the crosswalk first, then the catalogues**, whenever an SRG or
+the CCI list changes.
+
 The generator refuses to run against an input that does not match its pin, a
 CCI the list does not define, or a control the catalogue lacks or has
 withdrawn. Deprecated CCIs and CCIs with no Rev 5 reference are listed as

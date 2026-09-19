@@ -40,6 +40,8 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `artifacts/crosswalk.json`. It refuses to map against an unpinned input or to
   a missing or withdrawn control. Recorded as
   [ADR-0002](docs/adr/0002-derive-800-53-cross-references-from-cci.md).
+- Linked every rendered rule page to the 800-53 controls it reaches, read from
+  the committed crosswalk so the join lives in one place.
 
 ### Fixed
 

@@ -30,6 +30,7 @@ from pathlib import Path
 REPOSITORY = Path(__file__).resolve().parent.parent
 OUTPUT = REPOSITORY / "docs" / "srg"
 REGISTER = REPOSITORY / "artifacts" / "sources.json"
+CROSSWALK = REPOSITORY / "artifacts" / "crosswalk.json"
 XCCDF = "{http://checklists.nist.gov/xccdf/1.1}"
 CCI_SYSTEM = "http://cyber.mil/cci"
 
@@ -156,7 +157,9 @@ def parse(path: Path) -> Catalogue:
     )
 
 
-def rule_page(catalogue: Catalogue, rule: Rule) -> str:
+def rule_page(
+    catalogue: Catalogue, rule: Rule, controls: list[tuple[str, str]]
+) -> str:
     out: list[str] = []
     out.append("# " + rule.stig_id)
     out.append("")
@@ -171,6 +174,15 @@ def rule_page(catalogue: Catalogue, rule: Rule) -> str:
         out.append("| CCI | " + ", ".join("`" + c + "`" for c in rule.ccis) + " |")
     if rule.legacy:
         out.append("| Legacy IDs | " + ", ".join("`" + c + "`" for c in rule.legacy) + " |")
+    if controls:
+        out.append(
+            "| NIST SP 800-53 Rev 5 | "
+            + ", ".join(
+                "[" + label + "](../../../crosswalk/controls/" + identifier + ".md)"
+                for identifier, label in controls
+            )
+            + " |"
+        )
     out.append("| Source | " + catalogue.title + ", " + catalogue.release + " |")
     out.append("")
 
@@ -307,7 +319,28 @@ def discover() -> list[Path]:
     return selected
 
 
+def load_crosswalk() -> dict[tuple[str, str], list[tuple[str, str]]]:
+    """Read the controls each rule reaches from the committed crosswalk.
+
+    The join of CCIs to 800-53 lives in build-cci-crosswalk.py alone; this
+    only reads its output. The crosswalk derives from the XCCDF, not from
+    these pages, so run that script first when either changes.
+    """
+    if not CROSSWALK.is_file():
+        return {}
+    data = json.loads(CROSSWALK.read_text(encoding="utf-8"))
+    labels = {c["id"]: c["label"] for c in data["controls"]}
+    return {
+        (catalogue["slug"], rule["group_id"]): [
+            (identifier, labels[identifier]) for identifier in rule["controls"]
+        ]
+        for catalogue in data["catalogues"]
+        for rule in catalogue["rules"]
+    }
+
+
 def render(catalogues: list[Catalogue]) -> dict[Path, str]:
+    crosswalk = load_crosswalk()
     pages: dict[Path, str] = {OUTPUT / "README.md": catalogue_index(catalogues)}
     for catalogue in catalogues:
         base = OUTPUT / catalogue.slug
@@ -322,7 +355,9 @@ def render(catalogues: list[Catalogue]) -> dict[Path, str]:
                     "duplicate group id " + rule.group_id + " in "
                     + catalogue.title + "; refusing to overwrite a rule page"
                 )
-            pages[path] = rule_page(catalogue, rule)
+            pages[path] = rule_page(
+                catalogue, rule, crosswalk.get((catalogue.slug, rule.group_id), [])
+            )
     return pages
 
 

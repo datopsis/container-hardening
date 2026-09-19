@@ -110,6 +110,15 @@ class PageTests(unittest.TestCase):
                 with self.subTest(page=page.name, target=target):
                     self.assertTrue((page.parent / target).resolve().is_file())
 
+    def test_every_rule_page_links_the_controls_it_reaches(self) -> None:
+        for catalogue in crosswalk()["catalogues"]:
+            rules = REPOSITORY / "docs" / "srg" / catalogue["slug"] / "rules"
+            for rule in catalogue["rules"]:
+                body = (rules / (rule["group_id"] + ".md")).read_text(encoding="utf-8")
+                linked = re.findall(r"\(\.\./\.\./\.\./crosswalk/controls/([^)]+)\.md\)", body)
+                with self.subTest(catalogue=catalogue["slug"], rule=rule["group_id"]):
+                    self.assertEqual(linked, rule["controls"])
+
 
 if __name__ == "__main__":
     unittest.main()
