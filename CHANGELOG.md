@@ -265,6 +265,13 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   history, labels, the bill of materials, and the release's provenance for
   acquisition material, and reads its own workflows. ADOPTING.md adds how to
   fetch inputs and how to operate them.
+- Every control now says how it is satisfied. Each decision in an image's
+  worksheet carries a statement, in terms of what the image does, which becomes
+  that control's remarks in the component definition; and
+  `scripts/build-statements.py` renders all 379 baseline controls as one page
+  per image, generated and checked in CI. The reference image's statements are
+  written for its 57 decided controls and derived for the rest, and say plainly
+  which decisions are not yet reviewed.
 - Accepted [ADR-0007](docs/adr/0007-record-manual-reviews-as-expiring-evidence.md):
   a person's review may evidence a criterion only where the criterion says so,
   only by a code owner, and only until what it reviewed changes. IMG-04 is the

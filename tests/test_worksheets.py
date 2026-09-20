@@ -99,7 +99,9 @@ class DecisionTests(unittest.TestCase):
 
     def test_account_controls_warn_against_a_copied_no_accounts(self) -> None:
         rows = {r["control"]: r for r in sheets.new_decisions("test")["decisions"]}
-        self.assertIn("S3 access key", rows["ac-2"]["warning"])
+        # The warning covers taking part in identity, not only storing accounts.
+        for phrase in ("JWT signature", "session cookie", "inherited from them, not not-applicable"):
+            self.assertIn(phrase, rows["ac-2"]["warning"])
         self.assertNotIn("warning", rows["sc-13"])
 
     def test_the_reference_images_decisions_are_complete_and_unreviewed(self) -> None:
@@ -109,12 +111,18 @@ class DecisionTests(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(len(unreviewed), len(sheet["decisions"]))
 
-    def test_a_decision_needs_an_owner_and_a_rationale(self) -> None:
+    def test_a_decision_needs_an_owner_a_rationale_and_a_statement(self) -> None:
         sheet = json.loads((REFERENCE / "decisions.json").read_text(encoding="utf-8"))
-        sheet["decisions"][0] |= {"owner": "", "rationale": ""}
+        sheet["decisions"][0] |= {"owner": "", "rationale": "", "statement": ""}
         errors, _ = sheets.check_decisions(sheet)
-        self.assertTrue(any("owner is required" in e for e in errors))
-        self.assertTrue(any("rationale is required" in e for e in errors))
+        for field in ("owner", "rationale", "statement"):
+            self.assertTrue(any(field + " is required" in e for e in errors), field)
+
+    def test_every_decision_states_how_the_control_is_satisfied(self) -> None:
+        sheet = json.loads((REFERENCE / "decisions.json").read_text(encoding="utf-8"))
+        for row in sheet["decisions"]:
+            with self.subTest(control=row["control"]):
+                self.assertGreater(len(row["statement"].split()), 12, "a statement says how, not just that")
 
     def test_a_decision_the_component_contradicts_is_an_error(self) -> None:
         sheet = json.loads((REFERENCE / "decisions.json").read_text(encoding="utf-8"))

@@ -17,10 +17,13 @@ source's determination in the hardening profile follows from the worksheet: it
 applies if any rule applies.
 
 **Decisions**: every control the control baseline leaves ``research-required``,
-decided for this image with an origination, a rationale, an owner, and a
-review. Access-control and identification controls carry a warning, because a
-"no accounts" answer copied from the reference image is wrong for any image
-that authenticates a client, such as one holding API or S3 access keys.
+decided for this image with an origination, a rationale, a statement of how the
+control is satisfied in terms of what the image does, an owner, and a review.
+Access-control and identification controls carry a warning, because a "no
+accounts" answer copied from the reference image is wrong for any image that
+takes part in identity: one that verifies a token or session, holds a client
+secret, or decides authorization from claims, as much as one that stores
+accounts or API keys.
 
 Both are checked against the pinned sources and baseline. Undecided rows,
 unknown rules, and missing fields are errors; decisions not yet reviewed are
@@ -52,8 +55,12 @@ RULE_DECISIONS = ("applies", "not-applicable", "other-layer", "covered-by")
 REFERENCE = re.compile(r"^[a-z0-9][a-z0-9-]*:V-\d+$")
 ACCOUNTS = ("ac-", "ia-")
 ACCOUNTS_WARNING = (
-    "If the image authenticates any client, by password, token, certificate, API key, or S3 access key, it has "
-    "accounts or authenticators, and not-applicable does not fit; decide what the image does with them."
+    "Does this image take part in identity at all? It does if it stores accounts or keys; if it verifies a "
+    "credential itself, such as a JWT signature, a session cookie, a client certificate, or basic authentication; "
+    "if it holds a secret to do so, such as an OIDC client secret or a pinned JWKS; or if it decides authorization "
+    "from claims. Any of those makes this image-owned, at least in part. If an identity provider or a proxy does it "
+    "instead, the control is inherited from them, not not-applicable: not-applicable means there is nothing for the "
+    "control to apply to, which is true only where the image never sees an identity."
 )
 
 
@@ -163,7 +170,8 @@ def new_decisions(image: str) -> dict:
         if control["origination"] != "research-required":
             continue
         row = {"control": control["id"], "label": control["label"], "title": control["title"],
-               "origination": None, "rationale": "", "owner": "", "reviewed_by": None, "reviewed_on": None}
+               "origination": None, "rationale": "", "statement": "", "owner": "",
+               "reviewed_by": None, "reviewed_on": None}
         if control["id"].startswith(ACCOUNTS):
             row["warning"] = ACCOUNTS_WARNING
         rows.append(row)
@@ -192,7 +200,7 @@ def check_decisions(sheet: dict, component: dict | None = None) -> tuple[list[st
         if row.get("origination") not in originations and row.get("origination") != "research-required":
             errors.append(control + ": origination must be one of " + ", ".join(sorted(originations))
                           + ", or research-required with a reason it stays open")
-        for field in ("rationale", "owner"):
+        for field in ("rationale", "statement", "owner"):
             if not str(row.get(field) or "").strip():
                 errors.append(control + ": " + field + " is required")
         if not row.get("reviewed_by") or not row.get("reviewed_on"):

@@ -109,6 +109,11 @@ jobs:
         working-directory: .
         run: |
           python examples/reference-web-server/scripts/component.py --check
+          python scripts/build-statements.py --check \
+            --component examples/reference-web-server/oscal/component-definition.json \
+            --decisions examples/reference-web-server/decisions.json \
+            --crosswalk examples/reference-web-server/requirements-crosswalk.json \
+            --image reference-web-server --out examples/reference-web-server/CONTROL-STATEMENTS.md
           python scripts/check-component.py examples/reference-web-server/oscal/component-definition.json \
             --requirements examples/reference-web-server/requirements.md \
             --crosswalk examples/reference-web-server/requirements-crosswalk.json \

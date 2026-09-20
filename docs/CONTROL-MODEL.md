@@ -8,6 +8,13 @@ Where it lives, and why, is [ADR-0004](adr/0004-derive-the-control-baseline-here
 
 ## What each image produces
 
+An image says how each control is satisfied, in prose, in a generated page:
+`scripts/build-statements.py` renders the baseline, the component definition,
+and the decisions worksheet as one statement per control, as the
+[reference image's](../examples/reference-web-server/CONTROL-STATEMENTS.md)
+shows. A statement says what satisfies a control; it is not a claim that the
+control is assessed, which is what evidence and the score are for.
+
 Each image repository keeps an **OSCAL component definition** describing what
 that image contributes to each control. It is not a System Security Plan and
 cannot become one: an SSP depends on the deployed boundary, the organization's
