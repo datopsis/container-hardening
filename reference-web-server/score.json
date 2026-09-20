@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
-  "standard_revision": "800b5719f457ca10b4c1a4048650a2d640fd00ab",
-  "scored_on": "2026-09-19",
+  "standard_revision": "27a85ffc2cde8653d465774d8b8049d3deb4eb0b",
+  "scored_on": "2026-09-20",
   "mode": "audit",
-  "source_commit": "800b5719f457ca10b4c1a4048650a2d640fd00ab",
+  "source_commit": "27a85ffc2cde8653d465774d8b8049d3deb4eb0b",
   "state": "not eligible",
   "evidence_valid": true,
   "failing": false,
