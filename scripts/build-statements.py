@@ -43,7 +43,7 @@ FAMILIES = {
 }
 WHO = {
     "image-owned": "This image", "deployment-configured": "The deployment", "host-inherited": "The host or platform",
-    "organization-inherited": "The organization", "not-applicable": "Nobody: it does not apply",
+    "organization-inherited": "The organization", "not-applicable": "Nobody: nothing here to apply it to",
     "research-required": "Undecided",
 }
 
@@ -71,14 +71,14 @@ def statement(control: dict, entry: dict, decided: dict, criteria: dict, mapping
     if origination == "image-owned":
         titles = "; ".join(c + " " + criteria[c]["title"] for c in cited if c in criteria)
         stated = sorted({r for c in cited for r in (mapping.get(c) or [])})
-        parts.append("Satisfied by this image, through " + (titles or "its criteria") + ".")
+        parts.append("This image carries it, through " + (titles or "its criteria") + ".")
         if stated:
             parts.append("It states them as " + ", ".join(stated) + ", which name the checks that verify them.")
         if control["handoff"]:
             parts.append("The image cannot constrain how a deployment runs it: " + ", ".join(control["handoff"])
                          + " is the platform's part.")
     else:
-        parts.append(WHO[origination] + " satisfies it. " + control["reason"])
+        parts.append(WHO[origination] + " carries it. " + control["reason"])
         if cited:
             parts.append("This image contributes " + ", ".join(cited) + ".")
         if control["handoff"] and origination != "not-applicable":
@@ -111,15 +111,17 @@ def build(component: dict, decisions: dict, mapping: dict, image: str) -> str:
     lines = [
         "# Control statements: " + image,
         "",
-        "How every control in the standard's [baseline](../../docs/controls/README.md) is satisfied for this image, and",
-        "by whom. Generated from the baseline, this image's",
+        "What carries every control in the standard's [baseline](../../docs/controls/README.md) for",
+        "this image, and who carries the rest. Generated from the baseline, this image's",
         "[component definition](oscal/component-definition.json), and its",
         "[decisions](decisions.json) by `scripts/build-statements.py`; do not edit it by hand.",
         "",
-        "A statement says what satisfies the control. It is not a claim that the control is",
-        "assessed: what this image evidences, and how well, is its",
-        "[conformance score](../../docs/EVIDENCE.md), and no statement here asserts a",
-        "criterion is met.",
+        "Controls and criteria are many to many. A criterion contributes to several",
+        "controls, and a control is usually divided between the image, its deployment, the",
+        "host, and the organization. A statement says **what this image carries of a",
+        "control**, and who carries the rest; it does not say the control is satisfied,",
+        "which is true only when every part of it is. Nor is it evidence: what this image",
+        "evidences, and how well, is its [conformance score](../../docs/EVIDENCE.md).",
         "",
         "| Origination | Controls |",
         "| --- | ---: |",
@@ -131,7 +133,7 @@ def build(component: dict, decisions: dict, mapping: dict, image: str) -> str:
     lines.append("| **Total** | **" + str(sum(counts.values())) + "** |")
     for family in sorted(families):
         lines += ["", "## " + FAMILIES.get(family, family.upper()) + " (" + family.upper() + ")", "",
-                  "| Control | Title | Origination | How it is satisfied |", "| --- | --- | --- | --- |"]
+                  "| Control | Title | Origination | What carries it |", "| --- | --- | --- | --- |"]
         lines += families[family]
     return "\n".join(lines) + "\n"
 

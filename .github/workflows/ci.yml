@@ -37,7 +37,7 @@ jobs:
       # the packages it derives from needs the packages, and is done by
       # verify-sources.yml.
       - name: Validate the register, catalogues, crosswalk, standard, controls, and tailoring
-        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls tests.test_tailoring tests.test_applicability tests.test_score tests.test_revision tests.test_worksheets tests.test_reviews -v
+        run: python -m unittest tests.test_sources tests.test_crosswalk tests.test_standard tests.test_controls tests.test_tailoring tests.test_applicability tests.test_score tests.test_revision tests.test_worksheets tests.test_reviews tests.test_package -v
 
       # A change to the criteria makes the reference image's assessment stale
       # until its profile names the new revision.
@@ -52,6 +52,22 @@ jobs:
             --decisions examples/reference-web-server/decisions.json \
             --crosswalk examples/reference-web-server/requirements-crosswalk.json \
             --image reference-web-server --out examples/reference-web-server/CONTROL-STATEMENTS.md
+
+      # The list of controls to inspect, the package's diagrams, and the
+      # package's form. What the package says is review's business, not CI's.
+      - name: Check the reference image's inspection list and cyber package
+        run: |
+          python scripts/build-inspection-list.py --check \
+            --profile examples/reference-web-server/hardening-profile.json \
+            --component examples/reference-web-server/oscal/component-definition.json \
+            --decisions examples/reference-web-server/decisions.json \
+            --image reference-web-server --out examples/reference-web-server/INSPECTION-LIST.md
+          python examples/reference-web-server/scripts/build-package-diagrams.py --check
+          python scripts/check-package.py \
+            --package examples/reference-web-server/package/README.md \
+            --profile examples/reference-web-server/hardening-profile.json \
+            --inspection-list examples/reference-web-server/INSPECTION-LIST.md \
+            --statements examples/reference-web-server/CONTROL-STATEMENTS.md
 
       # The diagrams need no source package, so their drift is checked here.
       - name: Check the diagrams match their generator

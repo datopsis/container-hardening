@@ -14,68 +14,12 @@ Usage:
 import argparse
 import sys
 from pathlib import Path
-from xml.sax.saxutils import escape
 
 REPOSITORY = Path(__file__).resolve().parent.parent
 OUT = REPOSITORY / "docs" / "architecture" / "diagrams"
-RENDERED: dict[str, str] = {}
 
-FONT = "-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
-INK, MUTED, LINE = "#1f2328", "#57606a", "#8c959f"
-BOX, BOX_EDGE = "#f6f8fa", "#8c959f"
-KEY, KEY_EDGE = "#ddf4ff", "#0969da"
-MAP = "#8250df"
-
-
-class SVG:
-    def __init__(self, width, height, title, desc):
-        self.w, self.h = width, height
-        self.parts = [
-            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
-            f'viewBox="0 0 {width} {height}" role="img" aria-labelledby="t d">',
-            f"<title id=\"t\">{escape(title)}</title>",
-            f"<desc id=\"d\">{escape(desc)}</desc>",
-            "<defs><marker id=\"a\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" "
-            f"markerHeight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0,0 L10,5 L0,10 z\" fill=\"{MUTED}\"/></marker></defs>",
-            f'<rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" rx="10" fill="#ffffff" stroke="#d0d7de"/>',
-        ]
-
-    def text(self, x, y, s, size=13, weight="normal", fill=INK, anchor="start", italic=False):
-        style = ' font-style="italic"' if italic else ""
-        self.parts.append(
-            f'<text x="{x}" y="{y}" font-family="{FONT}" font-size="{size}" font-weight="{weight}" '
-            f'fill="{fill}" text-anchor="{anchor}"{style}>{escape(s)}</text>'
-        )
-
-    def box(self, x, y, w, h, title, lines=(), key=False, columns=1, subtitle=None):
-        fill, edge = (KEY, KEY_EDGE) if key else (BOX, BOX_EDGE)
-        self.parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="6" fill="{fill}" stroke="{edge}"/>')
-        self.text(x + w / 2, y + 21, title, 14, "600", anchor="middle")
-        top = y + 21
-        if subtitle:
-            self.text(x + w / 2, y + 38, subtitle, 11.5, fill=MUTED, anchor="middle", italic=True)
-            top = y + 38
-        per = -(-len(lines) // columns) if lines else 0
-        for i, line in enumerate(lines):
-            col, row = divmod(i, per) if per else (0, 0)
-            cx = x + 14 + col * (w - 20) / columns
-            self.text(cx, top + 21 + row * 18, line, 12.5, fill=INK)
-
-    def arrow(self, x1, y1, x2, y2):
-        self.parts.append(
-            f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)"/>'
-        )
-
-    def path(self, d):
-        self.parts.append(f'<path d="{d}" fill="none" stroke="{MUTED}" stroke-width="1.5" marker-end="url(#a)"/>')
-
-    def tag(self, x, y, s, anchor="start"):
-        self.text(x, y, s, 11.5, "600", fill=MAP, anchor=anchor)
-
-    def save(self, name):
-        self.parts.append("</svg>")
-        RENDERED[name] = "\n".join(self.parts) + "\n"
-
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from svg import INK, KEY, MAP, MUTED, RENDERED, SVG  # noqa: E402
 
 # 1. The workload's runtime stack ---------------------------------------------
 s = SVG(760, 570, "Container workload runtime stack",
@@ -343,6 +287,56 @@ for i, (line, tags) in enumerate(automated):
 s.path(f"M 370 {52 + (len(person) - 1) * 44 + 16} C 390 {52 + (len(person) - 1) * 44 + 16}, 390 68, 410 68")
 s.text(390, 52 + len(person) * 44 + 20, "tag vX.Y.Z", 11.5, "600", fill=MUTED, anchor="middle")
 s.save("releasing.svg")
+
+# 10. Where the reference image's controls are applied --------------------------
+s = SVG(920, 640, "Where the reference image's controls are applied",
+        "A client reaches the reference web server through the platform, which admits the image by verified digest, "
+        "imposes the security context, applies network policy, and mounts what the image needs read-only. Inside the "
+        "container, nginx runs as an unprivileged user under a read-only root filesystem with one writable tmpfs, "
+        "serving content on 8080 and, when key material is mounted, TLS on 8443, and writing its records to the "
+        "standard streams, which the platform collects. Each box names the controls that box carries part of; a "
+        "control named in more than one box is divided between them, and is satisfied only when every part is.")
+s.box(40, 24, 380, 74, "Client", ["Anonymous. No credential is presented,", "and none is asked for."])
+s.tag(430, 52, "AC-14, IA-2: nobody is identified")
+s.tag(430, 70, "AC-3: what is reachable is the deployment's")
+s.arrow(230, 98, 230, 126)
+s.box(40, 126, 380, 128, "The deployment and the platform", [
+    "Admits the image by verified digest; imposes the",
+    "security context; network policy; mounts content,",
+    "a server block, a certificate, and a key read-only.",
+], key=True)
+s.tag(430, 160, "PLT-01, PLT-02: admission and least privilege")
+s.tag(430, 178, "PLT-06: secrets as read-only files")
+s.tag(430, 196, "PLT-10: traffic controlled and encrypted")
+s.tag(430, 214, "SC-8, SC-23, AC-17(2): TLS, when mounted")
+s.tag(430, 232, "IA-5, IA-5(6): the key it supplies")
+s.arrow(230, 254, 230, 282)
+s.box(40, 282, 380, 190, "The container", [
+    "nginx 1.26: one master, workers, UID 1001:0",
+    "read-only root filesystem; one tmpfs on /tmp",
+    "every capability dropped; no new privileges",
+    "listeners 8080, and 8443 when TLS is mounted",
+    "no package manager, shell service, or su",
+    "serves only files under the document root",
+])
+s.tag(430, 316, "IMG-11 to IMG-15: user, capabilities, ports")
+s.tag(430, 334, "AC-6, CM-7: least privilege and functionality")
+s.tag(430, 352, "AC-3, SC-5: what it serves, and refuses")
+s.tag(430, 370, "SI-10, SI-11: malformed requests, error detail")
+s.tag(430, 388, "SC-18: no mobile code of its own")
+s.tag(430, 406, "CM-6: the configuration it ships")
+s.arrow(230, 472, 230, 500)
+s.box(40, 500, 380, 108, "Its records", [
+    "access records to standard output, combined",
+    "format; errors to standard error; no log file.",
+    "The platform collects and retains them.",
+])
+s.tag(430, 534, "AU-2, AU-3, AU-12: what is logged")
+s.tag(430, 552, "AU-9, PLT-09: protected and collected there")
+s.tag(430, 570, "AU-10: anonymous, so nothing to attribute")
+s.text(480, 614, "A control named in more than one box is divided between them: each box carries part of it, and no part "
+       "satisfies it alone.", 11.5, fill=MUTED, anchor="middle", italic=True)
+s.save("reference-controls.svg")
 
 
 def main() -> int:
