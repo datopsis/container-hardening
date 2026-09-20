@@ -32,7 +32,9 @@ accounts, and hosts no application runtime.
 | [`tests/gates.py`](tests/gates.py) | Source scans before the build; bill of materials, a scan of history, labels, and the bill of materials for acquisition material, two vulnerability gates, and a malware scan after it | IMG-05, IMG-21, IMG-25, IMG-28, IMG-34 |
 | [`scripts/drift.py`](scripts/drift.py) | How far the inputs are behind their publishers; fails CI once a base is more than 30 days behind | IMG-04, IMG-29 |
 | [`decisions.json`](decisions.json) | Its decision, rationale, statement of how the control is satisfied, owner, and review for each control the baseline leaves to the image | the control model |
-| [`CONTROL-STATEMENTS.md`](CONTROL-STATEMENTS.md) | Generated: how every control in the baseline is satisfied for this image, and by whom | the control model |
+| [`CONTROL-STATEMENTS.md`](CONTROL-STATEMENTS.md) | Generated: what carries every control in the baseline for this image, and who carries the rest | the control model |
+| [`INSPECTION-LIST.md`](INSPECTION-LIST.md) | Generated: every control, in three groups, from the capabilities this image declares | [the cyber package](../../docs/CYBER-PACKAGE.md) |
+| [`package/`](package/README.md), [`scripts/build-package-diagrams.py`](scripts/build-package-diagrams.py) | Its cyber package: the architecture, the trust boundaries, where the controls are applied, and eight diagrams | [the cyber package](../../docs/CYBER-PACKAGE.md) |
 | [`requirements.md`](requirements.md) | What the image commits to, one requirement per criterion, each naming its checks | the verification pointer |
 | [`scripts/component.py`](scripts/component.py), [`oscal/component-definition.json`](oscal/component-definition.json) | Its OSCAL component definition: every baseline control, and its own decisions for the ones the baseline leaves open | the control model |
 | [`tests/smoke.py`](tests/smoke.py) | Reads every runtime property back from the running image, and records the evidence | IMG-06 to IMG-20, IMG-27, IMG-30, IMG-32 |

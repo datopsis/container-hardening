@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="470" viewBox="0 0 900 470" role="img" aria-labelledby="t d">
+<title id="t">Deployment: what the platform gives it, and what it may write</title>
+<desc id="d">The platform runs the image under a restricted security context, with a read-only root filesystem and one writable tmpfs on /tmp. Content, an optional server block, and optional key material are mounted read-only. Everything else the image needs it already carries.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="899" height="469" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<rect x="20" y="16" width="860" height="270" rx="10" fill="none" stroke="#0969da" stroke-width="1.5" stroke-dasharray="7 5"/>
+<text x="32" y="36" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#0969da" text-anchor="start">The pod, as the platform runs it</text>
+<rect x="40" y="60" width="250" height="130" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="165.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Security context</text>
+<text x="54.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">runAsNonRoot, arbitrary UID</text>
+<text x="54.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">allowPrivilegeEscalation: false</text>
+<text x="54.0" y="138" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">capabilities: drop ALL</text>
+<text x="54.0" y="156" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">readOnlyRootFilesystem: true</text>
+<text x="54.0" y="174" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">seccomp: RuntimeDefault</text>
+<text x="40" y="210" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-02, IMG-11 to IMG-13, IMG-31</text>
+<rect x="320" y="60" width="250" height="130" rx="6" fill="#ddf4ff" stroke="#0969da"/>
+<text x="445.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">The container</text>
+<text x="334.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">nginx 1.26 on UBI 9 Micro</text>
+<text x="334.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">listens 8080, and 8443 with TLS</text>
+<text x="334.0" y="138" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">writes only under /tmp</text>
+<text x="334.0" y="156" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">logs to the standard streams</text>
+<text x="320" y="210" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-14, IMG-15, IMG-19</text>
+<rect x="600" y="60" width="260" height="130" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="730.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Mounted in</text>
+<text x="614.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">content -&gt; /usr/share/nginx/html</text>
+<text x="614.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">server block -&gt; /etc/nginx/conf.d</text>
+<text x="614.0" y="138" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">certificate and key -&gt; /etc/nginx/tls</text>
+<text x="614.0" y="156" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">all read-only; key 0640 root:0</text>
+<text x="600" y="210" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-06, IMG-16, IMG-17, ADR-0003</text>
+<rect x="40" y="300" width="400" height="96" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="240.0" y="321" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Writable: exactly one path</text>
+<text x="54.0" y="342" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">tmpfs /tmp, rw, noexec, nosuid, nodev, 16m</text>
+<text x="54.0" y="360" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">nginx's pid file and its temporary paths live there</text>
+<text x="40" y="416" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-15, IMG-10: nothing else is writable</text>
+<rect x="470" y="300" width="390" height="96" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="665.0" y="321" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Not given, and not needed</text>
+<text x="484.0" y="342" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">no persistent volume; the image stores nothing</text>
+<text x="484.0" y="360" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">no service account token, no environment secrets</text>
+<text x="470" y="416" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-05, ADR-0003, SC-28: nothing at rest here</text>
+</svg>

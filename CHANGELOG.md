@@ -265,6 +265,30 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   history, labels, the bill of materials, and the release's provenance for
   acquisition material, and reads its own workflows. ADOPTING.md adds how to
   fetch inputs and how to operate them.
+- What an image does now decides which controls it inspects. An image declares
+  capabilities in its profile, and `artifacts/inspection-map.json` turns them
+  into controls: declaring `terminates-mutual-tls` brings identification and
+  access enforcement, and removing it takes them away.
+  `scripts/build-inspection-list.py` renders every control in the baseline in
+  three groups, to inspect, inherited, and nothing to apply to, so a reviewer
+  can walk all 379 rather than trust a short list; it flags a control answered
+  not-applicable that a capability says the image does, and raises controls
+  outside the High baseline worth considering, such as SI-15 for an image that
+  renders content a caller supplied.
+- The cyber package, [docs/CYBER-PACKAGE.md](docs/CYBER-PACKAGE.md): what a
+  person writes for an image, in eight sections, with the architecture and its
+  trust boundaries drawn. `scripts/svg.py` is now a shared builder with the
+  shapes those diagrams need, and the reference image generates eight of its
+  own: context, data flow, two sequences, lifecycle, deployment, network, and
+  identity. `scripts/check-package.py` checks the package's form only: a
+  missing section, an undiscussed capability, an unreferenced diagram, a
+  flagged control the package passes over, a placeholder. Whether it is correct
+  stays with review. ADOPTING.md adds the step.
+- The reference image's IA-5 and IA-5(6) moved from not-applicable to
+  deployment-configured. The capability check found them: an image that can
+  terminate TLS handles key material, whoever supplies it. A decision that
+  claims the image owns a control now names the criteria it rests on, rather
+  than assuming logging.
 - Every control now says how it is satisfied. Each decision in an image's
   worksheet carries a statement, in terms of what the image does, which becomes
   that control's remarks in the component definition; and

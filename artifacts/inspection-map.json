@@ -1,0 +1,216 @@
+{
+  "schema": "container-hardening/inspection-map",
+  "schema_version": 1,
+  "note": "What an image does decides which controls must be inspected for it. Every image inspects the controls the baseline leaves to it, or gives it; each capability an image declares adds more. The map says which, and why. A capability may also raise a control the High baseline does not select, under consider: not required, but put in front of whoever inspects, to select or to decline with a reason. It does not decide the answer: inspecting a control is a person's work, recorded in the image's cyber package. See docs/CYBER-PACKAGE.md.",
+  "capabilities": {
+    "authenticates-clients": {
+      "title": "Authenticates clients",
+      "question": "Does the image verify a credential itself: a token, a session, a password, a certificate?",
+      "why": "It authenticates, even where an identity provider issued the credential, so identification and session controls apply to it.",
+      "controls": [
+        "ac-3",
+        "ac-7",
+        "ac-10",
+        "ac-12",
+        "au-2",
+        "au-3",
+        "ia-2",
+        "ia-5",
+        "ia-6",
+        "ia-8",
+        "ia-11"
+      ]
+    },
+    "authorizes-by-claims": {
+      "title": "Authorizes from claims or roles",
+      "question": "Does the image decide what a caller may do, from claims, roles, or policy it holds?",
+      "why": "The image enforces access, and least privilege applies to what it permits.",
+      "controls": [
+        "ac-3",
+        "ac-6",
+        "ac-6.1",
+        "ac-6.2",
+        "au-2"
+      ]
+    },
+    "issues-credentials": {
+      "title": "Issues credentials",
+      "question": "Does the image issue tokens, API keys, or access keys that a client uses later?",
+      "why": "An issued credential is an authenticator the image manages, and its use must be attributable.",
+      "controls": [
+        "ac-2",
+        "au-2",
+        "au-10",
+        "ia-4",
+        "ia-5",
+        "ia-5.2"
+      ],
+      "consider": [
+        {
+          "control": "ia-5.13",
+          "label": "IA-5(13)",
+          "title": "Expiration of Cached Authenticators",
+          "why": "An image that issues tokens decides how long they remain usable; the High baseline does not select this, and a token with no expiry is worth a deliberate decision."
+        }
+      ]
+    },
+    "manages-accounts": {
+      "title": "Manages accounts",
+      "question": "Does the image create, store, disable, or attribute accounts of its own?",
+      "why": "Account management is then the image's, not only the organization's.",
+      "controls": [
+        "ac-2",
+        "ac-2.1",
+        "ac-2.3",
+        "ac-2.4",
+        "ac-6.5",
+        "au-2",
+        "au-10",
+        "ia-4",
+        "ia-5"
+      ]
+    },
+    "offers-admin-interface": {
+      "title": "Offers an administrative interface",
+      "question": "Does the image expose an interface that configures or administers it?",
+      "why": "An administrative path is privileged access, and is where most SRG rules about management interfaces land.",
+      "controls": [
+        "ac-3",
+        "ac-6",
+        "ac-6.1",
+        "ac-6.9",
+        "ac-8",
+        "au-2",
+        "ia-2",
+        "ia-2.1"
+      ]
+    },
+    "processes-untrusted-content": {
+      "title": "Processes content it did not produce",
+      "question": "Does the image parse, render, or execute content supplied by a caller or a tenant?",
+      "why": "Input validation and mobile code apply where the image acts on something a caller sent.",
+      "controls": [
+        "sc-18",
+        "si-3",
+        "si-10"
+      ],
+      "consider": [
+        {
+          "control": "si-15",
+          "label": "SI-15",
+          "title": "Information Output Filtering",
+          "why": "An image that renders or transforms content a caller supplied can emit what that caller put in; output filtering is not in the High baseline, and is worth selecting where it can."
+        }
+      ]
+    },
+    "runs-several-roles": {
+      "title": "Runs as more than one role",
+      "question": "Does one image run as different roles, such as a server and its workers?",
+      "why": "Each role has its own surface, and the traffic between them is inside the system, not outside it.",
+      "controls": [
+        "ac-4",
+        "cm-7",
+        "sc-7",
+        "sc-8",
+        "si-4"
+      ],
+      "consider": [
+        {
+          "control": "ia-9",
+          "label": "IA-9",
+          "title": "Service Identification and Authentication",
+          "why": "Roles of one image authenticate to each other; the baseline does not select a control for that, and the platform's PLT-18 covers only what the platform can impose."
+        }
+      ]
+    },
+    "sends-email": {
+      "title": "Sends or receives mail",
+      "question": "Does the image handle electronic mail in any form?",
+      "why": "Mail brings its own controls, which are otherwise inapplicable.",
+      "controls": [
+        "si-8",
+        "si-8.2"
+      ]
+    },
+    "serves-http": {
+      "title": "Serves or proxies HTTP",
+      "question": "Does the image answer HTTP requests, for content, an API, or as a proxy?",
+      "why": "What it serves, to whom, and what it logs and rejects becomes the image's business.",
+      "controls": [
+        "ac-3",
+        "ac-14",
+        "au-2",
+        "au-3",
+        "au-12",
+        "sc-5",
+        "sc-10",
+        "si-10",
+        "si-11"
+      ]
+    },
+    "stores-data": {
+      "title": "Stores data that outlives the container",
+      "question": "Does the image write data meant to persist, to a volume or an object store?",
+      "why": "Data at rest, its protection, and its disposal become the image's concern as well as the platform's.",
+      "controls": [
+        "au-9",
+        "cp-9",
+        "mp-6",
+        "sc-28",
+        "sc-28.1",
+        "si-12"
+      ]
+    },
+    "talks-to-other-services": {
+      "title": "Calls other services",
+      "question": "Does the image open outbound connections to services of its own, such as a database or a peer?",
+      "why": "What it connects to, and how that traffic is authenticated and protected, is part of the image's design.",
+      "controls": [
+        "ac-4",
+        "ca-3",
+        "sc-7",
+        "sc-8",
+        "sc-23"
+      ],
+      "consider": [
+        {
+          "control": "ia-9",
+          "label": "IA-9",
+          "title": "Service Identification and Authentication",
+          "why": "Where an image calls services of its own, how those services prove who they are is not covered by the baseline's user-facing identification controls."
+        }
+      ]
+    },
+    "terminates-mutual-tls": {
+      "title": "Terminates mutual TLS",
+      "question": "Does the image verify a client certificate, and decide anything from it?",
+      "why": "Verifying a client certificate is authentication, and what follows from it is access enforcement.",
+      "controls": [
+        "ac-3",
+        "ia-2",
+        "ia-5",
+        "ia-5.2",
+        "ia-8",
+        "sc-12",
+        "sc-17",
+        "sc-23"
+      ]
+    },
+    "terminates-tls": {
+      "title": "Terminates TLS",
+      "question": "Does the image itself terminate TLS, with key material it is given?",
+      "why": "It then holds key material and chooses the protocol and ciphers, whoever issued the certificate.",
+      "controls": [
+        "ac-17.2",
+        "ia-5",
+        "ia-5.6",
+        "sc-8",
+        "sc-8.1",
+        "sc-12",
+        "sc-13",
+        "sc-17",
+        "sc-23"
+      ]
+    }
+  }
+}

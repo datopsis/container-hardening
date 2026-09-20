@@ -5,6 +5,10 @@
     "revision": "9680b083adc707c28ecd80fdcf4a9828794ce4b6"
   },
   "function": "Serves static content with nginx. It has no management interface, no user accounts, and hosts no application runtime.",
+  "capabilities": [
+    "serves-http",
+    "terminates-tls"
+  ],
   "architectures": [
     "amd64",
     "arm64"

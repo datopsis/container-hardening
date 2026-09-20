@@ -44,10 +44,9 @@ SEED = uuid.UUID("6f1c0b52-3d1e-4c6a-9a55-2b6f3f0c7e10")
 # The controls the baseline leaves to the image, decided in the decisions
 # worksheet with a rationale, an owner, and a review.
 DECISIONS = {
-    row["control"]: (row["origination"], row["statement"])
+    row["control"]: (row["origination"], row["statement"], row.get("criteria") or [])
     for row in json.loads((HERE / "decisions.json").read_text(encoding="utf-8"))["decisions"]
 }
-LOGGING_CRITERIA = ["IMG-19"]
 
 
 def requirements() -> dict[str, list[str]]:
@@ -79,8 +78,7 @@ def build() -> str:
         if origination == "research-required":
             if control["id"] not in DECISIONS:
                 raise SystemExit(control["id"] + " is research-required in the baseline and undecided here")
-            origination, remarks = DECISIONS[control["id"]]
-            criteria = LOGGING_CRITERIA if origination == "image-owned" else []
+            origination, remarks, criteria = DECISIONS[control["id"]]
         props = [prop("origination", origination)]
         if origination == "image-owned" and control["origination"] == "image-owned":
             # An image-owned claim states what it rests on and where it stops.

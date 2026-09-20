@@ -170,7 +170,7 @@ def new_decisions(image: str) -> dict:
         if control["origination"] != "research-required":
             continue
         row = {"control": control["id"], "label": control["label"], "title": control["title"],
-               "origination": None, "rationale": "", "statement": "", "owner": "",
+               "origination": None, "criteria": [], "rationale": "", "statement": "", "owner": "",
                "reviewed_by": None, "reviewed_on": None}
         if control["id"].startswith(ACCOUNTS):
             row["warning"] = ACCOUNTS_WARNING
@@ -203,6 +203,15 @@ def check_decisions(sheet: dict, component: dict | None = None) -> tuple[list[st
         for field in ("rationale", "statement", "owner"):
             if not str(row.get(field) or "").strip():
                 errors.append(control + ": " + field + " is required")
+        cited = row.get("criteria") or []
+        required = {c for c, m in baseline["criteria"].items() if m["level"] == "required"}
+        if row.get("origination") == "image-owned" and not cited:
+            errors.append(control + ": an image-owned decision names the criteria it rests on")
+        if row.get("origination") != "image-owned" and cited:
+            errors.append(control + ": only an image-owned decision cites criteria")
+        for criterion in cited:
+            if criterion not in required:
+                errors.append(control + ": cites " + str(criterion) + ", which is not a required criterion")
         if not row.get("reviewed_by") or not row.get("reviewed_on"):
             unreviewed.append(control)
         else:

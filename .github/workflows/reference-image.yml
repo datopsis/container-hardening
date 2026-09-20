@@ -114,6 +114,17 @@ jobs:
             --decisions examples/reference-web-server/decisions.json \
             --crosswalk examples/reference-web-server/requirements-crosswalk.json \
             --image reference-web-server --out examples/reference-web-server/CONTROL-STATEMENTS.md
+          python scripts/build-inspection-list.py --check \
+            --profile examples/reference-web-server/hardening-profile.json \
+            --component examples/reference-web-server/oscal/component-definition.json \
+            --decisions examples/reference-web-server/decisions.json \
+            --image reference-web-server --out examples/reference-web-server/INSPECTION-LIST.md
+          python examples/reference-web-server/scripts/build-package-diagrams.py --check
+          python scripts/check-package.py \
+            --package examples/reference-web-server/package/README.md \
+            --profile examples/reference-web-server/hardening-profile.json \
+            --inspection-list examples/reference-web-server/INSPECTION-LIST.md \
+            --statements examples/reference-web-server/CONTROL-STATEMENTS.md
           python scripts/check-component.py examples/reference-web-server/oscal/component-definition.json \
             --requirements examples/reference-web-server/requirements.md \
             --crosswalk examples/reference-web-server/requirements-crosswalk.json \

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430" viewBox="0 0 900 430" role="img" aria-labelledby="t d">
+<title id="t">Identity and privilege: who the processes are</title>
+<desc id="d">Every process runs as the numeric, non-root user the image declares, or any arbitrary UID the platform assigns, always in group 0 so mounted files remain readable. No process holds a capability, none may gain privilege, and there is no su, sudo, or login path in the image at all.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="899" height="429" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<rect x="40" y="60" width="260" height="120" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="170.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">The runtime identity</text>
+<text x="54.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">USER 1001:0 as declared</text>
+<text x="54.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">or any arbitrary UID, group 0</text>
+<text x="54.0" y="138" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">no login shell, no password</text>
+<text x="54.0" y="156" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">no su, no sudo in the image</text>
+<text x="40" y="200" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-11, IMG-12, AC-6(5)</text>
+<rect x="330" y="60" width="260" height="120" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="460.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">What it may do</text>
+<text x="344.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">read its configuration and content</text>
+<text x="344.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">write under /tmp only</text>
+<text x="344.0" y="138" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">bind 8080 and 8443</text>
+<text x="344.0" y="156" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">nothing else</text>
+<text x="330" y="200" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AC-3, AC-6, IMG-10, IMG-15</text>
+<rect x="620" y="60" width="240" height="120" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="740.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">What it cannot do</text>
+<text x="634.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">gain privilege (no_new_privs)</text>
+<text x="634.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">hold a capability (all dropped)</text>
+<text x="634.0" y="138" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">escape seccomp or SELinux</text>
+<text x="634.0" y="156" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">administer anything</text>
+<text x="620" y="200" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-13, IMG-27, AC-6(1) to AC-6(3)</text>
+<rect x="40" y="250" width="400" height="90" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="240.0" y="271" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Who the image authenticates</text>
+<text x="54.0" y="292" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">nobody: no accounts, no sessions, no credentials</text>
+<text x="40" y="360" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AC-2, IA-2 and their enhancements: nothing to apply to</text>
+<rect x="470" y="250" width="390" height="78" rx="6" fill="#fff8c5" stroke="#d4a72c"/>
+<text x="482" y="270" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1f2328" text-anchor="start">This is the part that changes first</text>
+<text x="482" y="288" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="start">an image that verifies a token, terminates mutual TLS,</text>
+<text x="482" y="304" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="start">or holds a client secret takes part in identity, and those</text>
+<text x="482" y="320" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="start">controls become its own; see the inspection list</text>
+</svg>
