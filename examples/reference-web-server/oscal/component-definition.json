@@ -3488,11 +3488,16 @@
                   {
                     "name": "origination",
                     "ns": "https://datopsis.example/ns/oscal",
-                    "value": "not-applicable"
+                    "value": "deployment-configured"
+                  }
+                ],
+                "responsible-roles": [
+                  {
+                    "role-id": "deployment-profile"
                   }
                 ],
                 "description": "IA-5 Authenticator Management.",
-                "remarks": "The image manages no authenticators. It holds no password, key, or token of its own; the only secret it may be given is a TLS private key, which arrives as a read-only mounted file and is never written, logged, or placed in arguments or environment (IMG-16, ADR-0003)."
+                "remarks": "The only authenticator this image handles is the TLS private key a deployment mounts to enable HTTPS (IMG-16). The image does not create, distribute, renew, or revoke it: the deployment does, from wherever it manages certificates, and mounts it read-only. What the image owes is not to spoil it: it never writes the key, and never puts it in arguments, environment, or logs, which the smoke suite verifies. Where no TLS is mounted, the image handles no authenticator at all."
               },
               {
                 "uuid": "45be3715-35d5-5068-879d-1ccd73f2c2cd",
@@ -3527,11 +3532,16 @@
                   {
                     "name": "origination",
                     "ns": "https://datopsis.example/ns/oscal",
-                    "value": "not-applicable"
+                    "value": "deployment-configured"
+                  }
+                ],
+                "responsible-roles": [
+                  {
+                    "role-id": "deployment-profile"
                   }
                 ],
                 "description": "IA-5(6) Protection of Authenticators.",
-                "remarks": "The image protects the one authenticator it may be given, a TLS private key, as ADR-0003 requires: read-only, readable only by the container's user or a group it belongs to, never in arguments, environment, or logs. The smoke suite proves the key does not appear in any of them (IMG-16)."
+                "remarks": "The TLS private key is protected by how it is delivered and how the image treats it: mounted read-only, owned by root and readable only by the group the container runs in (PLT-06, ADR-0003), never written, logged, or placed in arguments or environment. The image's own half of this, refusing a world-readable key at startup (IMG-16), is not yet met and is recorded as deviation DEV-011; until it closes, protection of this authenticator depends on the deployment mounting it correctly."
               },
               {
                 "uuid": "bddcd0c1-ba44-55a3-a0fc-5758e47db39d",

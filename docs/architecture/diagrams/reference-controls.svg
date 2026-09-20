@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="640" viewBox="0 0 920 640" role="img" aria-labelledby="t d">
+<title id="t">Where the reference image's controls are applied</title>
+<desc id="d">A client reaches the reference web server through the platform, which admits the image by verified digest, imposes the security context, applies network policy, and mounts what the image needs read-only. Inside the container, nginx runs as an unprivileged user under a read-only root filesystem with one writable tmpfs, serving content on 8080 and, when key material is mounted, TLS on 8443, and writing its records to the standard streams, which the platform collects. Each box names the controls that box carries part of; a control named in more than one box is divided between them, and is satisfied only when every part is.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="919" height="639" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<rect x="40" y="24" width="380" height="74" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="230.0" y="45" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Client</text>
+<text x="54.0" y="66" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">Anonymous. No credential is presented,</text>
+<text x="54.0" y="84" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">and none is asked for.</text>
+<text x="430" y="52" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AC-14, IA-2: nobody is identified</text>
+<text x="430" y="70" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AC-3: what is reachable is the deployment's</text>
+<line x1="230" y1="98" x2="230" y2="126" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="126" width="380" height="128" rx="6" fill="#ddf4ff" stroke="#0969da"/>
+<text x="230.0" y="147" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">The deployment and the platform</text>
+<text x="54.0" y="168" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">Admits the image by verified digest; imposes the</text>
+<text x="54.0" y="186" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">security context; network policy; mounts content,</text>
+<text x="54.0" y="204" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">a server block, a certificate, and a key read-only.</text>
+<text x="430" y="160" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-01, PLT-02: admission and least privilege</text>
+<text x="430" y="178" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-06: secrets as read-only files</text>
+<text x="430" y="196" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-10: traffic controlled and encrypted</text>
+<text x="430" y="214" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">SC-8, SC-23, AC-17(2): TLS, when mounted</text>
+<text x="430" y="232" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IA-5, IA-5(6): the key it supplies</text>
+<line x1="230" y1="254" x2="230" y2="282" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="282" width="380" height="190" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="230.0" y="303" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">The container</text>
+<text x="54.0" y="324" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">nginx 1.26: one master, workers, UID 1001:0</text>
+<text x="54.0" y="342" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">read-only root filesystem; one tmpfs on /tmp</text>
+<text x="54.0" y="360" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">every capability dropped; no new privileges</text>
+<text x="54.0" y="378" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">listeners 8080, and 8443 when TLS is mounted</text>
+<text x="54.0" y="396" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">no package manager, shell service, or su</text>
+<text x="54.0" y="414" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">serves only files under the document root</text>
+<text x="430" y="316" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-11 to IMG-15: user, capabilities, ports</text>
+<text x="430" y="334" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AC-6, CM-7: least privilege and functionality</text>
+<text x="430" y="352" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AC-3, SC-5: what it serves, and refuses</text>
+<text x="430" y="370" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">SI-10, SI-11: malformed requests, error detail</text>
+<text x="430" y="388" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">SC-18: no mobile code of its own</text>
+<text x="430" y="406" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">CM-6: the configuration it ships</text>
+<line x1="230" y1="472" x2="230" y2="500" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="500" width="380" height="108" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="230.0" y="521" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Its records</text>
+<text x="54.0" y="542" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">access records to standard output, combined</text>
+<text x="54.0" y="560" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">format; errors to standard error; no log file.</text>
+<text x="54.0" y="578" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">The platform collects and retains them.</text>
+<text x="430" y="534" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AU-2, AU-3, AU-12: what is logged</text>
+<text x="430" y="552" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AU-9, PLT-09: protected and collected there</text>
+<text x="430" y="570" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AU-10: anonymous, so nothing to attribute</text>
+<text x="480" y="614" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="middle" font-style="italic">A control named in more than one box is divided between them: each box carries part of it, and no part satisfies it alone.</text>
+</svg>

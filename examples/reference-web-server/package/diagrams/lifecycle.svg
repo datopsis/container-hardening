@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400" role="img" aria-labelledby="t d">
+<title id="t">Lifecycle: start, healthy, stop</title>
+<desc id="d">The container starts by running nginx in the foreground; if the declared tmpfs is missing, or the configuration does not parse, it exits non-zero naming what was wrong rather than running degraded. While it runs, the healthcheck parses the configuration; a readiness probe is the platform's. On SIGQUIT it finishes what it is serving and exits zero.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect x="0.5" y="0.5" width="899" height="399" rx="10" fill="#ffffff" stroke="#d0d7de"/>
+<rect x="40" y="60" width="170" height="96" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="125.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Created</text>
+<text x="54.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">image admitted by digest</text>
+<text x="54.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">security context imposed</text>
+<text x="40" y="176" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">PLT-01, PLT-02</text>
+<line x1="210" y1="108" x2="270" y2="108" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="270" y="60" width="170" height="96" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="355.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Running</text>
+<text x="284.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">nginx in the foreground</text>
+<text x="284.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">workers as UID 1001:0</text>
+<text x="270" y="176" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-11, IMG-13</text>
+<line x1="440" y1="108" x2="500" y2="108" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="500" y="60" width="170" height="96" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="585.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Stopping</text>
+<text x="514.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">SIGQUIT: finish in flight</text>
+<text x="514.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">grace period from the platform</text>
+<text x="500" y="176" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-20, PLT-11</text>
+<line x1="670" y1="108" x2="730" y2="108" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="730" y="60" width="170" height="96" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="815.0" y="81" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Stopped</text>
+<text x="744.0" y="102" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">exit 0</text>
+<text x="744.0" y="120" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">records already collected</text>
+<text x="730" y="176" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">AU-9</text>
+<rect x="270" y="220" width="400" height="70" rx="6" fill="#f6f8fa" stroke="#8c959f"/>
+<text x="470.0" y="241" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328" text-anchor="middle">Healthcheck: nginx -t every 30s</text>
+<text x="284.0" y="262" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#1f2328" text-anchor="start">proves the configuration parses, not that it answers</text>
+<text x="690" y="255" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#8250df" text-anchor="start">IMG-20</text>
+<line x1="355" y1="220" x2="355" y2="156" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="40" y="310" width="500" height="62" rx="6" fill="#fff8c5" stroke="#d4a72c"/>
+<text x="52" y="330" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#1f2328" text-anchor="start">Where it fails closed instead of starting</text>
+<text x="52" y="348" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="start">the declared tmpfs is missing: exits non-zero, naming the path (IMG-15)</text>
+<text x="52" y="364" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="start">a mounted server block does not parse: exits non-zero, naming file and line (IMG-18)</text>
+</svg>
