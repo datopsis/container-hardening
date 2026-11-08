@@ -15,6 +15,14 @@
 | --- | --- | --- | --- | --- |
 | [`V-233190`](../../srg/container-platform-srg/rules/V-233190.md) | `SRG-APP-000383-CTR-000910` | CAT II | `CCI-001762` | CM-7 (1) (b) |
 
+## Database Security Requirements Guide
+
+1 rule reaches this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-206599`](../../srg/database-srg/rules/V-206599.md) | `SRG-APP-000383-DB-000364` | CAT II | `CCI-001762` | CM-7 (1) (b) |
+
 ## Web Server Security Requirements Guide
 
 1 rule reaches this control.

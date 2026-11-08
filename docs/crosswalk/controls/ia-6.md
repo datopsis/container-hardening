@@ -7,6 +7,14 @@
 | High baseline | Selected |
 | Catalogue | NIST SP 800-53 Rev 5, 5.2.0 |
 
+## Application Security and Development Security Technical Implementation Guide
+
+1 rule reaches this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-222554`](../../srg/application-security-and-development-stig/rules/V-222554.md) | `APSC-DV-001850` | CAT I | `CCI-000206` | IA-6 |
+
 ## Application Server Security Requirements Guide
 
 1 rule reaches this control.
@@ -22,6 +30,14 @@
 | Group ID | STIG ID | Severity | CCI | DISA reference |
 | --- | --- | --- | --- | --- |
 | [`V-233102`](../../srg/container-platform-srg/rules/V-233102.md) | `SRG-APP-000178-CTR-000470` | CAT II | `CCI-000206` | IA-6 |
+
+## Database Security Requirements Guide
+
+1 rule reaches this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-206561`](../../srg/database-srg/rules/V-206561.md) | `SRG-APP-000178-DB-000083` | CAT I | `CCI-000206` | IA-6 |
 
 ## General Purpose Operating System Security Requirements Guide
 

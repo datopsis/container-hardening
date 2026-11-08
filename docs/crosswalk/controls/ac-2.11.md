@@ -15,6 +15,14 @@
 | --- | --- | --- | --- | --- |
 | [`V-257291`](../../srg/container-platform-srg/rules/V-257291.md) | `SRG-APP-000318-CTR-000740` | CAT II | `CCI-002145` | AC-2 (11) |
 
+## Red Hat OpenShift Container Platform 4.x Security Technical Implementation Guide
+
+1 rule reaches this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-257543`](../../srg/red-hat-openshift-container-platform-4-x-stig/rules/V-257543.md) | `CNTR-OS-000460` | CAT I | `CCI-002145` | AC-2 (11) |
+
 ---
 
 Derived from the DISA CCI list 2025-01-23 by `scripts/build-cci-crosswalk.py`. The DISA reference is the part of the control the CCI addresses. Do not edit by hand; edits are overwritten and the drift check fails.

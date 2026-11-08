@@ -7,6 +7,15 @@
 | High baseline | **Not selected** |
 | Catalogue | NIST SP 800-53 Rev 5, 5.2.0 |
 
+## Application Security and Development Security Technical Implementation Guide
+
+2 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-222562`](../../srg/application-security-and-development-stig/rules/V-222562.md) | `APSC-DV-001940` | CAT II | `CCI-002890` | MA-4 (6) |
+| [`V-222563`](../../srg/application-security-and-development-stig/rules/V-222563.md) | `APSC-DV-001950` | CAT II | `CCI-003123` | MA-4 (6) |
+
 ## Container Platform Security Requirements Guide
 
 2 rules reach this control.
@@ -24,6 +33,28 @@
 | --- | --- | --- | --- | --- |
 | [`V-203736`](../../srg/general-purpose-operating-system-srg/rules/V-203736.md) | `SRG-OS-000393-GPOS-00173` | CAT I | `CCI-002890` | MA-4 (6) |
 | [`V-203737`](../../srg/general-purpose-operating-system-srg/rules/V-203737.md) | `SRG-OS-000394-GPOS-00174` | CAT I | `CCI-003123` | MA-4 (6) |
+
+## Red Hat Enterprise Linux 9 Security Technical Implementation Guide
+
+3 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-258234`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258234.md) | `RHEL-09-215100` | CAT I | `CCI-002890` | MA-4 (6) |
+| [`V-258234`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258234.md) | `RHEL-09-215100` | CAT I | `CCI-003123` | MA-4 (6) |
+| [`V-258236`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258236.md) | `RHEL-09-672020` | CAT I | `CCI-002890` | MA-4 (6) |
+| [`V-258236`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258236.md) | `RHEL-09-672020` | CAT I | `CCI-003123` | MA-4 (6) |
+| [`V-258241`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258241.md) | `RHEL-09-215105` | CAT I | `CCI-002890` | MA-4 (6) |
+| [`V-258241`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258241.md) | `RHEL-09-215105` | CAT I | `CCI-003123` | MA-4 (6) |
+
+## Red Hat OpenShift Container Platform 4.x Security Technical Implementation Guide
+
+1 rule reaches this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-257546`](../../srg/red-hat-openshift-container-platform-4-x-stig/rules/V-257546.md) | `CNTR-OS-000510` | CAT I | `CCI-002890` | MA-4 (6) |
+| [`V-257546`](../../srg/red-hat-openshift-container-platform-4-x-stig/rules/V-257546.md) | `CNTR-OS-000510` | CAT I | `CCI-003123` | MA-4 (6) |
 
 ---
 

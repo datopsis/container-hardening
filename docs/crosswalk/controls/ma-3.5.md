@@ -15,6 +15,14 @@
 | --- | --- | --- | --- | --- |
 | [`V-263658`](../../srg/general-purpose-operating-system-srg/rules/V-263658.md) | `SRG-OS-000755-GPOS-00220` | CAT II | `CCI-004188` | MA-3 (5) |
 
+## Red Hat Enterprise Linux 9 Security Technical Implementation Guide
+
+1 rule reaches this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-258152`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258152.md) | `RHEL-09-653015` | CAT II | `CCI-004188` | MA-3 (5) |
+
 ---
 
 Derived from the DISA CCI list 2025-01-23 by `scripts/build-cci-crosswalk.py`. The DISA reference is the part of the control the CCI addresses. Do not edit by hand; edits are overwritten and the drift check fails.

@@ -7,6 +7,15 @@
 | High baseline | Selected |
 | Catalogue | NIST SP 800-53 Rev 5, 5.2.0 |
 
+## Application Security and Development Security Technical Implementation Guide
+
+2 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-222557`](../../srg/application-security-and-development-stig/rules/V-222557.md) | `APSC-DV-001880` | CAT II | `CCI-002009` | IA-8 (1) |
+| [`V-222558`](../../srg/application-security-and-development-stig/rules/V-222558.md) | `APSC-DV-001890` | CAT II | `CCI-002010` | IA-8 (1) |
+
 ## Application Server Security Requirements Guide
 
 2 rules reach this control.
@@ -23,6 +32,14 @@
 | Group ID | STIG ID | Severity | CCI | DISA reference |
 | --- | --- | --- | --- | --- |
 | [`V-233202`](../../srg/container-platform-srg/rules/V-233202.md) | `SRG-APP-000402-CTR-000970` | CAT II | `CCI-002009` | IA-8 (1) |
+
+## Red Hat OpenShift Container Platform 4.x Security Technical Implementation Guide
+
+1 rule reaches this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-257543`](../../srg/red-hat-openshift-container-platform-4-x-stig/rules/V-257543.md) | `CNTR-OS-000460` | CAT I | `CCI-002009` | IA-8 (1) |
 
 ---
 

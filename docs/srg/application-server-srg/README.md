@@ -1,13 +1,13 @@
 # Application Server Security Requirements Guide
 
-Release: 5 Benchmark Date: 01 Jul 2026. Accepted 2026-06-29.
+Release: 6 Benchmark Date: 30 Sep 2026. Accepted 2026-08-26.
 
 | | |
 | --- | --- |
 | Benchmark | `Application_Server_SRG` |
 | Rules | **137** |
-| CAT I | 13 |
-| CAT II | 124 |
+| CAT I | 14 |
+| CAT II | 123 |
 
 The source package is not committed. Its identity is pinned by SHA-256 in [`artifacts/sources.json`](../../../artifacts/sources.json).
 
@@ -52,7 +52,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-204742`](rules/V-204742.md) | `SRG-APP-000133-AS-000093` | CAT II | The application server must be capable of reverting to the last known good configuration in the event of failed installations and upgrades. |
 | [`V-204743`](rules/V-204743.md) | `SRG-APP-000141-AS-000095` | CAT II | The application server must adhere to the principles of least functionality by providing only essential capabilities. |
 | [`V-204744`](rules/V-204744.md) | `SRG-APP-000142-AS-000014` | CAT II | The application server must prohibit or restrict the use of nonsecure ports, protocols, modules, and/or services as defined in the PPSM CAL and vulnerability assessments. |
-| [`V-204745`](rules/V-204745.md) | `SRG-APP-000148-AS-000101` | CAT II | The application server must use an approved DOD enterprise identity, credential, and access management (ICAM) solution to uniquely identify and authenticate users (or processes acting on behalf of organizational users). |
+| [`V-204745`](rules/V-204745.md) | `SRG-APP-000148-AS-000101` | CAT II | The application server must use an approved DoW enterprise identity, credential, and access management (ICAM) solution to uniquely identify and authenticate users (or processes acting on behalf of organizational users). |
 | [`V-204746`](rules/V-204746.md) | `SRG-APP-000149-AS-000102` | CAT I | The application server must use multifactor authentication for network access to privileged accounts. |
 | [`V-204747`](rules/V-204747.md) | `SRG-APP-000151-AS-000103` | CAT I | The application server must use multifactor authentication for local access to privileged accounts. |
 | [`V-204748`](rules/V-204748.md) | `SRG-APP-000153-AS-000104` | CAT II | The application server must authenticate users individually prior to using a group authenticator. |
@@ -112,7 +112,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-204807`](rules/V-204807.md) | `SRG-APP-000403-AS-000248` | CAT II | The application server must electronically verify Personal Identity Verification (PIV) credentials from other federal agencies to access the management interface. |
 | [`V-204808`](rules/V-204808.md) | `SRG-APP-000404-AS-000249` | CAT II | The application server must accept Federal Identity, Credential, and Access Management (FICAM)-approved third-party credentials. |
 | [`V-204809`](rules/V-204809.md) | `SRG-APP-000405-AS-000250` | CAT II | The application server must conform to Federal Identity, Credential, and Access Management (FICAM)-issued profiles. |
-| [`V-204811`](rules/V-204811.md) | `SRG-APP-000427-AS-000264` | CAT II | The application server must only allow the use of DoD PKI-established certificate authorities for verification of the establishment of protected sessions. |
+| [`V-204811`](rules/V-204811.md) | `SRG-APP-000427-AS-000264` | CAT II | The application server must only allow the use of DoW PKI-established certificate authorities for verification of the establishment of protected sessions. |
 | [`V-204812`](rules/V-204812.md) | `SRG-APP-000428-AS-000265` | CAT I | The application server must implement cryptographic mechanisms to prevent unauthorized modification of organization-defined information at rest on organization-defined information system components. |
 | [`V-204813`](rules/V-204813.md) | `SRG-APP-000429-AS-000157` | CAT I | The application must implement cryptographic mechanisms to prevent unauthorized disclosure of organization-defined information at rest on organization-defined information system components. |
 | [`V-204814`](rules/V-204814.md) | `SRG-APP-000435-AS-000069` | CAT II | The application server, when a MAC I system, must be in a high-availability (HA) cluster. |
@@ -133,9 +133,9 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-204829`](rules/V-204829.md) | `SRG-APP-000506-AS-000231` | CAT II | The application server must generate log records when concurrent logons from different workstations occur to the application server management interface. |
 | [`V-204830`](rules/V-204830.md) | `SRG-APP-000509-AS-000234` | CAT II | The application server must generate log records for all account creations, modifications, disabling, and termination events. |
 | [`V-204831`](rules/V-204831.md) | `SRG-APP-000514-AS-000136` | CAT II | Application servers must use NIST-approved or NSA-approved key management technology and processes. |
-| [`V-204832`](rules/V-204832.md) | `SRG-APP-000514-AS-000137` | CAT II | The application server must use DOD- or CNSS-approved PKI Class 3 or Class 4 certificates. |
-| [`V-204833`](rules/V-204833.md) | `SRG-APP-000515-AS-000203` | CAT II | The application server must, at a minimum, transfer the logs of interconnected systems in real time, and transfer the logs of standalone systems weekly. |
-| [`V-204834`](rules/V-204834.md) | `SRG-APP-000516-AS-000237` | CAT II | The application server must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. |
+| [`V-204832`](rules/V-204832.md) | `SRG-APP-000514-AS-000137` | CAT II | The application server must use DoW or CNSS-approved PKI Class 3 or Class 4 certificates. |
+| [`V-204833`](rules/V-204833.md) | `SRG-APP-000515-AS-000203` | CAT I | The application server must, at a minimum, transfer the logs of interconnected systems in real time, and transfer the logs of standalone systems weekly. |
+| [`V-204834`](rules/V-204834.md) | `SRG-APP-000516-AS-000237` | CAT II | The application server must be configured in accordance with the security configuration settings based on DoW security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. |
 | [`V-240925`](rules/V-240925.md) | `SRG-APP-000416-AS-000140` | CAT II | The application server must implement NSA-approved cryptography to protect classified information in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. |
 | [`V-263549`](rules/V-263549.md) | `SRG-APP-000705-AS-000110` | CAT II | The application server must disable accounts when the accounts are no longer associated to a user. |
 | [`V-263550`](rules/V-263550.md) | `SRG-APP-000795-AS-000130` | CAT II | The application server must alert organization-defined personnel or roles upon detection of unauthorized access, modification, or deletion of audit information. |
