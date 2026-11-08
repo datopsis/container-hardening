@@ -129,6 +129,10 @@ injected as environment variables. The secret store encrypts them at rest and
 in transit with FIPS 140 approved algorithms in a validated module, and
 provides each secret only to the workloads that require it.
 
+OpenShift V2R7 V-257564 retains this keystore encryption obligation; its fix
+now points to the general OpenShift documentation. IMG-16 and IMG-17 still
+cover delivery and use of mounted material, not platform keystore encryption.
+
 - **Origination:** `deployment-configured`
 - **Implementation:** A secret store mounts secrets read-only, per workload,
   encrypted at rest with a validated module.
@@ -186,6 +190,11 @@ and the orchestrator schedules workloads only onto maintained runtimes.
 The platform collects each container's standard output and standard error and
 sends them to a central store for review, protected from modification by the
 workload.
+
+For applicable application servers, V4R6 V-204833 (AU-4(1)) is now CAT I.
+The application assessment and platform logging handoff must carry that
+priority for off-loading audit records to a different system or media.
+It does not make application-server requirements universal image criteria.
 
 - **Origination:** `host-inherited`
 - **Implementation:** Container output is forwarded to a central log store and

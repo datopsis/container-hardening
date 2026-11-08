@@ -7,6 +7,15 @@
 | High baseline | Selected |
 | Catalogue | NIST SP 800-53 Rev 5, 5.2.0 |
 
+## Application Security and Development Security Technical Implementation Guide
+
+2 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-222526`](../../srg/application-security-and-development-stig/rules/V-222526.md) | `APSC-DV-001580` | CAT II | `CCI-000766` | IA-2 (2) |
+| [`V-222528`](../../srg/application-security-and-development-stig/rules/V-222528.md) | `APSC-DV-001600` | CAT II | `CCI-000766` | IA-2 (2) |
+
 ## Container Platform Security Requirements Guide
 
 2 rules reach this control.
@@ -24,6 +33,25 @@
 | --- | --- | --- | --- | --- |
 | [`V-203641`](../../srg/general-purpose-operating-system-srg/rules/V-203641.md) | `SRG-OS-000106-GPOS-00053` | CAT II | `CCI-000766` | IA-2 (2) |
 | [`V-203643`](../../srg/general-purpose-operating-system-srg/rules/V-203643.md) | `SRG-OS-000108-GPOS-00055` | CAT II | `CCI-000766` | IA-2 (2) |
+
+## Red Hat Enterprise Linux 9 Security Technical Implementation Guide
+
+3 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-257983`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257983.md) | `RHEL-09-255035` | CAT II | `CCI-000766` | IA-2 (2) |
+| [`V-257984`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257984.md) | `RHEL-09-255040` | CAT I | `CCI-000766` | IA-2 (2) |
+| [`V-258121`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258121.md) | `RHEL-09-611160` | CAT II | `CCI-000766` | IA-2 (2) |
+
+## Red Hat OpenShift Container Platform 4.x Security Technical Implementation Guide
+
+2 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-257541`](../../srg/red-hat-openshift-container-platform-4-x-stig/rules/V-257541.md) | `CNTR-OS-000430` | CAT II | `CCI-000766` | IA-2 (2) |
+| [`V-257543`](../../srg/red-hat-openshift-container-platform-4-x-stig/rules/V-257543.md) | `CNTR-OS-000460` | CAT I | `CCI-000766` | IA-2 (2) |
 
 ---
 

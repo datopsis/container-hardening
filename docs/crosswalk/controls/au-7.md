@@ -7,6 +7,21 @@
 | High baseline | Selected |
 | Catalogue | NIST SP 800-53 Rev 5, 5.2.0 |
 
+## Application Security and Development Security Technical Implementation Guide
+
+8 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-222489`](../../srg/application-security-and-development-stig/rules/V-222489.md) | `APSC-DV-001150` | CAT II | `CCI-001876` | AU-7 a |
+| [`V-222490`](../../srg/application-security-and-development-stig/rules/V-222490.md) | `APSC-DV-001160` | CAT II | `CCI-001875` | AU-7 a |
+| [`V-222491`](../../srg/application-security-and-development-stig/rules/V-222491.md) | `APSC-DV-001170` | CAT II | `CCI-001877` | AU-7 a |
+| [`V-222492`](../../srg/application-security-and-development-stig/rules/V-222492.md) | `APSC-DV-001180` | CAT II | `CCI-001878` | AU-7 a |
+| [`V-222493`](../../srg/application-security-and-development-stig/rules/V-222493.md) | `APSC-DV-001190` | CAT II | `CCI-001879` | AU-7 a |
+| [`V-222494`](../../srg/application-security-and-development-stig/rules/V-222494.md) | `APSC-DV-001200` | CAT II | `CCI-001880` | AU-7 a |
+| [`V-222495`](../../srg/application-security-and-development-stig/rules/V-222495.md) | `APSC-DV-001210` | CAT II | `CCI-001881` | AU-7 b |
+| [`V-222496`](../../srg/application-security-and-development-stig/rules/V-222496.md) | `APSC-DV-001220` | CAT II | `CCI-001882` | AU-7 b |
+
 ## Application Server Security Requirements Guide
 
 1 rule reaches this control.
@@ -37,6 +52,29 @@
 | [`V-203708`](../../srg/general-purpose-operating-system-srg/rules/V-203708.md) | `SRG-OS-000352-GPOS-00140` | CAT III | `CCI-001880` | AU-7 a |
 | [`V-203709`](../../srg/general-purpose-operating-system-srg/rules/V-203709.md) | `SRG-OS-000353-GPOS-00141` | CAT II | `CCI-001881` | AU-7 b |
 | [`V-203710`](../../srg/general-purpose-operating-system-srg/rules/V-203710.md) | `SRG-OS-000354-GPOS-00142` | CAT II | `CCI-001882` | AU-7 b |
+
+## Red Hat Enterprise Linux 9 Security Technical Implementation Guide
+
+2 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-258151`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258151.md) | `RHEL-09-653010` | CAT II | `CCI-001875` | AU-7 a |
+| [`V-258151`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258151.md) | `RHEL-09-653010` | CAT II | `CCI-001876` | AU-7 a |
+| [`V-258151`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258151.md) | `RHEL-09-653010` | CAT II | `CCI-001877` | AU-7 a |
+| [`V-258151`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258151.md) | `RHEL-09-653010` | CAT II | `CCI-001878` | AU-7 a |
+| [`V-258151`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258151.md) | `RHEL-09-653010` | CAT II | `CCI-001879` | AU-7 a |
+| [`V-258151`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258151.md) | `RHEL-09-653010` | CAT II | `CCI-001880` | AU-7 a |
+| [`V-258151`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258151.md) | `RHEL-09-653010` | CAT II | `CCI-001881` | AU-7 b |
+| [`V-258151`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258151.md) | `RHEL-09-653010` | CAT II | `CCI-001882` | AU-7 b |
+| [`V-258152`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258152.md) | `RHEL-09-653015` | CAT II | `CCI-001875` | AU-7 a |
+| [`V-258152`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258152.md) | `RHEL-09-653015` | CAT II | `CCI-001876` | AU-7 a |
+| [`V-258152`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258152.md) | `RHEL-09-653015` | CAT II | `CCI-001877` | AU-7 a |
+| [`V-258152`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258152.md) | `RHEL-09-653015` | CAT II | `CCI-001878` | AU-7 a |
+| [`V-258152`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258152.md) | `RHEL-09-653015` | CAT II | `CCI-001879` | AU-7 a |
+| [`V-258152`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258152.md) | `RHEL-09-653015` | CAT II | `CCI-001880` | AU-7 a |
+| [`V-258152`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258152.md) | `RHEL-09-653015` | CAT II | `CCI-001881` | AU-7 b |
+| [`V-258152`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258152.md) | `RHEL-09-653015` | CAT II | `CCI-001882` | AU-7 b |
 
 ---
 

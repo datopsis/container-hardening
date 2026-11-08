@@ -1,6 +1,6 @@
 # Container Platform Security Requirements Guide
 
-Release: 4 Benchmark Date: 28 Oct 2025. Accepted 2025-09-10.
+Release: 5 Benchmark Date: 30 Sep 2026. Accepted 2026-09-01.
 
 | | |
 | --- | --- |
@@ -33,9 +33,9 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-233029`](rules/V-233029.md) | `SRG-APP-000038-CTR-000105` | CAT II | The container platform must enforce approved authorizations for controlling the flow of information within the container platform based on organization-defined information flow control policies. |
 | [`V-233030`](rules/V-233030.md) | `SRG-APP-000039-CTR-000110` | CAT II | The container platform must enforce approved authorizations for controlling the flow of information between interconnected systems and services based on organization-defined information flow control policies. |
 | [`V-233031`](rules/V-233031.md) | `SRG-APP-000065-CTR-000115` | CAT II | The container platform must enforce the limit of three consecutive invalid logon attempts by a user during a 15-minute time period. |
-| [`V-233032`](rules/V-233032.md) | `SRG-APP-000068-CTR-000120` | CAT III | The container platform must display the Standard Mandatory DoD Notice and Consent Banner before granting access to platform components. |
-| [`V-233033`](rules/V-233033.md) | `SRG-APP-000069-CTR-000125` | CAT III | The container platform must retain the Standard Mandatory DoD Notice and Consent Banner on the screen until users acknowledge the usage and conditions and take explicit actions to log on for further access. |
-| [`V-233038`](rules/V-233038.md) | `SRG-APP-000089-CTR-000150` | CAT II | The container platform must generate audit records for all DoD-defined auditable events within all components in the platform. |
+| [`V-233032`](rules/V-233032.md) | `SRG-APP-000068-CTR-000120` | CAT III | The container platform must display the Standard Mandatory DoW Notice and Consent Banner before granting access to platform components. |
+| [`V-233033`](rules/V-233033.md) | `SRG-APP-000069-CTR-000125` | CAT III | The container platform must retain the Standard Mandatory DoW Notice and Consent Banner on the screen until users acknowledge the usage and conditions and take explicit actions to log on for further access. |
+| [`V-233038`](rules/V-233038.md) | `SRG-APP-000089-CTR-000150` | CAT II | The container platform must generate audit records for all DoW-defined auditable events within all components in the platform. |
 | [`V-233039`](rules/V-233039.md) | `SRG-APP-000090-CTR-000155` | CAT II | The container platform must allow only the ISSM (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited. |
 | [`V-233040`](rules/V-233040.md) | `SRG-APP-000091-CTR-000160` | CAT II | The container platform must generate audit records when successful/unsuccessful attempts to access privileges occur. |
 | [`V-233041`](rules/V-233041.md) | `SRG-APP-000092-CTR-000165` | CAT II | The container platform must initiate session auditing upon startup. |
@@ -72,7 +72,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-233077`](rules/V-233077.md) | `SRG-APP-000148-CTR-000345` | CAT II | The container platform must uniquely identify and authenticate processes acting on behalf of the users. |
 | [`V-233078`](rules/V-233078.md) | `SRG-APP-000148-CTR-000350` | CAT II | The container platform application program interface (API) must uniquely identify and authenticate processes acting on behalf of the users. |
 | [`V-233079`](rules/V-233079.md) | `SRG-APP-000149-CTR-000355` | CAT II | The container platform must use multifactor authentication for network access to privileged accounts. |
-| [`V-233080`](rules/V-233080.md) | `SRG-APP-000150-CTR-000360` | CAT II | The container platform must use multifactor authentication for network access to non-privileged accounts. |
+| [`V-233080`](rules/V-233080.md) | `SRG-APP-000150-CTR-000360` | CAT II | The container platform must use multifactor authentication for network access to nonprivileged accounts. |
 | [`V-233081`](rules/V-233081.md) | `SRG-APP-000151-CTR-000365` | CAT II | The container platform must use multifactor authentication for local access to privileged accounts. |
 | [`V-233082`](rules/V-233082.md) | `SRG-APP-000152-CTR-000370` | CAT II | The container platform must use multifactor authentication for local access to nonprivileged accounts. |
 | [`V-233083`](rules/V-233083.md) | `SRG-APP-000153-CTR-000375` | CAT II | The container platform must ensure users are authenticated with an individual authenticator prior to using a group authenticator. |
@@ -89,7 +89,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-233095`](rules/V-233095.md) | `SRG-APP-000171-CTR-000435` | CAT II | For container platform using password authentication, the application must store only cryptographic representations of passwords. |
 | [`V-233096`](rules/V-233096.md) | `SRG-APP-000172-CTR-000440` | CAT I | For accounts using password authentication, the container platform must use FIPS-validated SHA-2 or later protocol to protect the integrity of the password authentication process. |
 | [`V-233097`](rules/V-233097.md) | `SRG-APP-000173-CTR-000445` | CAT II | The container platform must enforce 24 hours (one day) as the minimum password lifetime. |
-| [`V-233098`](rules/V-233098.md) | `SRG-APP-000174-CTR-000450` | CAT II | The container platform must enforce a 60-day maximum password lifetime restriction. |
+| [`V-233098`](rules/V-233098.md) | `SRG-APP-000174-CTR-000450` | CAT II | The container platform must enforce a 180-day maximum password lifetime restriction. |
 | [`V-233101`](rules/V-233101.md) | `SRG-APP-000177-CTR-000465` | CAT II | The container platform must map the authenticated identity to the individual user or group account for PKI-based authentication. |
 | [`V-233102`](rules/V-233102.md) | `SRG-APP-000178-CTR-000470` | CAT II | The container platform must obscure feedback of authentication information during the authentication process to protect the information from possible exploitation/use by unauthorized individuals. |
 | [`V-233105`](rules/V-233105.md) | `SRG-APP-000181-CTR-000485` | CAT II | The container platform must provide an audit reduction capability that supports on-demand reporting requirements. |
@@ -130,11 +130,11 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-233186`](rules/V-233186.md) | `SRG-APP-000378-CTR-000890` | CAT II | The container platform registry must prohibit installation or modification of container images without explicit privileged status. |
 | [`V-233188`](rules/V-233188.md) | `SRG-APP-000380-CTR-000900` | CAT II | The container platform must enforce access restrictions for container platform configuration changes. |
 | [`V-233189`](rules/V-233189.md) | `SRG-APP-000381-CTR-000905` | CAT II | The container platform must enforce access restrictions and support auditing of the enforcement actions. |
-| [`V-233190`](rules/V-233190.md) | `SRG-APP-000383-CTR-000910` | CAT II | All non-essential, unnecessary, and unsecure DoD ports, protocols, and services must be disabled in the container platform. |
+| [`V-233190`](rules/V-233190.md) | `SRG-APP-000383-CTR-000910` | CAT II | All nonessential, unnecessary, and unsecure DoW ports, protocols, and services must be disabled in the container platform. |
 | [`V-233191`](rules/V-233191.md) | `SRG-APP-000384-CTR-000915` | CAT II | The container platform must prevent component execution in accordance with organization-defined policies regarding software program usage and restrictions, and/or rules authorizing the terms and conditions of software program usage. |
 | [`V-233192`](rules/V-233192.md) | `SRG-APP-000386-CTR-000920` | CAT II | The container platform registry must employ a deny-all, permit-by-exception (whitelist) policy to allow only authorized container images in the container platform. |
 | [`V-233193`](rules/V-233193.md) | `SRG-APP-000389-CTR-000925` | CAT II | The container platform must require users to reauthenticate when organization-defined circumstances or situations require reauthentication. |
-| [`V-233195`](rules/V-233195.md) | `SRG-APP-000391-CTR-000935` | CAT II | The container platform must be configured to use multi-factor authentication for user authentication. |
+| [`V-233195`](rules/V-233195.md) | `SRG-APP-000391-CTR-000935` | CAT II | The container platform must be configured to use multifactor authentication for user authentication. |
 | [`V-233200`](rules/V-233200.md) | `SRG-APP-000400-CTR-000960` | CAT II | The container platform must prohibit the use of cached authenticators after an organization-defined time period. |
 | [`V-233201`](rules/V-233201.md) | `SRG-APP-000401-CTR-000965` | CAT II | The container platform, for PKI-based authentication, must implement a local cache of revocation data to support path discovery and validation in case of the inability to access revocation information via the network. |
 | [`V-233202`](rules/V-233202.md) | `SRG-APP-000402-CTR-000970` | CAT II | The container platform must accept Personal Identity Verification (PIV) credentials from other federal agencies. |
@@ -178,7 +178,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-233269`](rules/V-233269.md) | `SRG-APP-000509-CTR-001305` | CAT II | The container platform must generate audit records for all account creations, modifications, disabling, and termination events. |
 | [`V-233270`](rules/V-233270.md) | `SRG-APP-000510-CTR-001310` | CAT II | The container runtime must generate audit records for all container execution, shutdown, restart events, and program initiations. |
 | [`V-233271`](rules/V-233271.md) | `SRG-APP-000514-CTR-001315` | CAT II | The container platform must use a valid FIPS 140-2 or FIPS 140-3 approved cryptographic module to generate hashes. |
-| [`V-233273`](rules/V-233273.md) | `SRG-APP-000516-CTR-001325` | CAT II | Container platform components must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including SRGs, STIGs, NSA configuration guides, CTOs, and DTMs. |
+| [`V-233273`](rules/V-233273.md) | `SRG-APP-000516-CTR-001325` | CAT II | Container platform components must be configured in accordance with the security configuration settings based on DoW security configuration or implementation guidance, including SRGs, STIGs, NSA configuration guides, CTOs, and DTMs. |
 | [`V-233274`](rules/V-233274.md) | `SRG-APP-000516-CTR-001330` | CAT II | The container platform must be able to store and instantiate industry standard container images. |
 | [`V-233275`](rules/V-233275.md) | `SRG-APP-000516-CTR-001335` | CAT II | The container platform must continuously scan components, containers, and images for vulnerabilities. |
 | [`V-233276`](rules/V-233276.md) | `SRG-APP-000560-CTR-001340` | CAT II | The container platform must prohibit communication using TLS versions 1.0 and 1.1, and SSL 2.0 and 3.0. |

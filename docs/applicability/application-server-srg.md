@@ -9,8 +9,16 @@ this page as the basis for its determination; see
 | | |
 | --- | --- |
 | Source | `disa-application-server-srg` in the [register](../../artifacts/sources.json) |
-| Revision | V4R5, the pinned XCCDF |
+| Revision | V4R6, the pinned XCCDF |
 | Rules | 137, [rendered](../srg/application-server-srg/README.md) |
+
+V4R6 retains the same 137 Group IDs and the same 27-rule selection below.
+The changed titles preserve the objects this analysis identifies. V-204833,
+which requires off-loading audit records, is now CAT I; applicable application
+assessments and the PLT-09 logging handoff must reflect that priority. This
+source change does not decide an image's individual controls or supply a new
+owner review. The FIPS wording inconsistency remains open in the
+[adoption review](../drift/2026-11-disa-adoption.md).
 
 ## Method
 
@@ -80,7 +88,7 @@ applicable.
 | --- | --- |
 | [`V-204708`](../srg/application-server-srg/rules/V-204708.md) | The application server must limit the number of concurrent sessions to an organization-defined number for all accounts and/or account types. |
 | [`V-204727`](../srg/application-server-srg/rules/V-204727.md) | The application server must generate log records containing the full-text recording of privileged commands or the individual identities of group account users. |
-| [`V-204745`](../srg/application-server-srg/rules/V-204745.md) | The application server must use an approved DOD enterprise identity, credential, and access management (ICAM) solution to uniquely identify and authenticate users (or processes acting on behalf of organizational users). |
+| [`V-204745`](../srg/application-server-srg/rules/V-204745.md) | The application server must use an approved DoW enterprise identity, credential, and access management (ICAM) solution to uniquely identify and authenticate users (or processes acting on behalf of organizational users). |
 | [`V-204746`](../srg/application-server-srg/rules/V-204746.md) | The application server must use multifactor authentication for network access to privileged accounts. |
 | [`V-204747`](../srg/application-server-srg/rules/V-204747.md) | The application server must use multifactor authentication for local access to privileged accounts. |
 | [`V-204756`](../srg/application-server-srg/rules/V-204756.md) | The application server must map the authenticated identity to the individual user or group account for PKI-based authentication. |

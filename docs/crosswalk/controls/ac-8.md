@@ -7,6 +7,20 @@
 | High baseline | Selected |
 | Catalogue | NIST SP 800-53 Rev 5, 5.2.0 |
 
+## Application Security and Development Security Technical Implementation Guide
+
+3 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-222434`](../../srg/application-security-and-development-stig/rules/V-222434.md) | `APSC-DV-000550` | CAT III | `CCI-000048` | AC-8 a |
+| [`V-222435`](../../srg/application-security-and-development-stig/rules/V-222435.md) | `APSC-DV-000560` | CAT III | `CCI-000050` | AC-8 b |
+| [`V-222436`](../../srg/application-security-and-development-stig/rules/V-222436.md) | `APSC-DV-000570` | CAT III | `CCI-001384` | AC-8 c 1 |
+| [`V-222436`](../../srg/application-security-and-development-stig/rules/V-222436.md) | `APSC-DV-000570` | CAT III | `CCI-001385` | AC-8 c 2 |
+| [`V-222436`](../../srg/application-security-and-development-stig/rules/V-222436.md) | `APSC-DV-000570` | CAT III | `CCI-001386` | AC-8 c 2 |
+| [`V-222436`](../../srg/application-security-and-development-stig/rules/V-222436.md) | `APSC-DV-000570` | CAT III | `CCI-001387` | AC-8 c 2 |
+| [`V-222436`](../../srg/application-security-and-development-stig/rules/V-222436.md) | `APSC-DV-000570` | CAT III | `CCI-001388` | AC-8 c 3 |
+
 ## Application Server Security Requirements Guide
 
 2 rules reach this control.
@@ -38,6 +52,46 @@
 | [`V-203665`](../../srg/general-purpose-operating-system-srg/rules/V-203665.md) | `SRG-OS-000228-GPOS-00088` | CAT II | `CCI-001386` | AC-8 c 2 |
 | [`V-203665`](../../srg/general-purpose-operating-system-srg/rules/V-203665.md) | `SRG-OS-000228-GPOS-00088` | CAT II | `CCI-001387` | AC-8 c 2 |
 | [`V-203665`](../../srg/general-purpose-operating-system-srg/rules/V-203665.md) | `SRG-OS-000228-GPOS-00088` | CAT II | `CCI-001388` | AC-8 c 3 |
+
+## Red Hat Enterprise Linux 9 Security Technical Implementation Guide
+
+5 rules reach this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-257779`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257779.md) | `RHEL-09-211020` | CAT II | `CCI-000048` | AC-8 a |
+| [`V-257779`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257779.md) | `RHEL-09-211020` | CAT II | `CCI-001384` | AC-8 c 1 |
+| [`V-257779`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257779.md) | `RHEL-09-211020` | CAT II | `CCI-001385` | AC-8 c 2 |
+| [`V-257779`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257779.md) | `RHEL-09-211020` | CAT II | `CCI-001386` | AC-8 c 2 |
+| [`V-257779`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257779.md) | `RHEL-09-211020` | CAT II | `CCI-001387` | AC-8 c 2 |
+| [`V-257779`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257779.md) | `RHEL-09-211020` | CAT II | `CCI-001388` | AC-8 c 3 |
+| [`V-257981`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257981.md) | `RHEL-09-255025` | CAT II | `CCI-000048` | AC-8 a |
+| [`V-257981`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257981.md) | `RHEL-09-255025` | CAT II | `CCI-001384` | AC-8 c 1 |
+| [`V-257981`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257981.md) | `RHEL-09-255025` | CAT II | `CCI-001385` | AC-8 c 2 |
+| [`V-257981`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257981.md) | `RHEL-09-255025` | CAT II | `CCI-001386` | AC-8 c 2 |
+| [`V-257981`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257981.md) | `RHEL-09-255025` | CAT II | `CCI-001387` | AC-8 c 2 |
+| [`V-257981`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-257981.md) | `RHEL-09-255025` | CAT II | `CCI-001388` | AC-8 c 3 |
+| [`V-258012`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258012.md) | `RHEL-09-271010` | CAT II | `CCI-000048` | AC-8 a |
+| [`V-258012`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258012.md) | `RHEL-09-271010` | CAT II | `CCI-001384` | AC-8 c 1 |
+| [`V-258012`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258012.md) | `RHEL-09-271010` | CAT II | `CCI-001385` | AC-8 c 2 |
+| [`V-258012`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258012.md) | `RHEL-09-271010` | CAT II | `CCI-001386` | AC-8 c 2 |
+| [`V-258012`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258012.md) | `RHEL-09-271010` | CAT II | `CCI-001387` | AC-8 c 2 |
+| [`V-258012`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258012.md) | `RHEL-09-271010` | CAT II | `CCI-001388` | AC-8 c 3 |
+| [`V-258013`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258013.md) | `RHEL-09-271015` | CAT II | `CCI-000048` | AC-8 a |
+| [`V-258013`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258013.md) | `RHEL-09-271015` | CAT II | `CCI-001384` | AC-8 c 1 |
+| [`V-258013`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258013.md) | `RHEL-09-271015` | CAT II | `CCI-001385` | AC-8 c 2 |
+| [`V-258013`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258013.md) | `RHEL-09-271015` | CAT II | `CCI-001386` | AC-8 c 2 |
+| [`V-258013`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258013.md) | `RHEL-09-271015` | CAT II | `CCI-001387` | AC-8 c 2 |
+| [`V-258013`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-258013.md) | `RHEL-09-271015` | CAT II | `CCI-001388` | AC-8 c 3 |
+| [`V-270174`](../../srg/red-hat-enterprise-linux-9-stig/rules/V-270174.md) | `RHEL-09-271011` | CAT II | `CCI-000048` | AC-8 a |
+
+## Red Hat OpenShift Container Platform 4.x Security Technical Implementation Guide
+
+1 rule reaches this control.
+
+| Group ID | STIG ID | Severity | CCI | DISA reference |
+| --- | --- | --- | --- | --- |
+| [`V-257516`](../../srg/red-hat-openshift-container-platform-4-x-stig/rules/V-257516.md) | `CNTR-OS-000130` | CAT III | `CCI-000048` | AC-8 a |
 
 ---
 

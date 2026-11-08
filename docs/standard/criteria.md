@@ -124,7 +124,7 @@ that digest, not a tag.
   local storage.
 - **Scope:** Generic. Evidenced once for the image, whatever its
   architectures.
-- **Anchors:** [V-203720](../srg/general-purpose-operating-system-srg/rules/V-203720.md) → [CM-14](../crosswalk/controls/cm-14.md); [V-278977](../srg/general-purpose-operating-system-srg/rules/V-278977.md) → [SA-22](../crosswalk/controls/sa-22.md)
+- **Anchors:** [V-203720](../srg/general-purpose-operating-system-srg/rules/V-203720.md) → [CM-14](../crosswalk/controls/cm-14.md); [V-282963](../srg/general-purpose-operating-system-srg/rules/V-282963.md) → [SA-22](../crosswalk/controls/sa-22.md)
 
 ### IMG-02 Every build input pinned and verified
 
@@ -240,7 +240,7 @@ carries fixes nobody has scanned for yet.
 - **Evidence:** The drift report with the base age; the release check's result.
 - **Scope:** Generic. Evidenced once for the image, whatever its
   architectures.
-- **Anchors:** [V-259333](../srg/general-purpose-operating-system-srg/rules/V-259333.md) → [SI-2](../crosswalk/controls/si-2.md); [V-278977](../srg/general-purpose-operating-system-srg/rules/V-278977.md) → [SA-22](../crosswalk/controls/sa-22.md)
+- **Anchors:** [V-259333](../srg/general-purpose-operating-system-srg/rules/V-259333.md) → [SI-2](../crosswalk/controls/si-2.md); [V-282963](../srg/general-purpose-operating-system-srg/rules/V-282963.md) → [SA-22](../crosswalk/controls/sa-22.md)
 - **Source:** [NIST SP 800-190 §4.1.2](nist-800-190.md#image)
 
 ### IMG-05 No secrets in the build
@@ -318,7 +318,7 @@ administered by replacing it, or through the runtime's own interface.
 - **Evidence:** The smoke-test output; the behaviour declaration.
 - **Scope:** Per architecture. Each architecture's image is evidenced
   separately; a result for one does not stand for another.
-- **Anchors:** [V-203655](../srg/general-purpose-operating-system-srg/rules/V-203655.md) → [SC-2](../crosswalk/controls/sc-2.md); [V-203637](../srg/general-purpose-operating-system-srg/rules/V-203637.md) → [CM-7](../crosswalk/controls/cm-7.md)
+- **Anchors:** [V-278973](../srg/general-purpose-operating-system-srg/rules/V-278973.md) → [SC-2](../crosswalk/controls/sc-2.md); [V-203637](../srg/general-purpose-operating-system-srg/rules/V-203637.md) → [CM-7](../crosswalk/controls/cm-7.md)
 - **Source:** [NIST SP 800-190 §4.1.2](nist-800-190.md#image)
 
 ### IMG-08 Embedded package inventory

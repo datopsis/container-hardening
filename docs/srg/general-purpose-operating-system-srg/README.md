@@ -1,13 +1,13 @@
 # General Purpose Operating System Security Requirements Guide
 
-Release: 3 Benchmark Date: 28 Oct 2025. Accepted 2025-09-22.
+Release: 4 Benchmark Date: 30 Sep 2026. Accepted 2026-09-03.
 
 | | |
 | --- | --- |
 | Benchmark | `General_Purpose_Operating_System` |
-| Rules | **203** |
+| Rules | **202** |
 | CAT I | 20 |
-| CAT II | 173 |
+| CAT II | 172 |
 | CAT III | 10 |
 
 The source package is not committed. Its identity is pinned by SHA-256 in [`artifacts/sources.json`](../../../artifacts/sources.json).
@@ -22,15 +22,15 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-203592`](rules/V-203592.md) | `SRG-OS-000002-GPOS-00002` | CAT II | The operating system must automatically remove or disable temporary user accounts after 72 hours. |
 | [`V-203593`](rules/V-203593.md) | `SRG-OS-000004-GPOS-00004` | CAT II | The operating system must audit all account creations. |
 | [`V-203594`](rules/V-203594.md) | `SRG-OS-000021-GPOS-00005` | CAT II | The operating system must enforce the limit of three consecutive invalid logon attempts by a user during a 15-minute time period. |
-| [`V-203595`](rules/V-203595.md) | `SRG-OS-000023-GPOS-00006` | CAT II | The operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system. |
-| [`V-203596`](rules/V-203596.md) | `SRG-OS-000024-GPOS-00007` | CAT II | The operating system must display the Standard Mandatory DoD Notice and Consent Banner until users acknowledge the usage conditions and take explicit actions to log on for further access. |
+| [`V-203595`](rules/V-203595.md) | `SRG-OS-000023-GPOS-00006` | CAT II | The operating system must display the Standard Mandatory DoW Notice and Consent Banner before granting local or remote access to the system. |
+| [`V-203596`](rules/V-203596.md) | `SRG-OS-000024-GPOS-00007` | CAT II | The operating system must display the Standard Mandatory DoW Notice and Consent Banner until users acknowledge the usage conditions and take explicit actions to log on for further access. |
 | [`V-203597`](rules/V-203597.md) | `SRG-OS-000027-GPOS-00008` | CAT III | The operating system must limit the number of concurrent sessions to ten for all accounts and/or account types. |
 | [`V-203598`](rules/V-203598.md) | `SRG-OS-000028-GPOS-00009` | CAT II | The operating system must retain a users session lock until that user reestablishes access using established identification and authentication procedures. |
 | [`V-203599`](rules/V-203599.md) | `SRG-OS-000029-GPOS-00010` | CAT II | The operating system must initiate a session lock after a 15-minute period of inactivity for all connection types. |
 | [`V-203600`](rules/V-203600.md) | `SRG-OS-000030-GPOS-00011` | CAT II | The operating system must provide the capability for users to directly initiate a session lock for all connection types. |
 | [`V-203601`](rules/V-203601.md) | `SRG-OS-000031-GPOS-00012` | CAT II | The operating system must conceal, via the session lock, information previously visible on the display with a publicly viewable image. |
 | [`V-203602`](rules/V-203602.md) | `SRG-OS-000032-GPOS-00013` | CAT II | The operating system must monitor remote access methods. |
-| [`V-203603`](rules/V-203603.md) | `SRG-OS-000033-GPOS-00014` | CAT I | The operating system must implement DoD-approved encryption to protect the confidentiality of remote access sessions. |
+| [`V-203603`](rules/V-203603.md) | `SRG-OS-000033-GPOS-00014` | CAT I | The operating system must implement DoW-approved encryption to protect the confidentiality of remote access sessions. |
 | [`V-203604`](rules/V-203604.md) | `SRG-OS-000037-GPOS-00015` | CAT II | The operating system must produce audit records containing information to establish what type of events occurred. |
 | [`V-203605`](rules/V-203605.md) | `SRG-OS-000038-GPOS-00016` | CAT II | The operating system must produce audit records containing information to establish when (date and time) the events occurred. |
 | [`V-203606`](rules/V-203606.md) | `SRG-OS-000039-GPOS-00017` | CAT II | The operating system must produce audit records containing information to establish where the events occurred. |
@@ -45,7 +45,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-203616`](rules/V-203616.md) | `SRG-OS-000057-GPOS-00027` | CAT II | The operating system must protect audit information from unauthorized read access. |
 | [`V-203617`](rules/V-203617.md) | `SRG-OS-000058-GPOS-00028` | CAT II | The operating system must protect audit information from unauthorized modification. |
 | [`V-203618`](rules/V-203618.md) | `SRG-OS-000059-GPOS-00029` | CAT II | The operating system must protect audit information from unauthorized deletion. |
-| [`V-203619`](rules/V-203619.md) | `SRG-OS-000062-GPOS-00031` | CAT II | The operating system must provide audit record generation capability for DoD-defined auditable events for all operating system components. |
+| [`V-203619`](rules/V-203619.md) | `SRG-OS-000062-GPOS-00031` | CAT II | The operating system must provide audit record generation capability for DoW-defined auditable events for all operating system components. |
 | [`V-203620`](rules/V-203620.md) | `SRG-OS-000063-GPOS-00032` | CAT II | The operating system must allow only the ISSM (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited. |
 | [`V-203621`](rules/V-203621.md) | `SRG-OS-000064-GPOS-00033` | CAT II | The operating system must generate audit records when successful/unsuccessful attempts to access privileges occur. |
 | [`V-203622`](rules/V-203622.md) | `SRG-OS-000066-GPOS-00034` | CAT II | The operating system, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor. |
@@ -58,7 +58,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-203629`](rules/V-203629.md) | `SRG-OS-000073-GPOS-00041` | CAT I | The operating system must store only encrypted representations of passwords. |
 | [`V-203630`](rules/V-203630.md) | `SRG-OS-000074-GPOS-00042` | CAT I | The operating system must transmit only encrypted representations of passwords. |
 | [`V-203631`](rules/V-203631.md) | `SRG-OS-000075-GPOS-00043` | CAT II | Operating systems must enforce 24 hours/1 day as the minimum password lifetime. |
-| [`V-203632`](rules/V-203632.md) | `SRG-OS-000076-GPOS-00044` | CAT II | Operating systems must enforce a 60-day maximum password lifetime restriction. |
+| [`V-203632`](rules/V-203632.md) | `SRG-OS-000076-GPOS-00044` | CAT II | Operating systems must enforce a 180-day maximum password lifetime restriction. |
 | [`V-203634`](rules/V-203634.md) | `SRG-OS-000078-GPOS-00046` | CAT II | The operating system must enforce a minimum 15-character password length. |
 | [`V-203635`](rules/V-203635.md) | `SRG-OS-000079-GPOS-00047` | CAT II | The operating system must obscure feedback of authentication information during the authentication process to protect the information from possible exploitation/use by unauthorized individuals. |
 | [`V-203636`](rules/V-203636.md) | `SRG-OS-000080-GPOS-00048` | CAT II | The operating system must enforce approved authorizations for logical access to information and system resources in accordance with applicable access control policies. |
@@ -79,7 +79,6 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-203651`](rules/V-203651.md) | `SRG-OS-000122-GPOS-00063` | CAT II | The operating system must provide an audit reduction capability that supports on-demand reporting requirements. |
 | [`V-203652`](rules/V-203652.md) | `SRG-OS-000123-GPOS-00064` | CAT II | The information system must automatically remove or disable emergency accounts after the crisis is resolved or 72 hours. |
 | [`V-203653`](rules/V-203653.md) | `SRG-OS-000125-GPOS-00065` | CAT I | The operating system must employ strong authenticators in the establishment of nonlocal maintenance and diagnostic sessions. |
-| [`V-203655`](rules/V-203655.md) | `SRG-OS-000132-GPOS-00067` | CAT II | The operating system must separate user functionality (including user interface services) from operating system management functionality. |
 | [`V-203656`](rules/V-203656.md) | `SRG-OS-000134-GPOS-00068` | CAT II | The operating system must isolate security functions from nonsecurity functions. |
 | [`V-203657`](rules/V-203657.md) | `SRG-OS-000138-GPOS-00069` | CAT II | Operating systems must prevent unauthorized and unintended information transfer via shared system resources. |
 | [`V-203658`](rules/V-203658.md) | `SRG-OS-000142-GPOS-00071` | CAT II | The operating system must manage excess capacity, bandwidth, or other redundancy to limit the effects of information flooding types of Denial of Service (DoS) attacks. |
@@ -88,7 +87,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-203661`](rules/V-203661.md) | `SRG-OS-000185-GPOS-00079` | CAT II | The operating system must protect the confidentiality and integrity of all information at rest. |
 | [`V-203663`](rules/V-203663.md) | `SRG-OS-000205-GPOS-00083` | CAT II | The operating system must generate error messages that provide information necessary for corrective actions without revealing information that could be exploited by adversaries. |
 | [`V-203664`](rules/V-203664.md) | `SRG-OS-000206-GPOS-00084` | CAT II | The operating system must reveal error messages only to authorized users. |
-| [`V-203665`](rules/V-203665.md) | `SRG-OS-000228-GPOS-00088` | CAT II | Any publically accessible connection to the operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting access to the system. |
+| [`V-203665`](rules/V-203665.md) | `SRG-OS-000228-GPOS-00088` | CAT II | Any publicly accessible connection to the operating system must display the Standard Mandatory DoW Notice and Consent Banner before granting access to the system. |
 | [`V-203666`](rules/V-203666.md) | `SRG-OS-000239-GPOS-00089` | CAT II | The operating system must audit all account modifications. |
 | [`V-203667`](rules/V-203667.md) | `SRG-OS-000240-GPOS-00090` | CAT II | The operating system must audit all account disabling actions. |
 | [`V-203668`](rules/V-203668.md) | `SRG-OS-000241-GPOS-00091` | CAT II | The operating system must audit all account removal actions. |
@@ -161,7 +160,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-203737`](rules/V-203737.md) | `SRG-OS-000394-GPOS-00174` | CAT I | The operating system must implement cryptographic mechanisms to protect the confidentiality of nonlocal maintenance and diagnostic communications, when used for nonlocal maintenance sessions. |
 | [`V-203738`](rules/V-203738.md) | `SRG-OS-000395-GPOS-00175` | CAT II | The operating system must verify remote disconnection at the termination of nonlocal maintenance and diagnostic sessions, when used for nonlocal maintenance sessions. |
 | [`V-203739`](rules/V-203739.md) | `SRG-OS-000396-GPOS-00176` | CAT I | The operating system must implement NSA-approved cryptography to protect classified information in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. |
-| [`V-203744`](rules/V-203744.md) | `SRG-OS-000403-GPOS-00182` | CAT II | The operating system must only allow the use of DoD PKI-established certificate authorities for authentication in the establishment of protected sessions to the operating system. |
+| [`V-203744`](rules/V-203744.md) | `SRG-OS-000403-GPOS-00182` | CAT II | The operating system must only allow the use of DoW Public Key Infrastructure (PKI)-established certificate authorities for authentication in the establishment of protected sessions to the operating system. |
 | [`V-203745`](rules/V-203745.md) | `SRG-OS-000404-GPOS-00183` | CAT I | The operating system must implement cryptographic mechanisms to prevent unauthorized modification of all information at rest on all operating system components. |
 | [`V-203746`](rules/V-203746.md) | `SRG-OS-000405-GPOS-00184` | CAT I | The operating system must implement cryptographic mechanisms to prevent unauthorized disclosure of all information at rest on all operating system components. |
 | [`V-203747`](rules/V-203747.md) | `SRG-OS-000420-GPOS-00186` | CAT II | The operating system must protect against or limit the effects of Denial of Service (DoS) attacks by ensuring the operating system is implementing rate-limiting measures on impacted network interfaces. |
@@ -197,7 +196,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-203777`](rules/V-203777.md) | `SRG-OS-000479-GPOS-00224` | CAT II | The operating system must, at a minimum, off-load audit data from interconnected systems in real time and off-load audit data from standalone systems weekly. |
 | [`V-203778`](rules/V-203778.md) | `SRG-OS-000480-GPOS-00225` | CAT II | The operating system must prevent the use of dictionary words for passwords. |
 | [`V-203779`](rules/V-203779.md) | `SRG-OS-000480-GPOS-00226` | CAT II | The operating system must enforce a delay of at least 4 seconds between logon prompts following a failed logon attempt. |
-| [`V-203780`](rules/V-203780.md) | `SRG-OS-000480-GPOS-00227` | CAT II | The operating system must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. |
+| [`V-203780`](rules/V-203780.md) | `SRG-OS-000480-GPOS-00227` | CAT II | The operating system must be configured in accordance with the security configuration settings based on DoW security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. |
 | [`V-203781`](rules/V-203781.md) | `SRG-OS-000480-GPOS-00228` | CAT II | The operating system must define default permissions for all authenticated users in such a way that the user can only read and modify their own files. |
 | [`V-203782`](rules/V-203782.md) | `SRG-OS-000480-GPOS-00229` | CAT I | The operating system must not allow an unattended or automatic logon to the system. |
 | [`V-203783`](rules/V-203783.md) | `SRG-OS-000480-GPOS-00230` | CAT II | The operating system must limit the ability of non-privileged users to grant other users direct access to the contents of their home directories/folders. |
@@ -220,4 +219,4 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-278974`](rules/V-278974.md) | `SRG-OS-000313-GPOS-00124` | CAT II | The operating system must enforce a role-based access control (RBAC) policy over defined subjects and objects. |
 | [`V-278975`](rules/V-278975.md) | `SRG-OS-000550-GPOS-00100` | CAT II | The operating system must use a FIPS-validated cryptographic module to provision digital signatures. |
 | [`V-278976`](rules/V-278976.md) | `SRG-OS-000835-GPOS-00305` | CAT II | The operating system must enforce attribute-based access control policy over defined subjects and objects based upon organization-defined attributes to assume access permissions. |
-| [`V-278977`](rules/V-278977.md) | `SRG-OS-000830-GPOS-00300` | CAT I | The operating system must be a version supported by the vendor. |
+| [`V-282963`](rules/V-282963.md) | `SRG-OS-000830-GPOS-00300` | CAT I | The operating system must be a version supported by the vendor. |

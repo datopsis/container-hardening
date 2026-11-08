@@ -97,24 +97,25 @@ Package 4 source identification is recorded in the
 [per-function applicability guide](applicability/application-functions.md),
 reviewed 8 November 2026. It identifies the nearest fits where DISA has no
 dedicated guide and pins three conditional reference packages. These additions
-do not require image repositories to adopt this draft standard. Rendering
-limitations and unverified image-level determinations are recorded in that guide.
+do not require image repositories to adopt this draft standard. Rendering status and unverified image-level determinations are recorded in that guide.
 
 | Source | Release | Role | Rendered |
 | --- | --- | --- | --- |
 | NIST SP 800-53 Rev 5 catalogue | 5.2.0 | Spine | n/a |
 | NIST SP 800-53 Rev 5 High baseline | 5.2.0 | Baseline | n/a |
-| DISA CCI list | 2025-01-23 | Crosswalk | [Joined, 106 controls](crosswalk/README.md) |
-| DISA Container Platform SRG | V2R4 | Platform controls | Yes, 188 rules |
-| DISA GPOS SRG | V3R3 | **Image controls** | Yes, 203 rules |
+| DISA CCI list | 2025-01-23 | Crosswalk | [Joined, 161 controls](crosswalk/README.md) |
+| DISA Container Platform SRG | V2R5 | Platform controls | Yes, 188 rules |
+| DISA GPOS SRG | V3R4 | **Image controls** | Yes, 202 rules |
 | DISA Container Hardening Process Guide | V1R2 | Process guide | n/a, prose |
 | NIST SP 800-190, Application Container Security Guide | Final, 2017 | Process guide | [Mapped, 24 countermeasures](standard/nist-800-190.md) |
-| DISA RHEL 9 STIG | V2R4 | Host controls | Not yet |
-| DISA Web Server SRG | V3R3 | Conditional | Yes, 102 rules |
-| DISA Application Server SRG | V4R5 | Conditional | Yes, 137 rules |
-| DISA Database SRG | V4R6 | Conditional reference only | Deferred; see applicability guide |
-| DISA API SRG | V1R1 | Conditional reference only | Deferred; see applicability guide |
-| DISA Application Security and Development STIG | V6R5 | Conditional reference only | Deferred; see applicability guide |
+| DISA RHEL 9 STIG | V2R10 | Host controls | Yes, 445 rules |
+| DISA Web Server SRG | V4R5 | Conditional | Yes, 126 rules |
+| DISA Application Server SRG | V4R6 | Conditional | Yes, 137 rules |
+| DISA Database SRG | V4R6 | Conditional reference only | Yes, 142 rules |
+| DISA API SRG | V1R1 | Conditional reference only | Yes, 65 rules |
+| DISA Application Security and Development STIG | V6R5 | Conditional reference only | Yes, 286 rules |
+| DISA OpenShift STIG | V2R7 | Platform controls | Yes, 83 rules |
+| DISA Kubernetes STIG | V2R6 | Platform controls | Not yet |
 | CIS Benchmarks | — | Cross-reference | Never — terms forbid it |
 
 **The GPOS SRG carries image-level controls.** Per DoD guidance it is used to
@@ -132,10 +133,24 @@ standard, not an omission from it.
 
 ## Package 1: sources and rendering
 
-- [ ] [Decide on the 2026-11 DISA drift](drift/2026-11-disa-refresh.md).
-- [ ] Render the RHEL 9 STIG, which is pinned but not yet converted. Its
-  XCCDF digest must be pinned in the register first; the renderer skips a
-  package whose XCCDF is not.
+- [ ] Review RHEL 9 V2R10 host/UBI applicability, crypto-policy and audit-command
+  changes, and replacements for removed rules. Rendering is reference material;
+  host checks do not become image checks, and removed rules do not waive controls.
+- [ ] Review the eight RHEL 9 CAT II → CAT I promotions with the host owner:
+  V-257989 (SSH server ciphers), V-257991 (SSH server MACs), V-258232 (IP tunnels),
+  V-258234 (crypto-policies package), V-258241 (systemwide crypto policy),
+  V-258242 (bind encryption), V-270177 (SSH client ciphers), and V-270178
+  (SSH client MACs). See the [per-rule diff](drift/2026-11-disa-refresh.md#disa-rhel9-stig).
+- [ ] Resolve or explicitly disposition RHEL 9's CCIs without a Rev 5 mapping:
+  CCI-000058, CCI-000192, CCI-000193, CCI-000194, CCI-000195, CCI-000196,
+  CCI-000198, CCI-000199, CCI-000205, CCI-000767, CCI-000768, CCI-000770,
+  CCI-000795, CCI-001619, CCI-001683, CCI-001684, CCI-001685, CCI-001686,
+  CCI-001749, CCI-001814, CCI-001891, CCI-001942, CCI-001948, CCI-001991,
+  CCI-002046, and CCI-002132. The [crosswalk](crosswalk/README.md) retains
+  every affected rule as a finding; do not invent a local Rev 5 mapping.
+- [ ] Complete the [2026-11 adoption follow-ups](drift/2026-11-disa-adoption.md#owner-judgment):
+  password policy, FIPS, Web Server applicability and installation deadlines,
+  and OpenShift node evidence. Source adoption does not settle these decisions.
 - [ ] Extend the weekly source verification to probe adjacent releases. It
   confirms a pinned package is unchanged, which is not the same as confirming
   it is current: DISA serves superseded releases alongside current ones, so a
@@ -147,10 +162,9 @@ standard, not an omission from it.
 - [ ] Obtain the CIS Kubernetes and OpenShift benchmarks via an account holder
   and record their digests. They can be cited by identifier but never rendered;
   their terms are non-commercial and ShareAlike.
-- [ ] Render the DISA Kubernetes STIG V2R6 and OpenShift STIG V2R6, pinned but
-  not yet converted, and add them to the crosswalk. They instantiate the
-  Container Platform SRG for each product, so platform expectations can then
-  cite product rules as well.
+- [ ] Render the DISA Kubernetes STIG V2R6, pinned but not yet converted, and
+  add it to the crosswalk. It instantiates the Container Platform SRG for
+  Kubernetes, so platform expectations can then cite its product rules as well.
 - [ ] Map NIST IR 8176, the DISA Container Image Creation and Deployment Guide,
   and the NSA/CISA Kubernetes Hardening Guide countermeasure by countermeasure,
   as SP 800-190 is, with a test that fails on any unmapped item.
@@ -188,7 +202,7 @@ deviations in its profile; each item below closes some of them.
 - [ ] Decide the reference image's Web Server and Application Server SRGs rule
   by rule, in worksheets generated by
   [`scripts/worksheets.py`](../scripts/worksheets.py), and cite them from its
-  profile as the basis of each determination. 239 rules, and the worksheet
+  profile as the basis of each determination. 263 rules, and the worksheet
   suggests which rules of the other SRG share a CCI.
 - [ ] Build the reference image's SCAP profile: the SCAP Security Guide's RHEL 9
   DISA STIG profile, pinned, tailored for an image, with each rule tied to the
@@ -232,11 +246,12 @@ deviations in its profile; each item below closes some of them.
 ## What the scaffold already established
 
 - `scripts/build-srg-markdown.py` converts a DISA XCCDF package into one
-  Markdown file per rule, with `--check` for drift. 630 rules across four
+  Markdown file per rule, with `--check` for drift. 1,674 rules across nine
   catalogues render today, and only packages whose XCCDF digest is pinned are
   rendered.
-- `docs/srg/` holds the generated Container Platform SRG V2R4, GPOS SRG V3R3,
-  Web Server SRG V3R3, and Application Server SRG V4R5.
+- `docs/srg/` holds the generated Container Platform SRG V2R5, GPOS SRG V3R4,
+  Web Server SRG V4R5, Application Server SRG V4R6, RHEL 9 STIG V2R10,
+  OpenShift STIG V2R7, Database SRG V4R6, API SRG V1R1, and ASD STIG V6R5.
 - `artifacts/sources.json` pins eleven sources by digest, recording for each its
   role, whether it has been rendered, and whether it may be redistributed. All
   ten retrievable sources were verified against their recorded digests on
@@ -244,10 +259,9 @@ deviations in its profile; each item below closes some of them.
 - `scripts/build-cci-crosswalk.py` joins every rendered rule's CCIs to 800-53
   Rev 5 through the pinned DISA CCI list, resolved against the pinned OSCAL
   catalogue. `docs/crosswalk/` and `artifacts/crosswalk.json` hold the result:
-  120 distinct controls across the four rendered SRGs. Every cited CCI resolved
-  and none was deprecated; three Web Server SRG rules cite CCIs that DISA maps
-  only to Revision 4 controls Revision 5 withdraws, which the crosswalk reports
-  as findings rather than dropping. See
+  161 distinct controls across nine rendered catalogues. Web Server V4R5
+  repairs the former unmapped findings; other catalogues still cite CCIs with
+  no Rev 5 mapping, which remain visible on the crosswalk index. See
   [ADR-0002](adr/0002-derive-800-53-cross-references-from-cci.md).
 - `scripts/verify-sources.py` re-verifies those digests and never edits the
   register: a replaced release is a finding to read, not a digest to update.

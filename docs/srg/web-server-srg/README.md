@@ -1,13 +1,13 @@
 # Web Server Security Requirements Guide
 
-Release: 3 Benchmark Date: 08 Apr 2024. Accepted 2024-04-09.
+Release: 5 Benchmark Date: 01 Jul 2026. Accepted 2026-05-23.
 
 | | |
 | --- | --- |
 | Benchmark | `Web_Server_SRG` |
-| Rules | **102** |
-| CAT I | 3 |
-| CAT II | 98 |
+| Rules | **126** |
+| CAT I | 6 |
+| CAT II | 120 |
 
 The source package is not committed. Its identity is pinned by SHA-256 in [`artifacts/sources.json`](../../../artifacts/sources.json).
 
@@ -53,7 +53,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-206384`](rules/V-206384.md) | `SRG-APP-000141-WSR-000086` | CAT II | The web server must protect system resources and privileged operations from hosted applications. |
 | [`V-206385`](rules/V-206385.md) | `SRG-APP-000141-WSR-000087` | CAT II | Users and scripts running on behalf of users must be contained to the document root or home directory tree of the web server. |
 | [`V-206386`](rules/V-206386.md) | `SRG-APP-000142-WSR-000089` | CAT II | The web server must be configured to use a specified IP address and port. |
-| [`V-206387`](rules/V-206387.md) | `SRG-APP-000172-WSR-000104` | CAT II | The web server must encrypt passwords during transmission. |
+| [`V-206387`](rules/V-206387.md) | `SRG-APP-000172-WSR-000104` | CAT I | The web server must encrypt passwords during transmission. |
 | [`V-206388`](rules/V-206388.md) | `SRG-APP-000175-WSR-000095` | CAT II | The web server must perform RFC 5280-compliant certification path validation. |
 | [`V-206389`](rules/V-206389.md) | `SRG-APP-000176-WSR-000096` | CAT II | Only authenticated system administrators or the designated PKI Sponsor for the web server must have access to the web servers private key. |
 | [`V-206390`](rules/V-206390.md) | `SRG-APP-000179-WSR-000110` | CAT I | The web server must use cryptographic modules that meet the requirements of applicable federal laws, Executive Orders, directives, policies, regulations, standards, and guidance when encrypting stored data. |
@@ -73,7 +73,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-206404`](rules/V-206404.md) | `SRG-APP-000225-WSR-000074` | CAT II | The web server must augment re-creation to a stable and known baseline. |
 | [`V-206405`](rules/V-206405.md) | `SRG-APP-000225-WSR-000140` | CAT II | The web server must be built to fail to a known safe state if system initialization fails, shutdown fails, or aborts fail. |
 | [`V-206406`](rules/V-206406.md) | `SRG-APP-000225-WSR-000141` | CAT II | The web server must provide a clustering capability. |
-| [`V-206407`](rules/V-206407.md) | `SRG-APP-000231-WSR-000144` | CAT II | Information at rest must be encrypted using a DoD-accepted algorithm to protect the confidentiality and integrity of the information. |
+| [`V-206407`](rules/V-206407.md) | `SRG-APP-000231-WSR-000144` | CAT II | Information at rest must be encrypted using a DOD-accepted algorithm to protect the confidentiality and integrity of the information. |
 | [`V-206408`](rules/V-206408.md) | `SRG-APP-000233-WSR-000146` | CAT II | The web server document directory must be in a separate partition from the web servers system files. |
 | [`V-206409`](rules/V-206409.md) | `SRG-APP-000246-WSR-000149` | CAT II | The web server must restrict the ability of users to launch Denial of Service (DoS) attacks against other information systems or networks. |
 | [`V-206410`](rules/V-206410.md) | `SRG-APP-000251-WSR-000157` | CAT II | The web server must limit the character set used for data entry. |
@@ -86,7 +86,6 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-206417`](rules/V-206417.md) | `SRG-APP-000315-WSR-000004` | CAT II | The web server must restrict inbound connections from nonsecure zones. |
 | [`V-206418`](rules/V-206418.md) | `SRG-APP-000316-WSR-000170` | CAT II | The web server must provide the capability to immediately disconnect or disable remote access to the hosted applications. |
 | [`V-206419`](rules/V-206419.md) | `SRG-APP-000340-WSR-000029` | CAT II | Non-privileged accounts on the hosting system must only access web server security-relevant information and functions through a distinct administrative account. |
-| [`V-206420`](rules/V-206420.md) | `SRG-APP-000356-WSR-000007` | CAT II | A web server that is part of a web server cluster must route all remote management through a centrally managed access control point. |
 | [`V-206421`](rules/V-206421.md) | `SRG-APP-000357-WSR-000150` | CAT II | The web server must use a logging mechanism that is configured to allocate log record storage capacity large enough to accommodate the logging requirements of the web server. |
 | [`V-206422`](rules/V-206422.md) | `SRG-APP-000358-WSR-000063` | CAT II | The web server must not impede the ability to write specified log record content to an audit log server. |
 | [`V-206423`](rules/V-206423.md) | `SRG-APP-000358-WSR-000163` | CAT II | The web server must be configurable to integrate with an organizations security infrastructure. |
@@ -96,7 +95,7 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-206427`](rules/V-206427.md) | `SRG-APP-000380-WSR-000072` | CAT II | The web server application, libraries, and configuration files must only be accessible to privileged users. |
 | [`V-206428`](rules/V-206428.md) | `SRG-APP-000383-WSR-000175` | CAT II | The web server must prohibit or restrict the use of nonsecure or unnecessary ports, protocols, modules, and/or services. |
 | [`V-206430`](rules/V-206430.md) | `SRG-APP-000427-WSR-000186` | CAT II | The web server must only accept client certificates (user and machine) issued by DOD PKI or DOD-approved PKI Certificate Authorities (CAs). |
-| [`V-206431`](rules/V-206431.md) | `SRG-APP-000429-WSR-000113` | CAT II | The web server must encrypt user identifiers and passwords. |
+| [`V-206431`](rules/V-206431.md) | `SRG-APP-000429-WSR-000113` | CAT I | The web server must encrypt user identifiers and passwords. |
 | [`V-206432`](rules/V-206432.md) | `SRG-APP-000435-WSR-000147` | CAT II | The web server must be protected from being stopped by a non-privileged user. |
 | [`V-206433`](rules/V-206433.md) | `SRG-APP-000435-WSR-000148` | CAT II | The web server must be tuned to handle the operational requirements of the hosted application. |
 | [`V-206434`](rules/V-206434.md) | `SRG-APP-000439-WSR-000151` | CAT I | The web server must employ cryptographic mechanisms (TLS/DTLS/SSL) preventing the unauthorized disclosure of information during transmission. |
@@ -108,14 +107,39 @@ Pages are filed by Group ID, the only identifier DISA guarantees unique. A STIG 
 | [`V-206440`](rules/V-206440.md) | `SRG-APP-000439-WSR-000188` | CAT II | The web server must remove all export ciphers to protect the confidentiality and integrity of transmitted information. |
 | [`V-206441`](rules/V-206441.md) | `SRG-APP-000441-WSR-000181` | CAT II | The web server must maintain the confidentiality and integrity of information during preparation for transmission. |
 | [`V-206442`](rules/V-206442.md) | `SRG-APP-000442-WSR-000182` | CAT II | The web server must maintain the confidentiality and integrity of information during reception. |
-| [`V-206443`](rules/V-206443.md) | `SRG-APP-000456-WSR-000187` | CAT II | The web server must install security-relevant software updates within the configured time period directed by an authoritative source (e.g., IAVM, CTOs, DTMs, and STIGs). |
+| [`V-206443`](rules/V-206443.md) | `SRG-APP-000456-WSR-000187` | CAT II | The web server must install security-relevant software updates within 30 days unless the time period is directed by an authoritative source (e.g., IAVM, CTOs, DTMs, STIGs). |
 | [`V-206444`](rules/V-206444.md) | `SRG-APP-000516-WSR-000079` | CAT II | All accounts installed with the web server software and tools must have passwords assigned and default passwords changed. |
 | [`V-206445`](rules/V-206445.md) | `SRG-APP-000516-WSR-000174` | CAT II | The web server must be configured in accordance with the security configuration settings based on DoD security configuration or implementation guidance, including STIGs, NSA configuration guides, CTOs, and DTMs. |
 | [`V-239371`](rules/V-239371.md) | `SRG-APP-000416-WSR-000118` | CAT II | The web server must implement required cryptographic protections using cryptographic modules complying with applicable federal laws, Executive Orders, directives, policies, regulations, standards, and guidance when encrypting data that must be compartmentalized. |
-| [`V-260896`](rules/V-260896.md) | `SRG-APP-000219-WSR-000190` | CAT II | The web server must restrict a consistent inbound source IP for the entire management session. |
-| [`V-260897`](rules/V-260897.md) | `SRG-APP-000219-WSR-000191` | info | The web server must restrict a consistent inbound source IP for the entire user session. |
-| [`V-260898`](rules/V-260898.md) | `SRG-APP-000439-WSR-000192` | CAT II | The web server must use HTTP/2, at a minimum. |
-| [`V-260899`](rules/V-260899.md) | `SRG-APP-000439-WSR-000193` | CAT II | The web server must disable HTTP/1.x downgrading. |
-| [`V-260900`](rules/V-260900.md) | `SRG-APP-000251-WSR-000194` | CAT II | The web server must interpret and normalize ambiguous HTTP requests or terminate the TCP connection. |
-| [`V-260901`](rules/V-260901.md) | `SRG-APP-000251-WSR-000195` | CAT II | The web server must terminate the connection if server-level exceptions are triggered when handling requests to prevent HTTP request smuggling attacks. |
-| [`V-260902`](rules/V-260902.md) | `SRG-APP-000439-WSR-000196` | CAT II | The web server must only use forward proxies that route HTTP/2 requests upstream. |
+| [`V-264337`](rules/V-264337.md) | `SRG-APP-000700-WSR-000100` | CAT II | The web server must disable accounts when the accounts have expired. |
+| [`V-264338`](rules/V-264338.md) | `SRG-APP-000705-WSR-000110` | CAT II | The web server must disable accounts when the accounts are no longer associated to a user. |
+| [`V-264339`](rules/V-264339.md) | `SRG-APP-000745-WSR-000120` | CAT II | The web server must implement the capability to centrally review and analyze audit records from multiple components within the system. |
+| [`V-264340`](rules/V-264340.md) | `SRG-APP-000795-WSR-000130` | CAT II | The web server must alert organization-defined personnel or roles upon detection of unauthorized access, modification, or deletion of audit information. |
+| [`V-264341`](rules/V-264341.md) | `SRG-APP-000805-WSR-000140` | CAT II | The web server must automatically generate audit records of the enforcement actions. |
+| [`V-264342`](rules/V-264342.md) | `SRG-APP-000815-WSR-000160` | CAT II | The web server must require users to be individually authenticated before granting access to the shared accounts or resources. |
+| [`V-264343`](rules/V-264343.md) | `SRG-APP-000820-WSR-000170` | CAT II | The web server must implement multifactor authentication for local; network; and/or remote access to privileged accounts; and/or nonprivileged accounts such that one of the factors is provided by a device separate from the system gaining access. |
+| [`V-264344`](rules/V-264344.md) | `SRG-APP-000825-WSR-000180` | CAT II | The web server must implement multifactor authentication for local; network; and/or remote access to privileged accounts; and/or nonprivileged accounts such that the device meets organization-defined strength of mechanism requirements. |
+| [`V-264345`](rules/V-264345.md) | `SRG-APP-000830-WSR-000190` | CAT II | The web server must, for password-based authentication, maintain a list of commonly used, expected, or compromised passwords on an organization-defined frequency. |
+| [`V-264346`](rules/V-264346.md) | `SRG-APP-000835-WSR-000200` | CAT II | The web server must, for password-based authentication, update the list of passwords on an organization-defined frequency. |
+| [`V-264347`](rules/V-264347.md) | `SRG-APP-000840-WSR-000210` | CAT II | The web server must, for password-based authentication, update the list of passwords when organizational passwords are suspected to have been compromised directly or indirectly. |
+| [`V-264348`](rules/V-264348.md) | `SRG-APP-000845-WSR-000220` | CAT II | The web server must, for password-based authentication, verify when users create or update passwords, that the passwords are not found on the list of commonly-used, expected, or compromised passwords in IA-5 (1) (a). |
+| [`V-264349`](rules/V-264349.md) | `SRG-APP-000850-WSR-000230` | CAT II | The web server must, for password-based authentication, store passwords using an approved salted key derivation function, preferably using a keyed hash. |
+| [`V-264350`](rules/V-264350.md) | `SRG-APP-000855-WSR-000240` | CAT II | The web server must, for password-based authentication, require immediate selection of a new password upon account recovery. |
+| [`V-264351`](rules/V-264351.md) | `SRG-APP-000860-WSR-000250` | CAT II | The web server must, for password-based authentication, allow user selection of long passwords and passphrases, including spaces and all printable characters. |
+| [`V-264352`](rules/V-264352.md) | `SRG-APP-000865-WSR-000260` | CAT II | The web server must, for password-based authentication, employ automated tools to assist the user in selecting strong password authenticators. |
+| [`V-264353`](rules/V-264353.md) | `SRG-APP-000870-WSR-000270` | CAT II | The web server must, for password-based authentication, enforce organization-defined composition and complexity rules. |
+| [`V-264354`](rules/V-264354.md) | `SRG-APP-000875-WSR-000280` | CAT II | The web server must, for public key-based authentication, implement a local cache of revocation data to support path discovery and validation. |
+| [`V-264355`](rules/V-264355.md) | `SRG-APP-000880-WSR-000290` | CAT II | The web server must protect nonlocal maintenance sessions by separating the maintenance session from other network sessions with the system by logically separated communications paths. |
+| [`V-264356`](rules/V-264356.md) | `SRG-APP-000910-WSR-000300` | CAT II | The web server must include only approved trust anchors in trust stores or certificate stores managed by the organization. |
+| [`V-264357`](rules/V-264357.md) | `SRG-APP-000915-WSR-000310` | CAT II | The web server must provide protected storage for cryptographic keys with organization-defined safeguards and/or hardware protected key store. |
+| [`V-264358`](rules/V-264358.md) | `SRG-APP-000920-WSR-000320` | CAT II | The web server must synchronize system clocks within and between systems or system components. |
+| [`V-264359`](rules/V-264359.md) | `SRG-APP-000925-WSR-000330` | CAT II | The web server must compare the internal system clocks on an organization-defined frequency with organization-defined authoritative time source. |
+| [`V-264360`](rules/V-264360.md) | `SRG-APP-000219-WSR-000190` | CAT II | The web server must restrict a consistent inbound source IP for the entire management session. |
+| [`V-264361`](rules/V-264361.md) | `SRG-APP-000219-WSR-000191` | CAT II | The web server must restrict a consistent inbound source IP for the entire user session. |
+| [`V-264362`](rules/V-264362.md) | `SRG-APP-000439-WSR-000192` | CAT II | The web server must use HTTP/2, at a minimum. |
+| [`V-264363`](rules/V-264363.md) | `SRG-APP-000439-WSR-000193` | CAT II | The web server must disable HTTP/1.x downgrading. |
+| [`V-264364`](rules/V-264364.md) | `SRG-APP-000251-WSR-000194` | CAT II | The web server must interpret and normalize ambiguous HTTP requests or terminate the TCP connection. |
+| [`V-264365`](rules/V-264365.md) | `SRG-APP-000251-WSR-000195` | CAT II | The web server must terminate the connection if server-level exceptions are triggered when handling requests to prevent HTTP request smuggling attacks. |
+| [`V-264366`](rules/V-264366.md) | `SRG-APP-000439-WSR-000196` | CAT II | The web server must only use forward proxies that route HTTP/2 requests upstream. |
+| [`V-279028`](rules/V-279028.md) | `SRG-APP-000334-WSR-000024` | CAT II | The web server must uniquely identify and authenticate source by organization, system, application, and/or individual for information transfer. |
+| [`V-279029`](rules/V-279029.md) | `SRG-APP-001035-WSR-000340` | CAT I | The web server must be a version supported by the vendor. |
