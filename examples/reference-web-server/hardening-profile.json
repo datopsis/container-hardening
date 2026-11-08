@@ -51,8 +51,8 @@
       "applies": false,
       "basis": "27 of the 137 rules in V4R6 govern a management interface, hosted applications, or user accounts and identities, and this image has none of those. The rest state logging, TLS, and session requirements that the Web Server SRG states in terms that fit an HTTP server.",
       "evidence": "docs/applicability/application-server-srg.md",
-      "reviewed_on": "2026-09-18",
-      "reviewed_by": "Joey"
+      "reviewed_on": null,
+      "reviewed_by": null
     },
     {
       "source": "disa-web-server-srg",
@@ -61,8 +61,8 @@
       "applies": true,
       "basis": "The image's function is serving and proxying HTTP, which is the subject of the Web Server SRG.",
       "evidence": "docs/srg/web-server-srg/README.md",
-      "reviewed_on": "2026-09-18",
-      "reviewed_by": "Joey"
+      "reviewed_on": null,
+      "reviewed_by": null
     }
   ],
   "deviations": [
