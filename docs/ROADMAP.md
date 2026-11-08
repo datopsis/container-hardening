@@ -132,6 +132,7 @@ standard, not an omission from it.
 
 ## Package 1: sources and rendering
 
+- [ ] [Decide on the 2026-11 DISA drift](drift/2026-11-disa-refresh.md).
 - [ ] Render the RHEL 9 STIG, which is pinned but not yet converted. Its
   XCCDF digest must be pinned in the register first; the renderer skips a
   package whose XCCDF is not.
