@@ -93,6 +93,13 @@ revision and a replaced package is visible rather than silent.
 
 ## Requirement sources
 
+Package 4 source identification is recorded in the
+[per-function applicability guide](applicability/application-functions.md),
+reviewed 8 November 2026. It identifies the nearest fits where DISA has no
+dedicated guide and pins three conditional reference packages. These additions
+do not require image repositories to adopt this draft standard. Rendering
+limitations and unverified image-level determinations are recorded in that guide.
+
 | Source | Release | Role | Rendered |
 | --- | --- | --- | --- |
 | NIST SP 800-53 Rev 5 catalogue | 5.2.0 | Spine | n/a |
@@ -105,6 +112,9 @@ revision and a replaced package is visible rather than silent.
 | DISA RHEL 9 STIG | V2R4 | Host controls | Not yet |
 | DISA Web Server SRG | V3R3 | Conditional | Yes, 102 rules |
 | DISA Application Server SRG | V4R5 | Conditional | Yes, 137 rules |
+| DISA Database SRG | V4R6 | Conditional reference only | Deferred; see applicability guide |
+| DISA API SRG | V1R1 | Conditional reference only | Deferred; see applicability guide |
+| DISA Application Security and Development STIG | V6R5 | Conditional reference only | Deferred; see applicability guide |
 | CIS Benchmarks | — | Cross-reference | Never — terms forbid it |
 
 **The GPOS SRG carries image-level controls.** Per DoD guidance it is used to
@@ -163,14 +173,6 @@ standard, not an omission from it.
   second reader. Start with the nine that make a control `image-owned` by
   determination rather than derivation: AC-6, CM-2, CM-2(2), CM-2(3), CM-8,
   CM-8(1), CM-8(2), CM-11, and SI-7(15).
-
-## Package 4: per-application tailoring
-
-- [ ] Pin a conditional source for each image function the register does not
-  yet cover. Databases have none; the DISA Database SRG is the likely
-  candidate. Object storage and API or catalog services likewise need their
-  function's source identified. Each image would then record a determination
-  for it.
 
 ## Package 5: adoption
 

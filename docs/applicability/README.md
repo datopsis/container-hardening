@@ -1,5 +1,10 @@
 # Which SRGs an image takes
 
+This is a **draft reference standard**. The
+[database, object-storage, and API/catalog source guide](application-functions.md)
+identifies conditional references for the named `*-ubi` repositories without
+requiring adoption, workflows, badges, or repository dependencies.
+
 Every image takes three sources whatever it does. The others are
 **conditional**: they govern a kind of software, and an image takes one when
 it is that kind of software. This page is how to decide, and how to record the
@@ -24,8 +29,14 @@ These are not decided per image, and have no worksheet.
 | --- | --- | --- |
 | Serves or proxies HTTP, an API over HTTP included | [Web Server SRG](../srg/web-server-srg/README.md) | Pinned and rendered |
 | Hosts an application runtime, offers a management interface, or manages user accounts | [Application Server SRG](../srg/application-server-srg/README.md) | Pinned and rendered |
-| Is a database management system | Database SRG | Not pinned yet |
-| Does something none of these govern, such as object storage or messaging | No source identified | Record the gap |
+| Is a database management system | [Database SRG V4R6](application-functions.md) | Pinned; reference-only, unrendered |
+| Exposes an API, including catalog/query/compute service interfaces | [API SRG V1R1](application-functions.md) | Pinned; reference-only, unrendered |
+| Provides networked application behavior, including object storage and query/compute services | [Application Security and Development STIG V6R5](application-functions.md) | Pinned; reference-only, unrendered |
+| Does something none of these govern, such as a messaging-specific function | No function-specific source identified here | Record the gap |
+
+The new reference-only entries are optional reading; they do not require new
+profile determinations. The linked guide names each repository, explains the
+source boundaries, and records where no dedicated DISA guide exists.
 
 **More than one can apply.** The questions are not exclusive: an HTTP API that
 manages its own users and access keys takes both the Web Server SRG and the
@@ -45,8 +56,10 @@ CCI with it.
 
 ## Decide every rule: the worksheet
 
-For each conditional source that may apply, generate a worksheet from the
-pinned catalogue and decide every rule in it:
+The existing worksheet tooling supports pinned, rendered catalogues. It is
+not an adoption requirement for the new reference-only sources, which are not
+yet rendered. For a rendered source being assessed, it can generate a worksheet
+for deciding each rule:
 
 ```sh
 python ../container-hardening/scripts/worksheets.py applicability new \

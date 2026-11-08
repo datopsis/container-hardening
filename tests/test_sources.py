@@ -58,6 +58,9 @@ class RegisterShapeTests(unittest.TestCase):
                 self.assertIn(source["status"], STATUSES)
                 self.assertIn(source["role"], ROLES)
                 self.assertIsInstance(source["redistributable"], bool)
+                if "reference_only" in source:
+                    self.assertIsInstance(source["reference_only"], bool)
+                    self.assertEqual(source["role"], "conditional")
 
     def test_source_ids_are_unique(self) -> None:
         ids = [s["id"] for s in sources()]

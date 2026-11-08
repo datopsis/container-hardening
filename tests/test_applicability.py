@@ -32,8 +32,9 @@ def sections(body: str) -> dict[str, str]:
 
 class AnalysisTests(unittest.TestCase):
     def analyses(self) -> list[Path]:
-        # The README is the guide to choosing sources, not an analysis of one.
-        found = sorted(p for p in ANALYSES.glob("*.md") if p.name != "README.md")
+        # Source-selection guides have no per-rule analysis or summary counts.
+        found = sorted(p for p in ANALYSES.glob("*.md")
+                       if p.name not in ("README.md", "application-functions.md"))
         self.assertTrue(found)
         return found
 

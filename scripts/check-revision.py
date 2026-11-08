@@ -15,6 +15,8 @@ measured:
   expectations, the control baseline, and the source register. A newer
   revision that changed only prose or tooling does not make a profile stale;
   one that changed a criterion does, until someone reassesses.
+  Adding only optional reference-only conditional sources leaves existing
+  assessments current; changes to existing sources still require review.
 
 Needs the standard's full history.
 
@@ -45,6 +47,30 @@ NORMATIVE = (
 
 def git(repository: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-C", str(repository), *args], text=True, capture_output=True)
+
+
+def reference_only_additions(repository: Path, before: str, after: str) -> bool:
+    """Permit additions to the reference library, never changes to existing pins."""
+    try:
+        registers = []
+        for commit in (before, after):
+            result = git(repository, "show", commit + ":artifacts/sources.json")
+            if result.returncode:
+                return False
+            registers.append(json.loads(result.stdout))
+        old, new = registers
+        old_ids = {s["id"] for s in old["sources"]}
+        new_ids = {s["id"] for s in new["sources"]}
+        if len(old_ids) != len(old["sources"]) or len(new_ids) != len(new["sources"]):
+            return False
+        added = [s for s in new["sources"] if s["id"] not in old_ids]
+        if not added or any(s["role"] != "conditional" or s.get("reference_only") is not True
+                            for s in added):
+            return False
+        new["sources"] = [s for s in new["sources"] if s["id"] in old_ids]
+        return old == new
+    except (ValueError, KeyError, TypeError):
+        return False
 
 
 def check(
@@ -82,9 +108,12 @@ def check(
     changed = git(repository, "diff", "--name-only", profile_revision, head, "--", *NORMATIVE)
     if changed.returncode != 0:
         return ["cannot compare " + profile_revision + " with " + head + ": " + changed.stderr.strip()]
-    if changed.stdout.strip():
+    paths = changed.stdout.split()
+    if "artifacts/sources.json" in paths and reference_only_additions(repository, profile_revision, head):
+        paths.remove("artifacts/sources.json")
+    if paths:
         errors.append("the profile was assessed against " + profile_revision[:12] + ", and since then "
-                      + ", ".join(changed.stdout.split()) + " changed; reassess and name the newer revision")
+                      + ", ".join(paths) + " changed; reassess and name the newer revision")
     return errors
 
 

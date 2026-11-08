@@ -4,7 +4,8 @@
 Every image takes every required criterion. What varies per image is recorded
 in its hardening profile, and this script holds it to docs/TAILORING.md:
 
-- **Applicability.** Every conditional source in the register has exactly one
+- **Applicability.** Every conditional source except optional reference-only
+  entries in the register has exactly one
   determination, applies or does not, with its basis. It is made against the
   source's pinned digest, so a new release makes it stale rather than silently
   carrying it forward.
@@ -134,6 +135,7 @@ def check(
 
     # Applicability.
     conditional = {i for i, s in sources.items() if s["role"] == "conditional"}
+    required = {i for i in conditional if sources[i].get("reference_only") is not True}
     determined: dict[str, dict] = {}
     for position, entry in enumerate(profile.get("applicability", [])):
         source_id = entry.get("source", "")
@@ -168,7 +170,7 @@ def check(
             violations.extend(where + ": " + p for p in worksheet_problems(base, worksheet, entry.get("applies"), source_id))
         if entry.get("applies") is True and not sources[source_id]["rendered"]:
             warnings.append(where + ": applies, but the source is not yet rendered, so its rules cannot be traced")
-    for missing in sorted(conditional - set(determined)):
+    for missing in sorted(required - set(determined)):
         violations.append("applicability " + missing + ": conditional source with no determination")
 
     # Deviations.
