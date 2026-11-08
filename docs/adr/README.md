@@ -49,3 +49,4 @@ record says so, because an unenforced decision decays quietly.
 | [0006](0006-strict-per-architecture-evidence-and-release-eligibility.md) | Read evidence strictly, score it per architecture, and keep release eligibility apart from the score | accepted |
 | [0007](0007-record-manual-reviews-as-expiring-evidence.md) | Record manual reviews as evidence that lapses when what it reviewed changes | accepted |
 | [0008](0008-retrieve-by-locked-location-and-hold-the-pipeline-to-the-standard.md) | Retrieve inputs by locked location, pin keys by fingerprint, and hold the pipeline to the standard | proposed |
+| [0009](0009-reference-only-conditional-sources.md) | Allow reference-only conditional sources without per-image determinations | accepted |

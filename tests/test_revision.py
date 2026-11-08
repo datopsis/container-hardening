@@ -8,6 +8,8 @@ ancestor with no normative change since.
 from __future__ import annotations
 
 import importlib.util
+import copy
+import json
 import subprocess
 import sys
 import tempfile
@@ -59,6 +61,57 @@ class RevisionTests(unittest.TestCase):
         found = revision.check(self.root, self.base)
         self.assertEqual(len(found), 1)
         self.assertIn("criteria.md changed", found[0])
+
+    def source_register(self) -> tuple[dict, str]:
+        register = {"schema_version": 1, "sources": [
+            {"id": "existing", "role": "conditional", "sha256": "a" * 64},
+        ]}
+        base = self.commit("artifacts/sources.json", json.dumps(register))
+        return register, base
+
+    def test_only_reference_additions_leave_the_revision_current(self) -> None:
+        register, base = self.source_register()
+        register["sources"].append({
+            "id": "new", "role": "conditional", "reference_only": True,
+        })
+        self.commit("artifacts/sources.json", json.dumps(register))
+        self.assertEqual(revision.check(self.root, base), [])
+        self.commit("docs/standard/criteria.md", "changed")
+        self.assertIn("criteria.md changed", revision.check(self.root, base)[0])
+
+    def test_source_changes_cannot_hide_behind_reference_additions(self) -> None:
+        original, base = self.source_register()
+        added = {"id": "new", "role": "conditional", "reference_only": True}
+        cases = []
+        for field, value in (("sha256", "b" * 64), ("reference_only", True)):
+            changed = copy.deepcopy(original)
+            changed["sources"][0][field] = value
+            cases.append(changed)
+        cases.extend([
+            {"schema_version": 1, "sources": []},
+            {"schema_version": 2, "sources": original["sources"]},
+            {"schema_version": 1, "sources": original["sources"] * 2},
+        ])
+        for changed in cases:
+            changed["sources"] = changed["sources"] + [added]
+            with self.subTest(register=changed):
+                self.commit("artifacts/sources.json", json.dumps(changed))
+                self.assertIn("sources.json changed", revision.check(self.root, base)[0])
+
+    def test_required_or_malformed_additions_still_make_a_revision_stale(self) -> None:
+        original, base = self.source_register()
+        for added in (
+            {"id": "new", "role": "conditional"},
+            {"id": "new", "role": "conditional", "reference_only": "true"},
+            {"id": "new", "role": "image-controls", "reference_only": True},
+        ):
+            changed = copy.deepcopy(original)
+            changed["sources"].append(added)
+            with self.subTest(source=added):
+                self.commit("artifacts/sources.json", json.dumps(changed))
+                self.assertIn("sources.json changed", revision.check(self.root, base)[0])
+        self.commit("artifacts/sources.json", "invalid JSON")
+        self.assertIn("sources.json changed", revision.check(self.root, base)[0])
 
     def test_a_short_or_unknown_revision_is_refused(self) -> None:
         self.assertIn("full commit", revision.check(self.root, self.base[:7])[0])

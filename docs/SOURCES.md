@@ -69,6 +69,13 @@ from, and that is the one a reviewer needs to reproduce the output.
 | `assessment` | How a control is assessed; the source of assessment procedures |
 | `not-applicable` | Assessed and ruled out, with the basis recorded |
 
+A conditional entry may carry `reference_only: true` when it is optional
+reference material for this draft standard. It does not require a profile
+determination. Pure additions of such entries leave existing revision checks
+current; edits to existing entries, removals, and other normative changes still
+require review. A voluntarily recorded determination still checks its pin and
+basis. See the [per-function guide](applicability/application-functions.md).
+
 A `not-applicable` determination is a claim in its own right. It must record
 why, or it is indistinguishable from having forgotten the source.
 

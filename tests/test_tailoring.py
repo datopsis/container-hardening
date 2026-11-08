@@ -92,6 +92,26 @@ class ProfileRuleTests(unittest.TestCase):
         self.profile["applicability"] = self.profile["applicability"][:1]
         self.assertViolation("conditional source with no determination")
 
+    def test_reference_only_sources_do_not_require_a_determination(self) -> None:
+        self.profile["deviations"] = []
+        self.register["sources"].append({
+            "id": "optional-reference", "role": "conditional", "reference_only": True,
+        })
+        self.assertEqual(self.violations(), [])
+
+    def test_an_optional_determination_still_checks_the_pin(self) -> None:
+        self.profile["deviations"] = []
+        source = copy.deepcopy(self.register["sources"][-1])
+        source.update(id="optional-reference", role="conditional", reference_only=True,
+                      sha256="a" * 64, release="V1R1", rendered=None)
+        self.register["sources"].append(source)
+        entry = copy.deepcopy(self.profile["applicability"][0])
+        entry.update(source=source["id"], sha256=source["sha256"], release=source["release"])
+        self.profile["applicability"].append(entry)
+        self.assertEqual(self.violations(), [])
+        entry["sha256"] = "b" * 64
+        self.assertViolation("review it against the current revision")
+
     def test_a_stale_determination_is_a_violation(self) -> None:
         self.profile["applicability"][0]["sha256"] = "0" * 64
         self.assertViolation("review it against the current revision")
