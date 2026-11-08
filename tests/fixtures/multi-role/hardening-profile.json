@@ -2,7 +2,7 @@
   "schema_version": 2,
   "image": "multi-role-example",
   "standard": {
-    "revision": "9680b083adc707c28ecd80fdcf4a9828794ce4b6"
+    "revision": "35e855fd24910d5df4a34362f2ba072676c96cec"
   },
   "function": "A fixture for the conformance self-test: an image with a server and a worker role, run standalone and clustered. It is the reference image's profile with roles and topologies declared, and nothing is built from it.",
   "capabilities": [
@@ -55,18 +55,18 @@
   "applicability": [
     {
       "source": "disa-application-server-srg",
-      "release": "V4R5",
-      "sha256": "ea33d7f18f950e86c9e0cc63835cf8802d319804ac143b2020b1fbac13ff2643",
+      "release": "V4R6",
+      "sha256": "7527c3b2b42a8608650c27b3db7be2bcfbf39512859b814076eefe29f1c87aaa",
       "applies": false,
-      "basis": "27 of the 137 rules in V4R5 govern a management interface, hosted applications, or user accounts and identities, and this image has none of those. The rest state logging, TLS, and session requirements that the Web Server SRG states in terms that fit an HTTP server.",
+      "basis": "27 of the 137 rules in V4R6 govern a management interface, hosted applications, or user accounts and identities, and this image has none of those. The rest state logging, TLS, and session requirements that the Web Server SRG states in terms that fit an HTTP server.",
       "evidence": "docs/applicability/application-server-srg.md",
       "reviewed_on": "2026-09-18",
       "reviewed_by": "Joey"
     },
     {
       "source": "disa-web-server-srg",
-      "release": "V3R3",
-      "sha256": "7345e31a61c162ee4ca0253e3f44b729c18bb45b3a17cb364e5d08422412b409",
+      "release": "V4R5",
+      "sha256": "e7936ed668282a5536b1be9713fc6d69d2be3338c7728e8c2e701c5e5f64d4bd",
       "applies": true,
       "basis": "The image's function is serving and proxying HTTP, which is the subject of the Web Server SRG.",
       "evidence": "docs/srg/web-server-srg/README.md",
