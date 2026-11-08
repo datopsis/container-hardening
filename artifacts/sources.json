@@ -66,16 +66,16 @@
       "id": "disa-container-platform-srg",
       "publisher": "Defense Information Systems Agency",
       "title": "Container Platform Security Requirements Guide",
-      "release": "V2R4",
-      "released_on": "2025-10-28",
-      "accepted_on": "2025-09-10",
-      "retrieved_on": "2026-09-18",
-      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Container_Platform_V2R4_SRG.zip",
-      "sha256": "975a9e421e62e0ea52b1824e4a719aee87eed9070d5a3145fa9817f6498d99fe",
-      "size": 2915150,
+      "release": "V2R5",
+      "released_on": "2026-09-30",
+      "accepted_on": "2026-09-01",
+      "retrieved_on": "2026-11-08",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Container_Platform_V2R5_SRG.zip",
+      "sha256": "01a2782958b6f4d8084f179d2aa84e94d496aad6f11f8cbb3bc16921a0e542cd",
+      "size": 2957050,
       "xccdf": {
-        "file": "U_Container_Platform_SRG_V2R4_Manual-xccdf.xml",
-        "sha256": "fd7628b55593ef33ddb32d6b6968d19eb97c35f173346ebda384c472bcdad786",
+        "file": "U_Container_Platform_SRG_V2R5_Manual-xccdf.xml",
+        "sha256": "b45697a19dd0ede9818659f8d836d9d758baa870c928171f34db45ee8d24272d",
         "rules": 188
       },
       "rendered": "docs/srg/container-platform-srg/README.md",
@@ -89,24 +89,24 @@
       "id": "disa-gpos-srg",
       "publisher": "Defense Information Systems Agency",
       "title": "General Purpose Operating System Security Requirements Guide",
-      "release": "V3R3",
-      "released_on": "2025-10-28",
-      "accepted_on": "2025-09-22",
-      "retrieved_on": "2026-09-18",
-      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_GPOS_V3R3_SRG.zip",
-      "sha256": "97026655bce18d91e12c9c0a9fd54288989f0b483d3b92ec615e2dc0544e6f24",
-      "size": 1206754,
+      "release": "V3R4",
+      "released_on": "2026-09-30",
+      "accepted_on": "2026-09-03",
+      "retrieved_on": "2026-11-08",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_GPOS_V3R4_SRG.zip",
+      "sha256": "2f39169c6e6640972eeee82c046f4af81c2c87c4134cc6cc57e8d46c864967e2",
+      "size": 1287573,
       "xccdf": {
-        "file": "U_GPOS_SRG_V3R3_Manual-xccdf.xml",
-        "sha256": "922ff31d48bf36f1645a8bb08b72c3931403632271ed006cc64caa098be78cea",
-        "rules": 203
+        "file": "U_GPOS_SRG_V3R4_Manual-xccdf.xml",
+        "sha256": "e554d4278ddaea582343bee66185fa9e47da71f97e49c027e4fd5e01e8abcd4f",
+        "rules": 202
       },
       "rendered": "docs/srg/general-purpose-operating-system-srg/README.md",
       "status": "pinned",
       "role": "image-controls",
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "Per DoD guidance the GPOS SRG assesses image-level controls where no container-specific STIG exists, which is the situation for every image this standard covers. Note that DISA issues SRG-OS-000132-GPOS-00067 as two distinct rules in this release, V-203655 and V-278973, so the STIG ID is not a unique key; the Group ID is."
+      "notes": "Per DoD guidance the GPOS SRG assesses image-level controls where no container-specific STIG exists. V3R4 removes V-203655 in favor of surviving V-278973 and rekeys V-278977 as V-282963. Group ID remains the rule-page key."
     },
     {
       "id": "dod-container-hardening-guide",
@@ -148,55 +148,61 @@
       "id": "disa-rhel9-stig",
       "publisher": "Defense Information Systems Agency",
       "title": "Red Hat Enterprise Linux 9 Security Technical Implementation Guide",
-      "release": "V2R4",
-      "released_on": null,
-      "retrieved_on": "2026-09-18",
-      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_9_V2R4_STIG.zip",
-      "sha256": "0434fd47261f992b8aa4e48aa221b7862ada57b8504d82087bc8afb8748169de",
-      "size": 2117573,
-      "xccdf": null,
-      "rendered": null,
+      "release": "V2R10",
+      "released_on": "2026-09-30",
+      "retrieved_on": "2026-11-08",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_9_V2R10_STIG.zip",
+      "sha256": "a9a212444ac39060c6d6ecd3d8113c4e51ce4094ce50f760aaec792945c3d111",
+      "size": 2282653,
+      "xccdf": {
+        "file": "U_RHEL_9_STIG_V2R10_Manual-xccdf.xml",
+        "sha256": "3fcb716d5ca2bf539460b7baca42c1a6a65e1faff619737b1e88ffb25db87541",
+        "rules": 445
+      },
+      "rendered": "docs/srg/red-hat-enterprise-linux-9-stig/README.md",
       "status": "pinned",
       "role": "host-controls",
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "Applies to the host and to the UBI 9 filesystem inside an image built on it. Pinned but not yet rendered."
+      "notes": "Host baseline, rendered as reference material. UBI filesystem applicability requires a separate per-rule decision; rendering does not transfer host checks to images. Removed rules do not waive controls. CAT I promotions and unmapped CCIs remain follow-ups in docs/ROADMAP.md.",
+      "accepted_on": "2026-09-29"
     },
     {
       "id": "disa-web-server-srg",
       "publisher": "Defense Information Systems Agency",
       "title": "Web Server Security Requirements Guide",
-      "release": "V3R3",
-      "released_on": null,
-      "retrieved_on": "2026-09-18",
-      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Web_Server_V3R3_SRG.zip",
-      "sha256": "7345e31a61c162ee4ca0253e3f44b729c18bb45b3a17cb364e5d08422412b409",
-      "size": 1220358,
+      "release": "V4R5",
+      "released_on": "2026-07-01",
+      "retrieved_on": "2026-11-08",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Web_Server_V4R5_SRG.zip",
+      "sha256": "e7936ed668282a5536b1be9713fc6d69d2be3338c7728e8c2e701c5e5f64d4bd",
+      "size": 1186497,
       "xccdf": {
-        "file": "U_Web_Server_V3R3_Manual-xccdf.xml",
-        "sha256": "634ff396f651314aed1864ef1af5e617a314218cb7a3dfa7214213329ec1ac86",
-        "rules": 102
+        "file": "U_Web_Server_SRG_V4R5_Manual-xccdf.xml",
+        "sha256": "c4f66f0744fa06ddd571a0aaaf462e6e97cf587827a33fc8be69208e8b86a8f9",
+        "rules": 126
       },
       "rendered": "docs/srg/web-server-srg/README.md",
       "status": "pinned",
       "role": "conditional",
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "Applies to an image whose function is serving or proxying HTTP. It is the function-specific source for web servers and reverse proxies, and is selected per image by an applicability determination in that image's hardening profile. Confirmed current on 2026-09-18: V3R4, V3R5 and V4R1 are not published."
+      "notes": "Applies to an image whose function is serving or proxying HTTP. It is the function-specific source for web servers and reverse proxies, and is selected per image by an applicability determination in that image's hardening profile. V4R5 repairs V-206372/V-206373 to CCI-003992 (CM-14). New and rekeyed rules require function-specific assessment.",
+      "accepted_on": "2026-05-23"
     },
     {
       "id": "disa-application-server-srg",
       "publisher": "Defense Information Systems Agency",
       "title": "Application Server Security Requirements Guide",
-      "release": "V4R5",
-      "released_on": "2026-07-01",
-      "retrieved_on": "2026-09-18",
-      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Application_Server_V4R5_SRG.zip",
-      "sha256": "ea33d7f18f950e86c9e0cc63835cf8802d319804ac143b2020b1fbac13ff2643",
-      "size": 1253893,
+      "release": "V4R6",
+      "released_on": "2026-09-30",
+      "retrieved_on": "2026-11-08",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Application_Server_V4R6_SRG.zip",
+      "sha256": "7527c3b2b42a8608650c27b3db7be2bcfbf39512859b814076eefe29f1c87aaa",
+      "size": 1364666,
       "xccdf": {
-        "file": "U_Application_Server_SRG_V4R5_Manual-xccdf.xml",
-        "sha256": "45b6bf02f361ed9378a690ebbe2ab1c332c69d1b12abb2a815c66f5a1a7d0d4c",
+        "file": "U_Application_Server_SRG_V4R6_Manual-xccdf.xml",
+        "sha256": "a63458c6279a6c71e8b1f2bb981455645fb8d6841424194be69b3065656ae157",
         "rules": 137
       },
       "rendered": "docs/srg/application-server-srg/README.md",
@@ -204,7 +210,8 @@
       "role": "conditional",
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "Applies to an image that hosts an application runtime and manages the applications deployed into it. Much of it presupposes a management interface, hosted applications, and user accounts, so an image with none of those can be determined not applicable against this revision, citing the rendered rules that presuppose them."
+      "notes": "Applies to an image that hosts an application runtime and manages the applications deployed into it. Much of it presupposes a management interface, hosted applications, and user accounts, so an image with none of those can be determined not applicable against this revision, citing the rendered rules that presuppose them.",
+      "accepted_on": "2026-08-26"
     },
     {
       "id": "nist-ir-8176",
@@ -264,19 +271,24 @@
       "id": "disa-openshift-stig",
       "publisher": "Defense Information Systems Agency",
       "title": "Red Hat OpenShift Container Platform 4.x Security Technical Implementation Guide",
-      "release": "V2R6",
-      "released_on": null,
-      "retrieved_on": "2026-09-18",
-      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RH_OpenShift_Container_Platform_4-x_V2R6_STIG.zip",
-      "sha256": "dba61b6440f35a67d9643517ce6c206c885c73a532727070a93e57f8a3dd104a",
-      "size": 2461255,
-      "xccdf": null,
-      "rendered": null,
+      "release": "V2R7",
+      "released_on": "2026-09-30",
+      "retrieved_on": "2026-11-08",
+      "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RH_OpenShift_Container_Platform_4-x_V2R7_STIG.zip",
+      "sha256": "98235dc181f0d0671eae9cdd09b880c10bcb5b74254270f1ce3cb710c4d4f2ce",
+      "size": 2381029,
+      "xccdf": {
+        "file": "U_RH_OpenShift_Container_Platform_4-x_STIG_V2R7_Manual-xccdf.xml",
+        "sha256": "b453e1ad834d07c774117c774421ed293af1d219bffc070854a2175d196110df",
+        "rules": 83
+      },
+      "rendered": "docs/srg/red-hat-openshift-container-platform-4-x-stig/README.md",
       "status": "pinned",
       "role": "platform-controls",
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "Benchmark date 01 Jul 2026. The product STIG instantiating the Container Platform SRG for OpenShift. The filename uses 4-x from V2R3 onward; V1R1 used 4-12. V2R6 is the highest served on 2026-09-18. Pinned but not yet rendered."
+      "notes": "The product STIG instantiating the Container Platform SRG for OpenShift. V2R7 keeps platform/host ownership: V-257564 concerns keystore encryption, and V-257580 concerns node audit rules. Rendering does not transfer these obligations to images.",
+      "accepted_on": "2026-08-24"
     },
     {
       "id": "disa-container-image-guide",
@@ -577,14 +589,18 @@
       "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Database_V4R6_SRG.zip",
       "sha256": "bdf25263c41554ff276b7aa0704850ec442bdefd6283ddc5ab2c9ad7b3330bb0",
       "size": 1299720,
-      "xccdf": null,
-      "rendered": null,
+      "xccdf": {
+        "file": "U_Database_SRG_V4R6_Manual-xccdf.xml",
+        "sha256": "e10f071573d6a9259e5467d8cea8945d79a43e5fc3a88372027aa5b4d3fda545",
+        "rules": 142
+      },
+      "rendered": "docs/srg/database-srg/README.md",
       "status": "pinned",
       "role": "conditional",
       "reference_only": true,
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "Current DISA library entry checked 2026-11-08 (uploaded 2026-10-06). Conditional reference for postgresql-ubi, clickhouse-ubi, and neo4j-ubi as DBMSs without an applicable product-specific STIG. Vendor-specific Crunchy Data and EnterpriseDB STIGs are not automatically applicable to upstream PostgreSQL. SQL query/compute services do not become DBMSs merely by speaking SQL. 142 rules. Pinned but unrendered: the existing generator regenerates the complete catalogue/crosswalk set; the registered Container Platform V2R4, GPOS V3R3, and Application Server V4R5 package URLs returned HTTP 404 during this review. Generating from the available subset would orphan existing pages. The new XCCDF parses successfully; rendering is deferred without changing the generator or existing pins. See docs/applicability/application-functions.md."
+      "notes": "Current DISA library entry checked 2026-11-08 (uploaded 2026-10-06). Conditional reference for postgresql-ubi, clickhouse-ubi, and neo4j-ubi as DBMSs without an applicable product-specific STIG. Vendor-specific Crunchy Data and EnterpriseDB STIGs are not automatically applicable to upstream PostgreSQL. SQL query/compute services do not become DBMSs merely by speaking SQL. 142 rules. Rendered after the 2026-11 DISA adoption restored the complete input set. See docs/applicability/application-functions.md."
     },
     {
       "id": "disa-api-srg",
@@ -597,14 +613,18 @@
       "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_API_V1R1_SRG.zip",
       "sha256": "46fd6790bf976100324e9a1fa1f646cfcd7d78a4fe18ead4c9aa17c8fa68372a",
       "size": 2109711,
-      "xccdf": null,
-      "rendered": null,
+      "xccdf": {
+        "file": "U_API_SRG_V1R1_Manual-xccdf.xml",
+        "sha256": "0ea73336669f9374caa33929ebfa7d85f493534bafa9aec6fbbb04d7e377fcc3",
+        "rules": 65
+      },
+      "rendered": "docs/srg/application-programming-interface-api-srg/README.md",
       "status": "pinned",
       "role": "conditional",
       "reference_only": true,
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "Current final DISA library entry checked 2026-11-08 (uploaded 2025-11-25); not the earlier V1R0.1 draft. Conditional reference for lakekeeper-ubi, trino-ubi, and sail-ubi API services, and seaweedfs-ubi S3/administration APIs. Gateway, token, and HTTP-specific rules depend on the interface and deployment; an API client alone is not an API server. 65 rules. Pinned but unrendered: the existing generator regenerates the complete catalogue/crosswalk set; the registered Container Platform V2R4, GPOS V3R3, and Application Server V4R5 package URLs returned HTTP 404 during this review. Generating from the available subset would orphan existing pages. The new XCCDF parses successfully; rendering is deferred without changing the generator or existing pins. See docs/applicability/application-functions.md."
+      "notes": "Current final DISA library entry checked 2026-11-08 (uploaded 2025-11-25); not the earlier V1R0.1 draft. Conditional reference for lakekeeper-ubi, trino-ubi, and sail-ubi API services, and seaweedfs-ubi S3/administration APIs. Gateway, token, and HTTP-specific rules depend on the interface and deployment; an API client alone is not an API server. 65 rules. Rendered after the 2026-11 DISA adoption restored the complete input set. See docs/applicability/application-functions.md."
     },
     {
       "id": "disa-application-security-development-stig",
@@ -617,14 +637,18 @@
       "url": "https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_ASD_V6R5_STIG.zip",
       "sha256": "b73e8a74d591982d49cdc9e0c5c0023b37ab87d91f3f3f150d6dab8baa23c435",
       "size": 1343542,
-      "xccdf": null,
-      "rendered": null,
+      "xccdf": {
+        "file": "U_ASD_STIG_V6R5_Manual-xccdf.xml",
+        "sha256": "34e8dfa6841229735082e341a1cf6c5a48eec84ce0e7e5d3f03ab02355fe066d",
+        "rules": 286
+      },
+      "rendered": "docs/srg/application-security-and-development-stig/README.md",
       "status": "pinned",
       "role": "conditional",
       "reference_only": true,
       "license": "US Government work; redistribution terms stated in the package",
       "redistributable": false,
-      "notes": "Current DISA library entry checked 2026-11-08 (uploaded 2026-10-05). Nearest application-level reference for seaweedfs-ubi object storage and lakekeeper-ubi, trino-ubi, and sail-ubi application/compute behavior; its Overview section 1.1 covers network-connected enterprise applications, including RESTful services. No dedicated object-storage, Iceberg catalog, Trino, or Sail/Spark guide was found in the 417-entry public library. Storage Area Network STIG V2R5 is sunset and is not an object-storage baseline. This STIG does not supply object-store-specific or query-engine-specific configuration checks; development and operational requirements need their owning layer identified. 286 rules. Pinned but unrendered: the existing generator regenerates the complete catalogue/crosswalk set; the registered Container Platform V2R4, GPOS V3R3, and Application Server V4R5 package URLs returned HTTP 404 during this review. Generating from the available subset would orphan existing pages. The new XCCDF parses successfully; rendering is deferred without changing the generator or existing pins. See docs/applicability/application-functions.md."
+      "notes": "Current DISA library entry checked 2026-11-08 (uploaded 2026-10-05). Nearest application-level reference for seaweedfs-ubi object storage and lakekeeper-ubi, trino-ubi, and sail-ubi application/compute behavior; its Overview section 1.1 covers network-connected enterprise applications, including RESTful services. No dedicated object-storage, Iceberg catalog, Trino, or Sail/Spark guide was found in the 417-entry public library. Storage Area Network STIG V2R5 is sunset and is not an object-storage baseline. This STIG does not supply object-store-specific or query-engine-specific configuration checks; development and operational requirements need their owning layer identified. 286 rules. Rendered after the 2026-11 DISA adoption restored the complete input set. See docs/applicability/application-functions.md."
     }
   ]
 }

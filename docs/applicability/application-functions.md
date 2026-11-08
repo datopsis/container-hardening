@@ -16,9 +16,9 @@ are pinned in the [source register](../../artifacts/sources.json).
 
 | Source and official package | Version | Release | Benchmark date | Library upload | Register ID | Pinned / rendered |
 | --- | --- | --- | --- | --- | --- | --- |
-| [Database Security Requirements Guide](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Database_V4R6_SRG.zip) | 4 | 6 | 2026-09-30 | 2026-10-06 | `disa-database-srg` | Yes / no |
-| [Application Programming Interface (API) Security Requirements Guide](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_API_V1R1_SRG.zip) | 1 | 1 | 2025-09-11 | 2025-11-25 | `disa-api-srg` | Yes / no |
-| [Application Security and Development Security Technical Implementation Guide](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_ASD_V6R5_STIG.zip) | 6 | 5 | 2026-09-30 | 2026-10-05 | `disa-application-security-development-stig` | Yes / no |
+| [Database Security Requirements Guide](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_Database_V4R6_SRG.zip) | 4 | 6 | 2026-09-30 | 2026-10-06 | `disa-database-srg` | Yes / yes |
+| [Application Programming Interface (API) Security Requirements Guide](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_API_V1R1_SRG.zip) | 1 | 1 | 2025-09-11 | 2025-11-25 | `disa-api-srg` | Yes / yes |
+| [Application Security and Development Security Technical Implementation Guide](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_ASD_V6R5_STIG.zip) | 6 | 5 | 2026-09-30 | 2026-10-05 | `disa-application-security-development-stig` | Yes / yes |
 
 The API SRG is the **final V1R1**, not the earlier V1R0.1 public draft.
 The Database and API Overviews (§2.2) provide generic procedures where a
@@ -92,18 +92,12 @@ and their contents inspected: Database has **142** rules, API **65**, and ASD
 **286**. The existing Markdown parser and renderer accept each XCCDF without
 duplicate Group IDs. No package bytes are committed.
 
-Complete catalogue generation is deferred. The existing generator rebuilds
-the whole set, and the crosswalk requires every rendered catalogue. Three
-previously registered package URLs returned **HTTP 404** during retrieval:
-Container Platform V2R4, GPOS V3R3, and Application Server V4R5. A dry run with
-the available packages reports their committed pages as orphaned; a write
-would remove them. The new entries therefore keep `xccdf` and `rendered` null
-until the complete pinned inputs can be retrieved. No partial catalogue or
-hand-built crosswalk is committed, and the generators are unchanged.
+The 2026-11 DISA adoption restores the complete input set. All three XCCDFs
+are now pinned, rendered, and joined to the CCI crosswalk with the existing
+generators. The optional `reference_only` boundary is unchanged.
 
-This review does not refresh existing pins. In particular, the current library
-lists Web Server **V4R5** and Application Server **V4R6**, while this repository
-still pins V3R3 and V4R5 respectively. Those older entries are not evidence of
-currency. The three new packages are verified; the unavailable older packages,
-image implementations, product/version matches, deployed roles, and individual
-rule determinations are not verified by this change.
+Web Server V4R5 and Application Server V4R6 are now the registered releases.
+Rendering does not verify image implementations, product/version matches,
+deployed roles, or individual rule determinations. See the
+[adoption review](../drift/2026-11-disa-adoption.md) for the mechanical changes
+and the decisions still left to owners.
