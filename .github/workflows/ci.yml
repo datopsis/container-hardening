@@ -28,7 +28,7 @@ jobs:
 
       - name: Reject CRLF line endings
         run: |
-          if git ls-files --eol | grep -E "^i/(crlf|mixed)"; then echo "CRLF line endings found: commit LF only (see .gitattributes)" >&2; exit 1; fi
+          if git ls-files --eol | grep -E "^i/(crlf|mixed)"; then echo "CRLF line endings found, commit LF only (see .gitattributes)" >&2; exit 1; fi
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
