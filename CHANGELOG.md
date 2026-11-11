@@ -6,6 +6,8 @@ The project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- Enforce LF line endings: `.gitattributes` normalizes text to LF, a local
+  pre-commit hook and CI reject any committed CRLF.
 ### Added
 
 - Established the repository: the criteria, implementation, and controls used
